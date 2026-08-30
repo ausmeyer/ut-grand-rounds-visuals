@@ -120,8 +120,15 @@
     .event-guide { stroke-width: 1.5; stroke-dasharray: 3 4; transition: opacity .18s ease; }
     .event-dot { stroke: #fff; stroke-width: 2; cursor: pointer; transition: opacity .18s ease, r .18s ease; }
     .event-hit { fill: transparent; cursor: pointer; }
-    .event-label-bg { fill: #fff; stroke-width: 1; rx: 5; }
-    .event-label { font-size: 10.5px; font-weight: 760; pointer-events: none; }
+    .event-label {
+      font-size: 9.5px;
+      font-weight: 780;
+      pointer-events: none;
+      paint-order: stroke fill;
+      stroke: #fff;
+      stroke-width: 3px;
+      stroke-linejoin: round;
+    }
     .peak-label { fill: var(--curve); font-size: 11px; font-weight: 800; }
     .today-guide { stroke: var(--curve); stroke-width: 1.5; opacity: .35; }
 
@@ -435,7 +442,7 @@
       const bounds = svg.getBoundingClientRect();
       const width = Math.max(520, bounds.width);
       const height = Math.max(350, bounds.height);
-      const margin = { top: 83, right: 22, bottom: 42, left: 56 };
+      const margin = { top: 116, right: 22, bottom: 42, left: 56 };
       const plotWidth = width - margin.left - margin.right;
       const plotHeight = height - margin.top - margin.bottom;
       const yMax = 7.5;
@@ -453,33 +460,21 @@
       }
 
       const visibleEvents = filteredEvents();
-      const labelRows = [15, 34, 53, 72];
-      const lastRightByRow = labelRows.map(() => -Infinity);
       const eventMarkup = visibleEvents.map((event, index) => {
         const eventX = x(event.day);
         const active = event.day <= selectedDay;
         const color = categoryColors[event.category];
         const opacity = active ? 1 : 0.22;
         const short = escapeText(event.short);
-        const label = short.length > 20 ? `${short.slice(0, 19)}…` : short;
-        const estimatedWidth = Math.min(120, Math.max(72, label.length * 5.35 + 14));
-        const labelX = Math.max(
-          margin.left + estimatedWidth / 2,
-          Math.min(width - margin.right - estimatedWidth / 2, eventX)
-        );
-        const rectX = labelX - estimatedWidth / 2;
-        let rowIndex = lastRightByRow.findIndex((right) => right <= rectX - 5);
-        if (rowIndex === -1) {
-          rowIndex = lastRightByRow.indexOf(Math.min(...lastRightByRow));
-        }
-        const rowY = labelRows[rowIndex];
-        if (active) lastRightByRow[rowIndex] = rectX + estimatedWidth;
+        const label = short.length > 19 ? `${short.slice(0, 18)}…` : short;
+        const labelX = eventX + (index % 2 === 0 ? -7 : 7);
+        const labelY = margin.top - 8;
         return `
           <g class="event" data-event-id="${event.id}" style="opacity:${opacity}">
             <line class="event-guide" x1="${eventX}" y1="${margin.top}" x2="${eventX}" y2="${baselineY}" stroke="${color}"></line>
             <circle class="event-dot" cx="${eventX}" cy="${y(values[event.day])}" r="${active ? 5.5 : 4}" fill="${color}"></circle>
-            ${active ? `<rect class="event-label-bg" x="${rectX}" y="${rowY - 11}" width="${estimatedWidth}" height="18" stroke="${color}" opacity=".96"></rect>
-            <text class="event-label" x="${labelX}" y="${rowY + 2}" text-anchor="middle" fill="${color}">${label}</text>` : ""}
+            ${active ? `<line x1="${eventX}" y1="${margin.top}" x2="${labelX}" y2="${labelY + 3}" stroke="${color}" stroke-width="1.25"></line>
+            <text class="event-label" x="${labelX}" y="${labelY}" text-anchor="start" fill="${color}" transform="rotate(-90 ${labelX} ${labelY})">${label}</text>` : ""}
             <rect class="event-hit" x="${eventX - 9}" y="0" width="18" height="${baselineY}"></rect>
           </g>`;
       }).join("");
