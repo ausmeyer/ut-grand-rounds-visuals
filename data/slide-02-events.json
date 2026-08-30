@@ -28,6 +28,13 @@
     "detail": "Confirm antiviral supply and distribute stock to outpatient and acute-care sites."
   },
   {
+    "id": "testing-pretest-probability",
+    "date": "2026-11-29",
+    "category": "clinical",
+    "short": "Adjust influenza pre-test probability",
+    "detail": "As community influenza activity rises, update the pre-test probability used to interpret influenza testing results and guide empiric treatment decisions."
+  },
+  {
     "id": "onset",
     "date": "2026-12-03",
     "category": "surveillance",
