@@ -42,7 +42,7 @@ Then open `http://localhost:8000/slide-02.html`.
 
 3. Add an **Iframe** block in Slides.com and paste that URL.
 4. Resize the iframe to the available slide area. The page is responsive and
-   is optimized for a wide 16:9 frame.
+   is optimized for a 1240 × 540 pixel frame.
 
 Optional URL fragments can set the opening state:
 

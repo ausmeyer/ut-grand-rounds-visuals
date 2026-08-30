@@ -3,8 +3,9 @@ title: The goal of respiratory viral surveillance is to use that information to 
 route: slide-02.html
 format:
   responsive: true
-  target_aspect_ratio: "16:9"
-  minimum_height_px: 620
+  target_width_px: 1240
+  target_height_px: 540
+  minimum_height_px: 540
 visual:
   type: progressive simulated national influenza epidemic curve
   period: 2026-06-01 through 2027-05-31
