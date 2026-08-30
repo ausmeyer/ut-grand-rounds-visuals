@@ -297,8 +297,8 @@
       </div>
       <div class="slider-wrap">
         <label class="visually-hidden" for="date-slider">Date through which to reveal the epidemic curve</label>
-        <input id="date-slider" type="range" min="0" max="303" value="0" step="1">
-        <div class="slider-labels"><span>Jun 2026</span><span>Sep</span><span>Dec</span><span>Mar 2027</span></div>
+        <input id="date-slider" type="range" min="0" max="364" value="0" step="1">
+        <div class="slider-labels"><span>Jun 2026</span><span>Sep</span><span>Dec</span><span>Mar</span><span>May 2027</span></div>
       </div>
     </footer>
   </main>
@@ -309,7 +309,7 @@
     const events = /*__SLIDE_02_EVENTS__*/;
     const DAY_MS = 86400000;
     const startDate = new Date("2026-06-01T12:00:00Z");
-    const endDate = new Date("2027-03-31T12:00:00Z");
+    const endDate = new Date("2027-05-31T12:00:00Z");
     const totalDays = Math.round((endDate - startDate) / DAY_MS);
     const threshold = 2.5;
     const categoryColors = {
@@ -367,7 +367,8 @@
     const cardDetail = document.getElementById("card-detail");
     let selectedDay = 0;
     let selectedView = "all";
-    let focusedEvent = null;
+    let hoveredEvent = null;
+    let pinnedEvent = null;
     let playing = false;
     let timer = null;
 
@@ -400,7 +401,10 @@
 
     function latestVisibleEvent() {
       const visible = filteredEvents().filter((event) => event.day <= selectedDay);
-      return focusedEvent && filteredEvents().includes(focusedEvent) ? focusedEvent : visible.at(-1) || null;
+      const filtered = filteredEvents();
+      if (hoveredEvent && filtered.includes(hoveredEvent)) return hoveredEvent;
+      if (pinnedEvent && filtered.includes(pinnedEvent)) return pinnedEvent;
+      return visible.at(-1) || null;
     }
 
     function setCard(event) {
@@ -449,7 +453,7 @@
       const areaPath = curvePoints.length ? `${curvePath} L${x(selectedDay)},${baselineY} L${x(0)},${baselineY} Z` : "";
       const yTicks = [0, 2, 4, 6];
       const monthTicks = [];
-      for (let month = 0; month < 10; month += 1) {
+      for (let month = 0; month < 12; month += 1) {
         const date = new Date(Date.UTC(2026, 5 + month, 1, 12));
         monthTicks.push({ day: Math.round((date - startDate) / DAY_MS), label: date.toLocaleString("en-US", { month: "short", timeZone: "UTC" }) });
       }
@@ -502,9 +506,9 @@
 
       svg.querySelectorAll(".event").forEach((group) => {
         const event = events.find((candidate) => candidate.id === group.dataset.eventId);
-        group.addEventListener("mouseenter", () => { focusedEvent = event; setCard(event); });
-        group.addEventListener("mouseleave", () => { focusedEvent = null; setCard(latestVisibleEvent()); });
-        group.addEventListener("click", () => { focusedEvent = event; setCard(event); });
+        group.addEventListener("mouseenter", () => { hoveredEvent = event; setCard(event); });
+        group.addEventListener("mouseleave", () => { hoveredEvent = null; setCard(latestVisibleEvent()); });
+        group.addEventListener("click", () => { pinnedEvent = event; setCard(event); });
       });
 
       dateReadout.textContent = formatDate(dateForDay(selectedDay));
@@ -539,7 +543,7 @@
       timer = window.setInterval(() => {
         selectedDay = Math.min(totalDays, selectedDay + 2);
         slider.value = selectedDay;
-        focusedEvent = null;
+        hoveredEvent = null;
         draw();
         if (selectedDay >= totalDays) stopPlaying();
       }, 55);
@@ -548,7 +552,7 @@
     slider.addEventListener("input", () => {
       stopPlaying();
       selectedDay = Number(slider.value);
-      focusedEvent = null;
+      hoveredEvent = null;
       draw();
     });
 
@@ -558,13 +562,14 @@
       stopPlaying();
       selectedDay = 0;
       slider.value = 0;
-      focusedEvent = null;
+      hoveredEvent = null;
+      pinnedEvent = null;
       draw();
     });
 
     viewSelect.addEventListener("change", () => {
       selectedView = viewSelect.value;
-      focusedEvent = null;
+      hoveredEvent = null;
       draw();
     });
 

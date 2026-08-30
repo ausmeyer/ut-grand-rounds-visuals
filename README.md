@@ -47,5 +47,5 @@ Then open `http://localhost:8000/slide-02.html`.
 Optional URL fragments can set the opening state:
 
 - `#day=0&view=all` starts at June 1 with all annotation categories.
-- `#day=303&view=all` opens with the full season revealed.
+- `#day=364&view=all` opens with the full season revealed through May 31.
 - `view=vaccine`, `view=clinical`, or `view=public-health` filters markers.
