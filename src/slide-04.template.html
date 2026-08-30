@@ -180,6 +180,11 @@
       white-space: nowrap;
     }
 
+    .node-title.two-line {
+      line-height: 1.05;
+      white-space: normal;
+    }
+
     .path-node img {
       display: block;
       align-self: center;
@@ -250,6 +255,36 @@
     .ed-node img { max-width: 144px; }
     .hospital-node img { max-width: 152px; }
     .mortality-node img { max-height: 96px; }
+
+    .person-node .node-title {
+      width: 110px;
+      transform: translateY(-22px);
+    }
+
+    .clinic-node .node-title { transform: translateY(7px); }
+    .lab-node .node-title { transform: translateY(14px); }
+
+    .ed-node > img,
+    .hospital-node > img,
+    .mortality-node > img { grid-row: 2; }
+
+    .ed-node > .node-systems,
+    .hospital-node > .node-systems,
+    .mortality-node > .node-systems { grid-row: 3; }
+
+    .ed-node .node-title,
+    .hospital-node .node-title,
+    .mortality-node .node-title {
+      position: absolute;
+      left: 0;
+      width: 100%;
+    }
+
+    .ed-node .node-title { top: 137px; }
+    .hospital-node .node-title { top: 164px; }
+    .mortality-node .node-title { top: 138px; }
+    .ed-node .node-systems { transform: translateY(8px); }
+    .hospital-node .node-systems { transform: translateY(16px); }
 
     .lab-node {
       grid-template-rows: 22px minmax(0, 1fr);
@@ -391,17 +426,17 @@
             <path class="patient-path" d="M 361 340 H 475"></path>
             <path class="patient-path" d="M 635 333 H 770"></path>
             <path class="specimen-path" d="M 361 108 H 584"></path>
-            <path class="specimen-path" d="M 285 292 V 220 H 570 V 150 H 584"></path>
-            <path class="specimen-path" d="M 635 270 V 225 H 690 V 180"></path>
+            <path class="specimen-path" d="M 285 292 V 220 H 530 V 150 H 584"></path>
+            <path class="specimen-path" d="M 555 270 V 225 H 690 V 180"></path>
           </svg>
 
           <div class="path-node person-node">
             <img src="assets/slide-04-person.webp" alt="A person with influenza symptoms sneezing into a tissue">
-            <div class="node-title">Symptomatic illness</div>
+            <div class="node-title two-line">Symptomatic<br>illness</div>
           </div>
 
           <div class="path-node clinic-node">
-            <div class="node-title">Outpatient clinic</div>
+            <div class="node-title two-line">Outpatient<br>clinic</div>
             <img src="assets/slide-04-clinic.webp" alt="An outpatient clinic">
             <div class="node-systems">
               <button class="system-tag" type="button" data-system="ilinet" data-category="outpatient"><span>ILINet</span></button>
@@ -409,7 +444,7 @@
           </div>
 
           <div class="path-node lab-node">
-            <div class="node-title">Virologic testing</div>
+            <div class="node-title two-line">Virologic<br>testing</div>
             <div class="lab-row">
               <img src="assets/slide-04-lab.webp" alt="A clinical virology laboratory">
               <div class="node-systems">
@@ -420,7 +455,7 @@
           </div>
 
           <div class="path-node ed-node">
-            <div class="node-title">Emergency department</div>
+            <div class="node-title two-line">Emergency<br>department</div>
             <img src="assets/slide-04-ed.webp" alt="A hospital emergency department entrance">
             <div class="node-systems">
               <button class="system-tag" type="button" data-system="nssp" data-category="outpatient"><span>NSSP</span></button>
@@ -428,7 +463,7 @@
           </div>
 
           <div class="path-node hospital-node">
-            <div class="node-title">Hospital admission</div>
+            <div class="node-title two-line">Hospital<br>admission</div>
             <img src="assets/slide-04-hospital.webp" alt="An inpatient hospital">
             <div class="node-systems">
               <button class="system-tag" type="button" data-system="flusurv-net" data-category="inpatient"><span>FluSurv-NET</span></button>
