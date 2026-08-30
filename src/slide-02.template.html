@@ -313,8 +313,8 @@
       </div>
       <div class="slider-wrap">
         <label class="visually-hidden" for="date-slider">Date through which to reveal the epidemic curve</label>
-        <input id="date-slider" type="range" min="0" max="364" value="0" step="1">
-        <div class="slider-labels"><span>Jun 2026</span><span>Sep</span><span>Dec</span><span>Mar</span><span>May 2027</span></div>
+        <input id="date-slider" type="range" min="0" max="456" value="0" step="1">
+        <div class="slider-labels"><span>Mar 2026</span><span>Jun</span><span>Sep</span><span>Dec</span><span>Mar</span><span>May 2027</span></div>
       </div>
     </footer>
   </main>
@@ -324,7 +324,7 @@
 
     const events = /*__SLIDE_02_EVENTS__*/;
     const DAY_MS = 86400000;
-    const startDate = new Date("2026-06-01T12:00:00Z");
+    const startDate = new Date("2026-03-01T12:00:00Z");
     const endDate = new Date("2027-05-31T12:00:00Z");
     const totalDays = Math.round((endDate - startDate) / DAY_MS);
     const threshold = 2.5;
@@ -356,12 +356,18 @@
       };
     }
 
+    const simulationStartDay = dayIndex("2026-06-01");
+    const preSeasonRandom = mulberry32(20260301);
     const random = mulberry32(20260830);
+    const peakCenterDay = dayIndex("2027-01-20");
+    const shoulderCenterDay = dayIndex("2026-12-06");
     let noise = 0;
     const values = Array.from({ length: totalDays + 1 }, (_, day) => {
-      noise = 0.84 * noise + (random() - 0.5) * 0.16;
-      const mainWave = 5.55 * Math.exp(-0.5 * Math.pow((day - 233) / 29, 2));
-      const shoulder = 0.30 * Math.exp(-0.5 * Math.pow((day - 188) / 22, 2));
+      if (day === simulationStartDay) noise = 0;
+      const noiseDraw = day < simulationStartDay ? preSeasonRandom() : random();
+      noise = 0.84 * noise + (noiseDraw - 0.5) * 0.16;
+      const mainWave = 5.55 * Math.exp(-0.5 * Math.pow((day - peakCenterDay) / 29, 2));
+      const shoulder = 0.30 * Math.exp(-0.5 * Math.pow((day - shoulderCenterDay) / 22, 2));
       return Math.max(0.8, 1.18 + mainWave + shoulder + noise);
     });
 
@@ -466,8 +472,8 @@
       const areaPath = curvePoints.length ? `${curvePath} L${x(selectedDay)},${baselineY} L${x(0)},${baselineY} Z` : "";
       const yTicks = [0, 2, 4, 6];
       const monthTicks = [];
-      for (let month = 0; month < 12; month += 1) {
-        const date = new Date(Date.UTC(2026, 5 + month, 1, 12));
+      for (let month = 0; month < 15; month += 1) {
+        const date = new Date(Date.UTC(2026, 2 + month, 1, 12));
         monthTicks.push({ day: Math.round((date - startDate) / DAY_MS), label: date.toLocaleString("en-US", { month: "short", timeZone: "UTC" }) });
       }
 

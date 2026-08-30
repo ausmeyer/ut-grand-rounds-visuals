@@ -8,7 +8,7 @@ format:
   minimum_height_px: 540
 visual:
   type: progressive simulated national influenza epidemic curve
-  period: 2026-06-01 through 2027-05-31
+  period: 2026-03-01 through 2027-05-31
   metric: simulated percent of outpatient visits with influenza-like illness
   onset_threshold_percent: 2.5
   simulated_peak_date: 2027-01-20
@@ -23,5 +23,6 @@ visual:
     - keep future decision markers visible but muted
     - activate decision annotations when the selected date reaches them
     - update the selected date and annotation view in the URL fragment
+    - mark the start of seasonal vaccine manufacturing after spring strain selection
 events_source: ../data/slide-02-events.json
 editorial_point: Many consequential actions must begin before surveillance can confirm epidemic onset or peak.

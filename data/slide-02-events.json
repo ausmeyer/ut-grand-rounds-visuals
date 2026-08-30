@@ -1,17 +1,25 @@
 [
   {
+    "id": "vaccine-manufacturing",
+    "date": "2026-03-12",
+    "category": "vaccine",
+    "short": "Vaccine manufacturing begins",
+    "detail": "Manufacturing typically begins after U.S. strain selection in late February or early March for the upcoming Northern Hemisphere season.",
+    "source": "https://www.fda.gov/consumers/consumer-updates/fdas-critical-role-ensuring-safe-and-effective-flu-vaccines"
+  },
+  {
     "id": "vaccine-distribution",
     "date": "2026-08-03",
     "category": "vaccine",
     "short": "Vaccine distribution begins",
-    "detail": "Begin distributing vaccine to administration sites—about four months before the simulated onset."
+    "detail": "Begin distributing vaccine to administration sites—about four months before season onset."
   },
   {
     "id": "vaccination-campaign",
     "date": "2026-09-01",
     "category": "vaccine",
     "short": "Vaccination campaign starts",
-    "detail": "Start the vaccination campaign while incidence remains near the summer baseline."
+    "detail": "Start the vaccination campaign before incidence begins rising to capture as many people as possible at outpatient points of care."
   },
   {
     "id": "uptake-target",
@@ -39,7 +47,7 @@
     "date": "2026-12-03",
     "category": "surveillance",
     "short": "Onset threshold crossed",
-    "detail": "The simulated national curve first exceeds the plausible surveillance onset threshold."
+    "detail": "The national curve exceeds the surveillance onset threshold."
   },
   {
     "id": "behavior-guidance",
@@ -53,7 +61,7 @@
     "date": "2026-12-21",
     "category": "clinical",
     "short": "Shift clinical resources",
-    "detail": "Redistribute staffing, beds, diagnostics, and supplies toward regions experiencing the greatest burden."
+    "detail": "Redistribute staffing, diagnostics, pharmaceuticals, and equipment toward regions experiencing the greatest burden."
   },
   {
     "id": "peak-response",

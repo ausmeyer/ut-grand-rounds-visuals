@@ -313,8 +313,8 @@
       </div>
       <div class="slider-wrap">
         <label class="visually-hidden" for="date-slider">Date through which to reveal the epidemic curve</label>
-        <input id="date-slider" type="range" min="0" max="364" value="0" step="1">
-        <div class="slider-labels"><span>Jun 2026</span><span>Sep</span><span>Dec</span><span>Mar</span><span>May 2027</span></div>
+        <input id="date-slider" type="range" min="0" max="456" value="0" step="1">
+        <div class="slider-labels"><span>Mar 2026</span><span>Jun</span><span>Sep</span><span>Dec</span><span>Mar</span><span>May 2027</span></div>
       </div>
     </footer>
   </main>
@@ -322,9 +322,9 @@
   <script>
     "use strict";
 
-    const events = [{"id":"vaccine-distribution","date":"2026-08-03","category":"vaccine","short":"Vaccine distribution begins","detail":"Begin distributing vaccine to administration sites—about four months before the simulated onset."},{"id":"vaccination-campaign","date":"2026-09-01","category":"vaccine","short":"Vaccination campaign starts","detail":"Start the vaccination campaign while incidence remains near the summer baseline."},{"id":"uptake-target","date":"2026-11-16","category":"vaccine","short":"Target maximum uptake","detail":"Aim to reach maximum vaccine uptake before the surveillance onset threshold is crossed."},{"id":"antiviral-distribution","date":"2026-11-19","category":"clinical","short":"Stage antivirals at clinics","detail":"Confirm antiviral supply and distribute stock to outpatient and acute-care sites."},{"id":"testing-pretest-probability","date":"2026-11-29","category":"clinical","short":"Adjust influenza pre-test probability","detail":"As community influenza activity rises, update the pre-test probability used to interpret influenza testing results and guide empiric treatment decisions."},{"id":"onset","date":"2026-12-03","category":"surveillance","short":"Onset threshold crossed","detail":"The simulated national curve first exceeds the plausible surveillance onset threshold."},{"id":"behavior-guidance","date":"2026-12-10","category":"public-health","short":"Intensify prevention guidance","detail":"Reinforce hand hygiene, staying home when ill, masking when appropriate, and avoiding crowded indoor exposure."},{"id":"resource-redistribution","date":"2026-12-21","category":"clinical","short":"Shift clinical resources","detail":"Redistribute staffing, beds, diagnostics, and supplies toward regions experiencing the greatest burden."},{"id":"peak-response","date":"2027-01-20","category":"public-health","short":"Peak: sustain interventions","detail":"Communicate that cases may be turning while asking the public and health systems to sustain effective interventions."},{"id":"preliminary-ve","date":"2027-01-27","category":"vaccine","short":"Preliminary VE available","detail":"Early vaccine-effectiveness estimates become available after most vaccination-timing decisions are already complete."},{"id":"strain-selection","date":"2027-02-19","category":"vaccine","short":"Select next season’s strain","detail":"Select the Northern Hemisphere vaccine strain for the next influenza season."}];
+    const events = [{"id":"vaccine-manufacturing","date":"2026-03-12","category":"vaccine","short":"Vaccine manufacturing begins","detail":"Manufacturing typically begins after U.S. strain selection in late February or early March for the upcoming Northern Hemisphere season.","source":"https://www.fda.gov/consumers/consumer-updates/fdas-critical-role-ensuring-safe-and-effective-flu-vaccines"},{"id":"vaccine-distribution","date":"2026-08-03","category":"vaccine","short":"Vaccine distribution begins","detail":"Begin distributing vaccine to administration sites—about four months before season onset."},{"id":"vaccination-campaign","date":"2026-09-01","category":"vaccine","short":"Vaccination campaign starts","detail":"Start the vaccination campaign before incidence begins rising to capture as many people as possible at outpatient points of care."},{"id":"uptake-target","date":"2026-11-16","category":"vaccine","short":"Target maximum uptake","detail":"Aim to reach maximum vaccine uptake before the surveillance onset threshold is crossed."},{"id":"antiviral-distribution","date":"2026-11-19","category":"clinical","short":"Stage antivirals at clinics","detail":"Confirm antiviral supply and distribute stock to outpatient and acute-care sites."},{"id":"testing-pretest-probability","date":"2026-11-29","category":"clinical","short":"Adjust influenza pre-test probability","detail":"As community influenza activity rises, update the pre-test probability used to interpret influenza testing results and guide empiric treatment decisions."},{"id":"onset","date":"2026-12-03","category":"surveillance","short":"Onset threshold crossed","detail":"The national curve exceeds the surveillance onset threshold."},{"id":"behavior-guidance","date":"2026-12-10","category":"public-health","short":"Intensify prevention guidance","detail":"Reinforce hand hygiene, staying home when ill, masking when appropriate, and avoiding crowded indoor exposure."},{"id":"resource-redistribution","date":"2026-12-21","category":"clinical","short":"Shift clinical resources","detail":"Redistribute staffing, diagnostics, pharmaceuticals, and equipment toward regions experiencing the greatest burden."},{"id":"peak-response","date":"2027-01-20","category":"public-health","short":"Peak: sustain interventions","detail":"Communicate that cases may be turning while asking the public and health systems to sustain effective interventions."},{"id":"preliminary-ve","date":"2027-01-27","category":"vaccine","short":"Preliminary VE available","detail":"Early vaccine-effectiveness estimates become available after most vaccination-timing decisions are already complete."},{"id":"strain-selection","date":"2027-02-19","category":"vaccine","short":"Select next season’s strain","detail":"Select the Northern Hemisphere vaccine strain for the next influenza season."}];
     const DAY_MS = 86400000;
-    const startDate = new Date("2026-06-01T12:00:00Z");
+    const startDate = new Date("2026-03-01T12:00:00Z");
     const endDate = new Date("2027-05-31T12:00:00Z");
     const totalDays = Math.round((endDate - startDate) / DAY_MS);
     const threshold = 2.5;
@@ -356,12 +356,18 @@
       };
     }
 
+    const simulationStartDay = dayIndex("2026-06-01");
+    const preSeasonRandom = mulberry32(20260301);
     const random = mulberry32(20260830);
+    const peakCenterDay = dayIndex("2027-01-20");
+    const shoulderCenterDay = dayIndex("2026-12-06");
     let noise = 0;
     const values = Array.from({ length: totalDays + 1 }, (_, day) => {
-      noise = 0.84 * noise + (random() - 0.5) * 0.16;
-      const mainWave = 5.55 * Math.exp(-0.5 * Math.pow((day - 233) / 29, 2));
-      const shoulder = 0.30 * Math.exp(-0.5 * Math.pow((day - 188) / 22, 2));
+      if (day === simulationStartDay) noise = 0;
+      const noiseDraw = day < simulationStartDay ? preSeasonRandom() : random();
+      noise = 0.84 * noise + (noiseDraw - 0.5) * 0.16;
+      const mainWave = 5.55 * Math.exp(-0.5 * Math.pow((day - peakCenterDay) / 29, 2));
+      const shoulder = 0.30 * Math.exp(-0.5 * Math.pow((day - shoulderCenterDay) / 22, 2));
       return Math.max(0.8, 1.18 + mainWave + shoulder + noise);
     });
 
@@ -466,8 +472,8 @@
       const areaPath = curvePoints.length ? `${curvePath} L${x(selectedDay)},${baselineY} L${x(0)},${baselineY} Z` : "";
       const yTicks = [0, 2, 4, 6];
       const monthTicks = [];
-      for (let month = 0; month < 12; month += 1) {
-        const date = new Date(Date.UTC(2026, 5 + month, 1, 12));
+      for (let month = 0; month < 15; month += 1) {
+        const date = new Date(Date.UTC(2026, 2 + month, 1, 12));
         monthTicks.push({ day: Math.round((date - startDate) / DAY_MS), label: date.toLocaleString("en-US", { month: "short", timeZone: "UTC" }) });
       }
 
