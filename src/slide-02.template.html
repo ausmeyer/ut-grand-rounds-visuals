@@ -117,6 +117,7 @@
     .threshold-line { stroke: var(--threshold); stroke-width: 2; stroke-dasharray: 7 5; }
     .threshold-label { fill: var(--threshold); font-size: 13px; font-weight: 820; }
     .area { fill: url(#areaGradient); }
+    .curve-ghost { fill: none; stroke: #c8cfcc; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; }
     .curve { fill: none; stroke: var(--curve); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
     .reveal-dot { fill: #fff; stroke: var(--curve); stroke-width: 3; }
     .event-guide { stroke-width: 1.5; stroke-dasharray: 3 4; transition: opacity .18s ease; }
@@ -462,6 +463,8 @@
       const x = (day) => margin.left + day / totalDays * plotWidth;
       const y = (value) => margin.top + (1 - value / yMax) * plotHeight;
       const baselineY = y(0);
+      const fullCurvePoints = values.map((value, day) => [x(day), y(value)]);
+      const fullCurvePath = pathFor(fullCurvePoints);
       const curvePoints = values.slice(0, selectedDay + 1).map((value, day) => [x(day), y(value)]);
       const curvePath = pathFor(curvePoints);
       const areaPath = curvePoints.length ? `${curvePath} L${x(selectedDay)},${baselineY} L${x(0)},${baselineY} Z` : "";
@@ -489,7 +492,7 @@
       svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
       svg.innerHTML = `
         <title id="chart-title">Simulated national influenza epidemic curve revealed through ${formatDate(dateForDay(selectedDay))}</title>
-        <desc id="chart-desc">The curve is revealed with a date slider. The onset threshold is ${threshold.toFixed(1)} percent. Decision markers become active as time reaches them.</desc>
+        <desc id="chart-desc">The full simulated season is shown in light gray. The curve through the selected date is highlighted in teal. The onset threshold is ${threshold.toFixed(1)} percent. Decision markers become active as time reaches them.</desc>
         <defs>
           <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="#56b8bb" stop-opacity=".56"></stop>
@@ -504,6 +507,7 @@
         <rect x="${width - margin.right - 126}" y="${y(threshold) - 19}" width="126" height="17" rx="4" fill="#fff" opacity=".92"></rect>
         <text class="threshold-label" x="${width - margin.right - 5}" y="${y(threshold) - 7}" text-anchor="end">Onset threshold ${threshold.toFixed(1)}%</text>
         <g clip-path="url(#plotClip)">
+          <path class="curve-ghost" d="${fullCurvePath}"></path>
           <path class="area" d="${areaPath}"></path>
           <path class="curve" d="${curvePath}"></path>
           <line class="today-guide" x1="${x(selectedDay)}" y1="${margin.top}" x2="${x(selectedDay)}" y2="${baselineY}"></line>

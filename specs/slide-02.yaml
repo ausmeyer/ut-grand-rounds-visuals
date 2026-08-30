@@ -19,6 +19,7 @@ visual:
     - playback speed selector
     - annotation category dropdown
   behavior:
+    - show the full simulated season as a light-gray reference curve
     - reveal the epidemic curve only through the selected date
     - keep future decision markers visible but muted
     - activate decision annotations when the selected date reaches them
