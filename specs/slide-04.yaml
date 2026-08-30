@@ -2,10 +2,11 @@ slide: 4
 title: There are many different influenza surveillance systems in the US
 route: slide-04.html
 format:
-  responsive: true
+  responsive: false
   target_width_px: 1240
   target_height_px: 540
   minimum_height_px: 540
+  behavior: use fixed coordinates and assume an exact 1240-by-540 iframe
 visual:
   type: interactive patient-journey surveillance diagram
   stages:
