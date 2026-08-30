@@ -15,6 +15,7 @@ visual:
     - date slider
     - play/pause
     - restart
+    - playback speed selector
     - annotation category dropdown
   behavior:
     - reveal the epidemic curve only through the selected date

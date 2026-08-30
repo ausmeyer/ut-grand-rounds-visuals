@@ -210,7 +210,27 @@
       gap: 12px;
     }
 
-    .button-group { display: flex; gap: 7px; }
+    .button-group { display: flex; align-items: center; gap: 7px; }
+
+    .speed-control {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 3px;
+    }
+
+    .speed-control label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 780;
+      white-space: nowrap;
+    }
+
+    .speed-control select {
+      width: 72px;
+      height: 34px;
+      padding-right: 24px;
+    }
 
     button {
       height: 34px;
@@ -294,6 +314,15 @@
       <div class="button-group">
         <button class="primary" id="play-button" type="button" aria-label="Play timeline">▶ Play</button>
         <button id="reset-button" type="button">Restart</button>
+        <div class="speed-control">
+          <label for="speed-select">Speed</label>
+          <select id="speed-select" aria-label="Playback speed">
+            <option value="0.5">0.5×</option>
+            <option value="1" selected>1×</option>
+            <option value="2">2×</option>
+            <option value="4">4×</option>
+          </select>
+        </div>
       </div>
       <div class="slider-wrap">
         <label class="visually-hidden" for="date-slider">Date through which to reveal the epidemic curve</label>
@@ -357,6 +386,7 @@
     const slider = document.getElementById("date-slider");
     const playButton = document.getElementById("play-button");
     const resetButton = document.getElementById("reset-button");
+    const speedSelect = document.getElementById("speed-select");
     const viewSelect = document.getElementById("view-select");
     const dateReadout = document.getElementById("date-readout");
     const iliReadout = document.getElementById("ili-readout");
@@ -370,6 +400,7 @@
     let hoveredEvent = null;
     let pinnedEvent = null;
     let playing = false;
+    let playbackSpeed = 1;
     let timer = null;
 
     function dateForDay(day) {
@@ -541,7 +572,7 @@
       playButton.textContent = "Ⅱ Pause";
       playButton.setAttribute("aria-label", "Pause timeline");
       timer = window.setInterval(() => {
-        selectedDay = Math.min(totalDays, selectedDay + 2);
+        selectedDay = Math.min(totalDays, selectedDay + Math.max(1, Math.round(2 * playbackSpeed)));
         slider.value = selectedDay;
         hoveredEvent = null;
         draw();
@@ -557,6 +588,10 @@
     });
 
     playButton.addEventListener("click", () => { playing ? stopPlaying() : startPlaying(); });
+
+    speedSelect.addEventListener("change", () => {
+      playbackSpeed = Number(speedSelect.value);
+    });
 
     resetButton.addEventListener("click", () => {
       stopPlaying();
