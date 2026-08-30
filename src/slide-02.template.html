@@ -313,7 +313,7 @@
       </div>
       <div class="slider-wrap">
         <label class="visually-hidden" for="date-slider">Date through which to reveal the epidemic curve</label>
-        <input id="date-slider" type="range" min="0" max="456" value="0" step="1">
+        <input id="date-slider" type="range" min="0" max="456" value="11" step="1">
         <div class="slider-labels"><span>Mar 2026</span><span>Jun</span><span>Sep</span><span>Dec</span><span>Mar</span><span>May 2027</span></div>
       </div>
     </footer>
@@ -387,13 +387,13 @@
     const cardKicker = document.getElementById("card-kicker");
     const cardTitle = document.getElementById("card-title");
     const cardDetail = document.getElementById("card-detail");
-    let selectedDay = 0;
+    let selectedDay = 11;
     let selectedView = "all";
     let hoveredEvent = null;
     let pinnedEvent = null;
     let playing = false;
     let playbackSpeed = 1;
-    let playbackPosition = 0;
+    let playbackPosition = 11;
     let timer = null;
 
     function dateForDay(day) {
@@ -446,9 +446,10 @@
 
     function readFragment() {
       const params = new URLSearchParams(location.hash.replace(/^#/, ""));
-      const day = Number(params.get("day"));
+      const dayParam = params.get("day");
+      const day = Number(dayParam);
       const view = params.get("view");
-      if (Number.isFinite(day)) selectedDay = Math.max(0, Math.min(totalDays, Math.round(day)));
+      if (dayParam !== null && Number.isFinite(day)) selectedDay = Math.max(0, Math.min(totalDays, Math.round(day)));
       playbackPosition = selectedDay;
       if (["all", "vaccine", "clinical", "public-health", "surveillance"].includes(view)) selectedView = view;
       slider.max = totalDays;
