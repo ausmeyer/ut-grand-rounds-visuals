@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>U.S. influenza surveillance systems</title>
+  <style>
+    :root {
+      --ink: #14242b;
+      --muted: #647278;
+      --paper: #fbfaf6;
+      --panel: #f1eee6;
+      --line: #8b9699;
+      --outpatient: #2677a8;
+      --inpatient: #c66a2b;
+      --virologic: #7654a3;
+      --mortality: #59646b;
+      --focus: #0a6670;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+
+    body {
+      min-width: 760px;
+      min-height: 540px;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button, select { font: inherit; }
+
+    .app {
+      display: grid;
+      grid-template-rows: 36px minmax(0, 1fr);
+      gap: 8px;
+      height: 100%;
+      padding: 10px 16px 8px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .eyebrow {
+      padding-left: 2px;
+      color: var(--focus);
+      font-size: 12px;
+      font-weight: 820;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .layer-control {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .layer-control label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 760;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    select {
+      width: 222px;
+      height: 34px;
+      border: 1px solid #bac4c1;
+      border-radius: 8px;
+      padding: 0 34px 0 10px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 720;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 292px;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid #d5dad6;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 8px 24px rgb(28 49 50 / 7%);
+    }
+
+    .diagram-wrap {
+      position: relative;
+      min-width: 0;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .path-key {
+      position: absolute;
+      z-index: 5;
+      top: 10px;
+      left: 14px;
+      display: flex;
+      gap: 18px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .key-item { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .key-line { width: 25px; height: 0; border-top: 2px solid var(--line); }
+    .key-line.specimen { border-top-color: var(--focus); border-top-style: dashed; }
+
+    .figure-stage {
+      position: absolute;
+      inset: 36px 8px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .figure {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      aspect-ratio: 1899 / 828;
+    }
+
+    .care-art {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: .94;
+      filter: contrast(.92);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .connectors {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    .patient-path {
+      fill: none;
+      stroke: var(--line);
+      stroke-width: 2.3;
+      stroke-linecap: round;
+      opacity: .78;
+      marker-end: url(#arrow-patient);
+    }
+
+    .specimen-path {
+      fill: none;
+      stroke: var(--focus);
+      stroke-width: 2.1;
+      stroke-linecap: round;
+      stroke-dasharray: 6 5;
+      opacity: .72;
+      marker-end: url(#arrow-specimen);
+    }
+
+    .system-tag {
+      position: absolute;
+      z-index: 4;
+      min-height: 31px;
+      border: 1.5px solid currentColor;
+      border-radius: 8px;
+      padding: 4px 9px;
+      background: rgb(255 255 255 / 92%);
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 820;
+      line-height: 1.05;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: 0 2px 7px rgb(35 51 56 / 11%);
+      transition: opacity .15s ease, transform .15s ease, box-shadow .15s ease;
+    }
+
+    .system-tag::before {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      margin-right: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      content: "";
+    }
+
+    .system-tag[data-category="outpatient"] { color: var(--outpatient); }
+    .system-tag[data-category="inpatient"] { color: var(--inpatient); }
+    .system-tag[data-category="virologic"] { color: var(--virologic); }
+    .system-tag[data-category="mortality"] { color: var(--mortality); }
+    .system-tag:hover { transform: translateY(-2px); box-shadow: 0 5px 12px rgb(35 51 56 / 16%); }
+    .system-tag.is-selected { background: currentColor; box-shadow: 0 0 0 3px rgb(10 102 112 / 16%); }
+    .system-tag.is-selected span { color: #fff; }
+    .system-tag.is-selected::before { background: #fff; }
+    .system-tag.is-muted { opacity: .12; pointer-events: none; }
+    .system-tag:focus-visible, select:focus-visible { outline: 3px solid rgb(8 127 140 / 26%); outline-offset: 2px; }
+
+    .tag-ilinet { left: 25.5%; top: 35%; }
+    .tag-nssp { left: 24.5%; top: 80%; }
+    .tag-flusurv-net { left: 50.5%; top: 84%; }
+    .tag-nhsn { left: 64.5%; top: 84%; }
+    .tag-icls { left: 69%; top: 9%; }
+    .tag-nrevss { left: 79.5%; top: 9%; }
+    .tag-nchs { right: .5%; top: 67%; }
+    .tag-pediatric-mortality { right: .5%; top: 78%; }
+
+    .side-panel {
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      gap: 10px;
+      min-height: 0;
+      border-left: 1px solid #d8ddd9;
+      padding: 16px;
+      background: var(--panel);
+    }
+
+    .category-label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 820;
+      letter-spacing: .075em;
+      text-transform: uppercase;
+    }
+
+    .category-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--focus); }
+
+    .side-heading h2 {
+      margin: 4px 0 3px;
+      font-size: 20px;
+      line-height: 1.08;
+      letter-spacing: -.025em;
+      text-wrap: balance;
+    }
+
+    .full-name {
+      margin: 0;
+      color: #46575e;
+      font-size: 12.5px;
+      font-weight: 620;
+      line-height: 1.27;
+    }
+
+    .detail-body {
+      min-height: 0;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .detail-block + .detail-block { margin-top: 14px; }
+    .detail-label {
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 840;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .detail-block p {
+      margin: 0;
+      color: #34464d;
+      font-size: 14px;
+      line-height: 1.36;
+    }
+
+    .source-link {
+      width: fit-content;
+      color: var(--focus);
+      font-size: 11px;
+      font-weight: 780;
+      text-decoration: none;
+    }
+
+    .source-link:hover { text-decoration: underline; }
+
+    @media (max-width: 980px) {
+      .content { grid-template-columns: minmax(0, 1fr) 260px; }
+      .side-panel { padding: 12px; }
+      .system-tag { padding: 4px 7px; font-size: 12px; }
+      .layer-control select { width: 190px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="eyebrow">Surveillance along the patient journey</div>
+      <div class="layer-control">
+        <label for="layer-select">Surveillance layer</label>
+        <select id="layer-select" aria-label="Surveillance layer">
+          <option value="all">All systems</option>
+          <option value="outpatient">Outpatient &amp; emergency care</option>
+          <option value="inpatient">Inpatient</option>
+          <option value="virologic">Virologic</option>
+          <option value="mortality">Mortality</option>
+        </select>
+      </div>
+    </header>
+
+    <section class="content" aria-label="Interactive diagram of influenza surveillance systems along the patient journey">
+      <div class="diagram-wrap">
+        <div class="path-key" aria-label="Arrow legend">
+          <span class="key-item"><span class="key-line"></span>Patient journey</span>
+          <span class="key-item"><span class="key-line specimen"></span>Specimen / laboratory signal</span>
+        </div>
+
+        <div class="figure-stage">
+          <div class="figure">
+            <img class="care-art" src="assets/slide-04-care-pathway.webp" alt="A person with influenza symptoms, an outpatient clinic, an emergency department, a hospital, a laboratory, and a respectful grave marker">
+            <svg class="connectors" viewBox="0 0 1000 436" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <marker id="arrow-patient" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b9699"></path>
+                </marker>
+                <marker id="arrow-specimen" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#0a6670"></path>
+                </marker>
+              </defs>
+              <path class="patient-path" d="M 183 225 C 220 196, 247 164, 295 142"></path>
+              <path class="patient-path" d="M 185 238 C 226 270, 250 306, 302 326"></path>
+              <path class="patient-path" d="M 457 327 C 500 326, 530 325, 565 324"></path>
+              <path class="patient-path" d="M 756 325 C 806 326, 842 325, 872 316"></path>
+              <path class="specimen-path" d="M 424 145 C 540 105, 653 92, 756 103"></path>
+              <path class="specimen-path" d="M 429 301 C 545 270, 654 190, 759 116"></path>
+              <path class="specimen-path" d="M 662 268 C 690 211, 720 158, 765 118"></path>
+            </svg>
+
+            <button class="system-tag tag-ilinet" type="button" data-system="ilinet" data-category="outpatient"><span>ILINet</span></button>
+            <button class="system-tag tag-nssp" type="button" data-system="nssp" data-category="outpatient"><span>NSSP</span></button>
+            <button class="system-tag tag-flusurv-net" type="button" data-system="flusurv-net" data-category="inpatient"><span>FluSurv-NET</span></button>
+            <button class="system-tag tag-nhsn" type="button" data-system="nhsn" data-category="inpatient"><span>NHSN</span></button>
+            <button class="system-tag tag-icls" type="button" data-system="icls" data-category="virologic"><span>ICLS</span></button>
+            <button class="system-tag tag-nrevss" type="button" data-system="nrevss" data-category="virologic"><span>NREVSS</span></button>
+            <button class="system-tag tag-nchs" type="button" data-system="nchs" data-category="mortality"><span>NCHS</span></button>
+            <button class="system-tag tag-pediatric-mortality" type="button" data-system="pediatric-mortality" data-category="mortality"><span>Pediatric deaths</span></button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="side-panel" aria-live="polite">
+        <div class="category-label"><span class="category-dot" id="category-dot"></span><span id="category-label">Complementary signals</span></div>
+        <div class="side-heading">
+          <h2 id="system-title">Different systems answer different questions</h2>
+          <p class="full-name" id="system-name">Select a label on the pathway to see what that surveillance system reports.</p>
+        </div>
+        <div class="detail-body">
+          <div class="detail-block">
+            <div class="detail-label">Reports</div>
+            <p id="reports-text">No single stream measures all influenza illness. Together, these systems describe symptoms, emergency visits, hospitalizations, circulating viruses, and deaths.</p>
+          </div>
+          <div class="detail-block">
+            <div class="detail-label">How to read it</div>
+            <p id="interpretation-text">Each signal has a different population, denominator, timeliness, and degree of laboratory confirmation.</p>
+          </div>
+        </div>
+        <a class="source-link" id="source-link" href="https://www.cdc.gov/fluview/overview/index.html" target="_blank" rel="noopener">CDC surveillance methods ↗</a>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    "use strict";
+
+    const systems = /*__SLIDE_04_SYSTEMS__*/;
+    const systemById = new Map(systems.map((system) => [system.id, system]));
+    const categoryNames = {
+      all: "Complementary signals",
+      outpatient: "Outpatient & emergency care",
+      inpatient: "Inpatient surveillance",
+      virologic: "Virologic surveillance",
+      mortality: "Mortality surveillance"
+    };
+    const categoryColors = {
+      all: "#0a6670",
+      outpatient: "#2677a8",
+      inpatient: "#c66a2b",
+      virologic: "#7654a3",
+      mortality: "#59646b"
+    };
+
+    const layerSelect = document.getElementById("layer-select");
+    const tags = [...document.querySelectorAll(".system-tag")];
+    const categoryDot = document.getElementById("category-dot");
+    const categoryLabel = document.getElementById("category-label");
+    const systemTitle = document.getElementById("system-title");
+    const systemName = document.getElementById("system-name");
+    const reportsText = document.getElementById("reports-text");
+    const interpretationText = document.getElementById("interpretation-text");
+    const sourceLink = document.getElementById("source-link");
+    let selectedId = null;
+
+    function writeHash() {
+      const params = new URLSearchParams();
+      params.set("layer", layerSelect.value);
+      if (selectedId) params.set("system", selectedId);
+      history.replaceState(null, "", `#${params.toString()}`);
+    }
+
+    function showOverview(category = "all") {
+      selectedId = null;
+      tags.forEach((tag) => tag.classList.remove("is-selected"));
+      categoryDot.style.background = categoryColors[category];
+      categoryLabel.textContent = categoryNames[category];
+
+      if (category === "all") {
+        systemTitle.textContent = "Different systems answer different questions";
+        systemName.textContent = "Select a label on the pathway to see what that surveillance system reports.";
+        reportsText.textContent = "No single stream measures all influenza illness. Together, these systems describe symptoms, emergency visits, hospitalizations, circulating viruses, and deaths.";
+        interpretationText.textContent = "Each signal has a different population, denominator, timeliness, and degree of laboratory confirmation.";
+      } else {
+        const count = systems.filter((system) => system.category === category).length;
+        systemTitle.textContent = categoryNames[category];
+        systemName.textContent = `${count} complementary ${count === 1 ? "system" : "systems"} observe this part of the patient journey.`;
+        reportsText.textContent = "Select an emphasized label to see the specific signal it contributes.";
+        interpretationText.textContent = "Compare its unit of observation and reporting delay with the other surveillance layers.";
+      }
+      sourceLink.href = "https://www.cdc.gov/fluview/overview/index.html";
+      writeHash();
+    }
+
+    function selectSystem(id) {
+      const system = systemById.get(id);
+      if (!system) return;
+      selectedId = id;
+      if (layerSelect.value !== "all" && layerSelect.value !== system.category) {
+        layerSelect.value = system.category;
+        applyLayer(false);
+      }
+      tags.forEach((tag) => tag.classList.toggle("is-selected", tag.dataset.system === id));
+      categoryDot.style.background = categoryColors[system.category];
+      categoryLabel.textContent = `${categoryNames[system.category]} · ${system.stage}`;
+      systemTitle.textContent = system.short;
+      systemName.textContent = system.name;
+      reportsText.textContent = system.reports;
+      interpretationText.textContent = system.interpretation;
+      sourceLink.href = system.source;
+      writeHash();
+    }
+
+    function applyLayer(resetSelection = true) {
+      const layer = layerSelect.value;
+      tags.forEach((tag) => {
+        const muted = layer !== "all" && tag.dataset.category !== layer;
+        tag.classList.toggle("is-muted", muted);
+        tag.setAttribute("aria-hidden", muted ? "true" : "false");
+      });
+      if (resetSelection) showOverview(layer);
+    }
+
+    tags.forEach((tag) => tag.addEventListener("click", () => selectSystem(tag.dataset.system)));
+    layerSelect.addEventListener("change", () => applyLayer(true));
+
+    function restoreFromHash() {
+      const params = new URLSearchParams(location.hash.slice(1));
+      const layer = params.get("layer");
+      const system = params.get("system");
+      if (layer && ["all", "outpatient", "inpatient", "virologic", "mortality"].includes(layer)) {
+        layerSelect.value = layer;
+      }
+      applyLayer(false);
+      if (systemById.has(system)) selectSystem(system);
+      else showOverview(layerSelect.value);
+    }
+
+    restoreFromHash();
+  </script>
+</body>
+</html>

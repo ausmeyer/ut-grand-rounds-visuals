@@ -1,0 +1,30 @@
+slide: 4
+title: There are many different influenza surveillance systems in the US
+route: slide-04.html
+format:
+  responsive: true
+  target_width_px: 1240
+  target_height_px: 540
+  minimum_height_px: 540
+visual:
+  type: interactive patient-journey surveillance diagram
+  stages:
+    - symptomatic illness
+    - outpatient clinic
+    - emergency department
+    - inpatient hospitalization
+    - mortality
+    - virologic testing
+  controls:
+    - surveillance layer dropdown
+    - clickable surveillance-system labels
+  behavior:
+    - selecting a system pins its full name and reported signal in the sidebar
+    - selecting a surveillance layer emphasizes only systems in that layer
+    - selected system and layer are stored in the URL fragment
+systems_source: ../data/slide-04-systems.json
+illustration: ../docs/assets/slide-04-care-pathway.webp
+editorial_point: No single stream measures influenza directly; complementary systems observe different parts of the illness and healthcare journey.
+sources:
+  - https://www.cdc.gov/fluview/overview/index.html
+  - https://www.cdc.gov/fluview/overview/influenza-hospitalization-surveillance.html

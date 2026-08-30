@@ -14,12 +14,13 @@ src/        HTML source templates
 scripts/    Reproducible build scripts
 ```
 
-Only slide 2 is implemented currently.
+Slides 2 and 4 are implemented currently.
 
 ## Build
 
 ```bash
 python3 scripts/build_slide_02.py
+python3 scripts/build_slide_04.py
 ```
 
 ## Preview locally
@@ -30,7 +31,8 @@ From the repository root:
 python3 -m http.server 8000 --directory docs
 ```
 
-Then open `http://localhost:8000/slide-02.html`.
+Then open `http://localhost:8000/slide-02.html` or
+`http://localhost:8000/slide-04.html`.
 
 ## Publish and embed
 
@@ -39,6 +41,10 @@ Then open `http://localhost:8000/slide-02.html`.
 2. After pushing, the slide-2 page will be available at:
 
    `https://ausmeyer.github.io/ut-grand-rounds-visuals/slide-02.html`
+
+   The slide-4 page will be available at:
+
+   `https://ausmeyer.github.io/ut-grand-rounds-visuals/slide-04.html`
 
 3. Add an **Iframe** block in Slides.com and paste that URL.
 4. Resize the iframe to the available slide area. The page is responsive and
@@ -49,3 +55,10 @@ Optional URL fragments can set the opening state:
 - `#day=0&view=all` starts at June 1 with all annotation categories.
 - `#day=364&view=all` opens with the full season revealed through May 31.
 - `view=vaccine`, `view=clinical`, or `view=public-health` filters markers.
+
+Slide 4 also supports URL fragments:
+
+- `#layer=all` opens with all surveillance systems visible.
+- `layer=outpatient`, `layer=inpatient`, `layer=virologic`, or
+  `layer=mortality` emphasizes one surveillance layer.
+- Add `system=ilinet` (or another system ID) to open with that system selected.
