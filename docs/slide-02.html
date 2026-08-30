@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Surveillance and action timeline</title>
+  <style>
+    :root {
+      --ink: #14242b;
+      --muted: #627178;
+      --paper: #fbfaf6;
+      --panel: #f1eee6;
+      --grid: #d8ddd9;
+      --curve: #087f8c;
+      --curve-fill: #91d3d2;
+      --threshold: #a33b20;
+      --vaccine: #815ac0;
+      --clinical: #d97706;
+      --public-health: #13795b;
+      --surveillance: #2463a5;
+      --focus: #0a6670;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+
+    body {
+      min-width: 760px;
+      min-height: 520px;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-variant-numeric: tabular-nums;
+    }
+
+    button, select, input { font: inherit; }
+
+    .app {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 10px;
+      height: 100%;
+      padding: 16px 20px 13px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .eyebrow {
+      color: var(--focus);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 2px 0 0;
+      max-width: 900px;
+      font-size: clamp(22px, 2.25vw, 34px);
+      line-height: 1.06;
+      letter-spacing: -.035em;
+    }
+
+    .view-control {
+      display: grid;
+      flex: 0 0 225px;
+      gap: 3px;
+    }
+
+    .view-control label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    select {
+      width: 100%;
+      height: 34px;
+      border: 1px solid #bac4c1;
+      border-radius: 8px;
+      padding: 0 34px 0 10px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 250px;
+      min-height: 0;
+      border: 1px solid #d5dad6;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 8px 24px rgb(28 49 50 / 7%);
+    }
+
+    .chart-wrap { position: relative; min-width: 0; min-height: 0; }
+
+    svg { display: block; width: 100%; height: 100%; min-height: 360px; }
+
+    .axis-label { fill: var(--muted); font-size: 11px; font-weight: 650; }
+    .axis-title { fill: var(--muted); font-size: 11px; font-weight: 750; letter-spacing: .02em; }
+    .gridline { stroke: var(--grid); stroke-width: 1; }
+    .month-line { stroke: #edf0ed; stroke-width: 1; }
+    .threshold-line { stroke: var(--threshold); stroke-width: 2; stroke-dasharray: 7 5; }
+    .threshold-label { fill: var(--threshold); font-size: 11px; font-weight: 800; }
+    .area { fill: url(#areaGradient); }
+    .curve { fill: none; stroke: var(--curve); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+    .reveal-dot { fill: #fff; stroke: var(--curve); stroke-width: 3; }
+    .event-guide { stroke-width: 1.5; stroke-dasharray: 3 4; transition: opacity .18s ease; }
+    .event-dot { stroke: #fff; stroke-width: 2; cursor: pointer; transition: opacity .18s ease, r .18s ease; }
+    .event-hit { fill: transparent; cursor: pointer; }
+    .event-label-bg { fill: #fff; stroke-width: 1; rx: 5; }
+    .event-label { font-size: 10.5px; font-weight: 760; pointer-events: none; }
+    .peak-label { fill: var(--curve); font-size: 11px; font-weight: 800; }
+    .today-guide { stroke: var(--curve); stroke-width: 1.5; opacity: .35; }
+
+    .side-panel {
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      gap: 11px;
+      min-height: 0;
+      border-left: 1px solid #d8ddd9;
+      padding: 15px;
+      background: var(--panel);
+    }
+
+    .readout {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .date-readout { font-size: 17px; font-weight: 850; letter-spacing: -.02em; }
+    .ili-readout { color: var(--curve); font-size: 15px; font-weight: 850; }
+
+    .status {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: #dfe9e8;
+      color: #35535a;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .status::before { width: 7px; height: 7px; border-radius: 50%; background: currentColor; content: ""; }
+    .status.onset { background: #f1d9d0; color: var(--threshold); }
+    .status.declining { background: #d8ebe4; color: var(--public-health); }
+
+    .event-card {
+      min-height: 0;
+      overflow: auto;
+      border: 1px solid #d5d9d5;
+      border-left: 5px solid var(--surveillance);
+      border-radius: 10px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .event-card .card-kicker {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .event-card h2 { margin: 4px 0 6px; font-size: 16px; line-height: 1.14; letter-spacing: -.015em; }
+    .event-card p { margin: 0; color: #405057; font-size: 12.5px; line-height: 1.35; }
+
+    .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 8px; }
+    .legend-item { display: flex; align-items: center; gap: 5px; color: #46545a; font-size: 10.5px; font-weight: 700; }
+    .swatch { width: 8px; height: 8px; border-radius: 50%; }
+
+    .controls {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .button-group { display: flex; gap: 7px; }
+
+    button {
+      height: 34px;
+      border: 1px solid #bac4c1;
+      border-radius: 8px;
+      padding: 0 12px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button.primary { min-width: 76px; border-color: var(--focus); background: var(--focus); color: #fff; }
+    button:hover { filter: brightness(.97); }
+    button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid rgb(8 127 140 / 25%); outline-offset: 2px; }
+
+    .slider-wrap { display: grid; gap: 3px; }
+    .slider-labels { display: flex; justify-content: space-between; color: var(--muted); font-size: 10px; font-weight: 700; }
+    input[type="range"] { width: 100%; accent-color: var(--curve); cursor: pointer; }
+
+    .message {
+      max-width: 280px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 650;
+      line-height: 1.25;
+      text-align: right;
+    }
+
+    @media (max-width: 930px) {
+      .content { grid-template-columns: minmax(0, 1fr) 220px; }
+      .side-panel { padding: 11px; }
+      .view-control { flex-basis: 190px; }
+      .message { display: none; }
+      .controls { grid-template-columns: auto minmax(0, 1fr); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">Simulated national influenza season</div>
+        <h1>Many consequential actions begin before the epidemic is visible</h1>
+      </div>
+      <div class="view-control">
+        <label for="view-select">Annotation view</label>
+        <select id="view-select" aria-label="Annotation view">
+          <option value="all">All decisions</option>
+          <option value="vaccine">Vaccine decisions</option>
+          <option value="clinical">Clinical operations</option>
+          <option value="public-health">Public health guidance</option>
+          <option value="surveillance">Surveillance milestone</option>
+        </select>
+      </div>
+    </header>
+
+    <section class="content" aria-label="Progressively revealed simulated epidemic curve and decision timeline">
+      <div class="chart-wrap">
+        <svg id="chart" role="img" aria-labelledby="chart-title chart-desc">
+          <title id="chart-title">Simulated national influenza epidemic curve</title>
+          <desc id="chart-desc">Use the date slider to reveal the epidemic curve. Decision markers show when vaccine, clinical, surveillance, and public health actions occur.</desc>
+        </svg>
+      </div>
+
+      <aside class="side-panel" aria-live="polite">
+        <div class="readout">
+          <div class="date-readout" id="date-readout">June 1, 2026</div>
+          <div class="ili-readout" id="ili-readout">1.2%</div>
+        </div>
+        <div class="status" id="status">Below onset</div>
+        <article class="event-card" id="event-card">
+          <div class="card-kicker" id="card-kicker">What surveillance shows</div>
+          <h2 id="card-title">Summer baseline</h2>
+          <p id="card-detail">The curve is quiet, but preparation for the coming season cannot wait for a visible epidemic signal.</p>
+        </article>
+        <div class="legend" aria-label="Annotation categories">
+          <div class="legend-item"><span class="swatch" style="background:var(--vaccine)"></span>Vaccine</div>
+          <div class="legend-item"><span class="swatch" style="background:var(--clinical)"></span>Clinical</div>
+          <div class="legend-item"><span class="swatch" style="background:var(--public-health)"></span>Public health</div>
+          <div class="legend-item"><span class="swatch" style="background:var(--surveillance)"></span>Surveillance</div>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="controls">
+      <div class="button-group">
+        <button class="primary" id="play-button" type="button" aria-label="Play timeline">▶ Play</button>
+        <button id="reset-button" type="button">Restart</button>
+      </div>
+      <div class="slider-wrap">
+        <label class="visually-hidden" for="date-slider">Date through which to reveal the epidemic curve</label>
+        <input id="date-slider" type="range" min="0" max="303" value="0" step="1">
+        <div class="slider-labels"><span>Jun 2026</span><span>Sep</span><span>Dec</span><span>Mar 2027</span></div>
+      </div>
+      <div class="message">Planned markers remain visible; they activate as surveillance time reaches them.</div>
+    </footer>
+  </main>
+
+  <script>
+    "use strict";
+
+    const events = [{"id":"vaccine-distribution","date":"2026-08-03","category":"vaccine","short":"Vaccine distribution begins","detail":"Begin distributing vaccine to administration sites—about four months before the simulated onset."},{"id":"vaccination-campaign","date":"2026-09-01","category":"vaccine","short":"Vaccination campaign starts","detail":"Start the vaccination campaign while incidence remains near the summer baseline."},{"id":"uptake-target","date":"2026-11-16","category":"vaccine","short":"Target maximum uptake","detail":"Aim to reach maximum vaccine uptake before the surveillance onset threshold is crossed."},{"id":"antiviral-distribution","date":"2026-11-19","category":"clinical","short":"Stage antivirals at clinics","detail":"Confirm antiviral supply and distribute stock to outpatient and acute-care sites."},{"id":"onset","date":"2026-12-03","category":"surveillance","short":"Onset threshold crossed","detail":"The simulated national curve first exceeds the plausible surveillance onset threshold."},{"id":"behavior-guidance","date":"2026-12-10","category":"public-health","short":"Intensify prevention guidance","detail":"Reinforce hand hygiene, staying home when ill, masking when appropriate, and avoiding crowded indoor exposure."},{"id":"resource-redistribution","date":"2026-12-21","category":"clinical","short":"Shift clinical resources","detail":"Redistribute staffing, beds, diagnostics, and supplies toward regions experiencing the greatest burden."},{"id":"peak-response","date":"2027-01-20","category":"public-health","short":"Peak: sustain interventions","detail":"Communicate that cases may be turning while asking the public and health systems to sustain effective interventions."},{"id":"preliminary-ve","date":"2027-01-27","category":"vaccine","short":"Preliminary VE available","detail":"Early vaccine-effectiveness estimates become available after most vaccination-timing decisions are already complete."},{"id":"strain-selection","date":"2027-02-19","category":"vaccine","short":"Select next season’s strain","detail":"Select the Northern Hemisphere vaccine strain for the next influenza season."}];
+    const DAY_MS = 86400000;
+    const startDate = new Date("2026-06-01T12:00:00Z");
+    const endDate = new Date("2027-03-31T12:00:00Z");
+    const totalDays = Math.round((endDate - startDate) / DAY_MS);
+    const threshold = 2.5;
+    const categoryColors = {
+      vaccine: "#815ac0",
+      clinical: "#d97706",
+      "public-health": "#13795b",
+      surveillance: "#2463a5"
+    };
+    const categoryNames = {
+      vaccine: "Vaccine decision",
+      clinical: "Clinical operation",
+      "public-health": "Public health guidance",
+      surveillance: "Surveillance milestone"
+    };
+
+    function dayIndex(isoDate) {
+      return Math.round((new Date(`${isoDate}T12:00:00Z`) - startDate) / DAY_MS);
+    }
+
+    events.forEach((event) => { event.day = dayIndex(event.date); });
+
+    function mulberry32(seed) {
+      return function random() {
+        let value = seed += 0x6D2B79F5;
+        value = Math.imul(value ^ value >>> 15, value | 1);
+        value ^= value + Math.imul(value ^ value >>> 7, value | 61);
+        return ((value ^ value >>> 14) >>> 0) / 4294967296;
+      };
+    }
+
+    const random = mulberry32(20260830);
+    let noise = 0;
+    const values = Array.from({ length: totalDays + 1 }, (_, day) => {
+      noise = 0.84 * noise + (random() - 0.5) * 0.16;
+      const mainWave = 5.55 * Math.exp(-0.5 * Math.pow((day - 233) / 29, 2));
+      const shoulder = 0.30 * Math.exp(-0.5 * Math.pow((day - 188) / 22, 2));
+      return Math.max(0.8, 1.18 + mainWave + shoulder + noise);
+    });
+
+    const actualOnsetDay = values.findIndex((value) => value >= threshold);
+    const peakDay = values.reduce((best, value, day) => value > values[best] ? day : best, 0);
+    const peakValue = values[peakDay];
+
+    const svg = document.getElementById("chart");
+    const slider = document.getElementById("date-slider");
+    const playButton = document.getElementById("play-button");
+    const resetButton = document.getElementById("reset-button");
+    const viewSelect = document.getElementById("view-select");
+    const dateReadout = document.getElementById("date-readout");
+    const iliReadout = document.getElementById("ili-readout");
+    const status = document.getElementById("status");
+    const eventCard = document.getElementById("event-card");
+    const cardKicker = document.getElementById("card-kicker");
+    const cardTitle = document.getElementById("card-title");
+    const cardDetail = document.getElementById("card-detail");
+    let selectedDay = 0;
+    let selectedView = "all";
+    let focusedEvent = null;
+    let playing = false;
+    let timer = null;
+
+    function dateForDay(day) {
+      return new Date(startDate.getTime() + day * DAY_MS);
+    }
+
+    function formatDate(date, includeYear = true) {
+      return new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        day: "numeric",
+        ...(includeYear ? { year: "numeric" } : {}),
+        timeZone: "UTC"
+      }).format(date);
+    }
+
+    function escapeText(text) {
+      return text.replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+      })[character]);
+    }
+
+    function pathFor(points) {
+      return points.map((point, index) => `${index ? "L" : "M"}${point[0].toFixed(2)},${point[1].toFixed(2)}`).join(" ");
+    }
+
+    function filteredEvents() {
+      return events.filter((event) => selectedView === "all" || event.category === selectedView);
+    }
+
+    function latestVisibleEvent() {
+      const visible = filteredEvents().filter((event) => event.day <= selectedDay);
+      return focusedEvent && filteredEvents().includes(focusedEvent) ? focusedEvent : visible.at(-1) || null;
+    }
+
+    function setCard(event) {
+      if (!event) {
+        eventCard.style.borderLeftColor = categoryColors.surveillance;
+        cardKicker.textContent = "What surveillance shows";
+        cardTitle.textContent = "Summer baseline";
+        cardDetail.textContent = "The curve is quiet, but preparation for the coming season cannot wait for a visible epidemic signal.";
+        return;
+      }
+      eventCard.style.borderLeftColor = categoryColors[event.category];
+      cardKicker.textContent = `${categoryNames[event.category]} · ${formatDate(new Date(`${event.date}T12:00:00Z`), false)}`;
+      cardTitle.textContent = event.short;
+      cardDetail.textContent = event.detail;
+    }
+
+    function writeFragment() {
+      const hash = `#day=${selectedDay}&view=${encodeURIComponent(selectedView)}`;
+      if (location.hash !== hash) history.replaceState(null, "", hash);
+    }
+
+    function readFragment() {
+      const params = new URLSearchParams(location.hash.replace(/^#/, ""));
+      const day = Number(params.get("day"));
+      const view = params.get("view");
+      if (Number.isFinite(day)) selectedDay = Math.max(0, Math.min(totalDays, Math.round(day)));
+      if (["all", "vaccine", "clinical", "public-health", "surveillance"].includes(view)) selectedView = view;
+      slider.max = totalDays;
+      slider.value = selectedDay;
+      viewSelect.value = selectedView;
+    }
+
+    function draw() {
+      const bounds = svg.getBoundingClientRect();
+      const width = Math.max(520, bounds.width);
+      const height = Math.max(350, bounds.height);
+      const margin = { top: 83, right: 22, bottom: 42, left: 56 };
+      const plotWidth = width - margin.left - margin.right;
+      const plotHeight = height - margin.top - margin.bottom;
+      const yMax = 7.5;
+      const x = (day) => margin.left + day / totalDays * plotWidth;
+      const y = (value) => margin.top + (1 - value / yMax) * plotHeight;
+      const baselineY = y(0);
+      const curvePoints = values.slice(0, selectedDay + 1).map((value, day) => [x(day), y(value)]);
+      const curvePath = pathFor(curvePoints);
+      const areaPath = curvePoints.length ? `${curvePath} L${x(selectedDay)},${baselineY} L${x(0)},${baselineY} Z` : "";
+      const yTicks = [0, 2, 4, 6];
+      const monthTicks = [];
+      for (let month = 0; month < 10; month += 1) {
+        const date = new Date(Date.UTC(2026, 5 + month, 1, 12));
+        monthTicks.push({ day: Math.round((date - startDate) / DAY_MS), label: date.toLocaleString("en-US", { month: "short", timeZone: "UTC" }) });
+      }
+
+      const visibleEvents = filteredEvents();
+      const labelRows = [15, 34, 53, 72];
+      const lastRightByRow = labelRows.map(() => -Infinity);
+      const eventMarkup = visibleEvents.map((event, index) => {
+        const eventX = x(event.day);
+        const active = event.day <= selectedDay;
+        const color = categoryColors[event.category];
+        const opacity = active ? 1 : 0.22;
+        const short = escapeText(event.short);
+        const label = short.length > 20 ? `${short.slice(0, 19)}…` : short;
+        const estimatedWidth = Math.min(120, Math.max(72, label.length * 5.35 + 14));
+        const labelX = Math.max(
+          margin.left + estimatedWidth / 2,
+          Math.min(width - margin.right - estimatedWidth / 2, eventX)
+        );
+        const rectX = labelX - estimatedWidth / 2;
+        let rowIndex = lastRightByRow.findIndex((right) => right <= rectX - 5);
+        if (rowIndex === -1) {
+          rowIndex = lastRightByRow.indexOf(Math.min(...lastRightByRow));
+        }
+        const rowY = labelRows[rowIndex];
+        if (active) lastRightByRow[rowIndex] = rectX + estimatedWidth;
+        return `
+          <g class="event" data-event-id="${event.id}" style="opacity:${opacity}">
+            <line class="event-guide" x1="${eventX}" y1="${margin.top}" x2="${eventX}" y2="${baselineY}" stroke="${color}"></line>
+            <circle class="event-dot" cx="${eventX}" cy="${y(values[event.day])}" r="${active ? 5.5 : 4}" fill="${color}"></circle>
+            ${active ? `<rect class="event-label-bg" x="${rectX}" y="${rowY - 11}" width="${estimatedWidth}" height="18" stroke="${color}" opacity=".96"></rect>
+            <text class="event-label" x="${labelX}" y="${rowY + 2}" text-anchor="middle" fill="${color}">${label}</text>` : ""}
+            <rect class="event-hit" x="${eventX - 9}" y="0" width="18" height="${baselineY}"></rect>
+          </g>`;
+      }).join("");
+
+      svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      svg.innerHTML = `
+        <title id="chart-title">Simulated national influenza epidemic curve revealed through ${formatDate(dateForDay(selectedDay))}</title>
+        <desc id="chart-desc">The curve is revealed with a date slider. The onset threshold is ${threshold.toFixed(1)} percent. Decision markers become active as time reaches them.</desc>
+        <defs>
+          <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#56b8bb" stop-opacity=".56"></stop>
+            <stop offset="100%" stop-color="#d8eeee" stop-opacity=".18"></stop>
+          </linearGradient>
+          <clipPath id="plotClip"><rect x="${margin.left}" y="${margin.top}" width="${plotWidth}" height="${plotHeight}"></rect></clipPath>
+        </defs>
+        ${yTicks.map((tick) => `<line class="gridline" x1="${margin.left}" y1="${y(tick)}" x2="${width - margin.right}" y2="${y(tick)}"></line><text class="axis-label" x="${margin.left - 10}" y="${y(tick) + 4}" text-anchor="end">${tick}%</text>`).join("")}
+        ${monthTicks.map((tick) => `<line class="month-line" x1="${x(tick.day)}" y1="${margin.top}" x2="${x(tick.day)}" y2="${baselineY}"></line><text class="axis-label" x="${x(tick.day)}" y="${height - 14}" text-anchor="middle">${tick.label}</text>`).join("")}
+        <text class="axis-title" x="15" y="${margin.top - 12}">ILI visits</text>
+        <line class="threshold-line" x1="${margin.left}" y1="${y(threshold)}" x2="${width - margin.right}" y2="${y(threshold)}"></line>
+        <rect x="${width - margin.right - 126}" y="${y(threshold) - 19}" width="126" height="17" rx="4" fill="#fff" opacity=".92"></rect>
+        <text class="threshold-label" x="${width - margin.right - 5}" y="${y(threshold) - 7}" text-anchor="end">Onset threshold ${threshold.toFixed(1)}%</text>
+        <g clip-path="url(#plotClip)">
+          <path class="area" d="${areaPath}"></path>
+          <path class="curve" d="${curvePath}"></path>
+          <line class="today-guide" x1="${x(selectedDay)}" y1="${margin.top}" x2="${x(selectedDay)}" y2="${baselineY}"></line>
+        </g>
+        ${eventMarkup}
+        <circle class="reveal-dot" cx="${x(selectedDay)}" cy="${y(values[selectedDay])}" r="6"></circle>
+        ${selectedDay >= peakDay ? `<text class="peak-label" x="${x(peakDay)}" y="${y(peakValue) - 13}" text-anchor="middle">Peak ${peakValue.toFixed(1)}%</text>` : ""}
+      `;
+
+      svg.querySelectorAll(".event").forEach((group) => {
+        const event = events.find((candidate) => candidate.id === group.dataset.eventId);
+        group.addEventListener("mouseenter", () => { focusedEvent = event; setCard(event); });
+        group.addEventListener("mouseleave", () => { focusedEvent = null; setCard(latestVisibleEvent()); });
+        group.addEventListener("click", () => { focusedEvent = event; setCard(event); });
+      });
+
+      dateReadout.textContent = formatDate(dateForDay(selectedDay));
+      iliReadout.textContent = `${values[selectedDay].toFixed(1)}% ILI`;
+      status.className = "status";
+      if (selectedDay < actualOnsetDay) {
+        status.textContent = "Below onset";
+      } else if (selectedDay <= peakDay) {
+        status.textContent = "Epidemic underway";
+        status.classList.add("onset");
+      } else {
+        status.textContent = "Declining after peak";
+        status.classList.add("declining");
+      }
+      setCard(latestVisibleEvent());
+      writeFragment();
+    }
+
+    function stopPlaying() {
+      playing = false;
+      if (timer) window.clearInterval(timer);
+      timer = null;
+      playButton.textContent = "▶ Play";
+      playButton.setAttribute("aria-label", "Play timeline");
+    }
+
+    function startPlaying() {
+      if (selectedDay >= totalDays) selectedDay = 0;
+      playing = true;
+      playButton.textContent = "Ⅱ Pause";
+      playButton.setAttribute("aria-label", "Pause timeline");
+      timer = window.setInterval(() => {
+        selectedDay = Math.min(totalDays, selectedDay + 2);
+        slider.value = selectedDay;
+        focusedEvent = null;
+        draw();
+        if (selectedDay >= totalDays) stopPlaying();
+      }, 55);
+    }
+
+    slider.addEventListener("input", () => {
+      stopPlaying();
+      selectedDay = Number(slider.value);
+      focusedEvent = null;
+      draw();
+    });
+
+    playButton.addEventListener("click", () => { playing ? stopPlaying() : startPlaying(); });
+
+    resetButton.addEventListener("click", () => {
+      stopPlaying();
+      selectedDay = 0;
+      slider.value = 0;
+      focusedEvent = null;
+      draw();
+    });
+
+    viewSelect.addEventListener("change", () => {
+      selectedView = viewSelect.value;
+      focusedEvent = null;
+      draw();
+    });
+
+    window.addEventListener("hashchange", () => { readFragment(); draw(); });
+    window.addEventListener("resize", draw);
+
+    readFragment();
+    draw();
+  </script>
+</body>
+</html>
