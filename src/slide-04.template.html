@@ -237,19 +237,40 @@
     .system-tag.is-muted { opacity: .12; pointer-events: none; }
     .system-tag:focus-visible, select:focus-visible { outline: 3px solid rgb(8 127 140 / 26%); outline-offset: 2px; }
 
-    .person-node { left: 22px; top: 142px; width: 136px; height: 296px; }
-    .clinic-node { left: 188px; top: 20px; width: 244px; height: 174px; }
-    .lab-node { left: 598px; top: 18px; width: 274px; height: 188px; }
-    .ed-node { left: 198px; top: 232px; width: 234px; height: 214px; }
-    .hospital-node { left: 476px; top: 214px; width: 256px; height: 236px; }
-    .mortality-node { left: 760px; top: 232px; width: 150px; height: 224px; }
+    .person-node { left: 22px; top: 160px; width: 110px; height: 270px; }
+    .clinic-node { left: 190px; top: 30px; width: 190px; height: 155px; }
+    .lab-node { left: 565px; top: 24px; width: 335px; height: 178px; }
+    .ed-node { left: 190px; top: 250px; width: 190px; height: 190px; }
+    .hospital-node { left: 450px; top: 235px; width: 210px; height: 210px; }
+    .mortality-node { left: 745px; top: 245px; width: 140px; height: 210px; }
 
-    .person-node img { max-height: 270px; }
-    .clinic-node img { max-width: 230px; }
-    .lab-node img { max-width: 252px; }
-    .ed-node img { max-width: 222px; }
-    .hospital-node img { max-width: 234px; }
-    .mortality-node img { max-height: 142px; }
+    .person-node img { max-height: 238px; }
+    .clinic-node img { max-width: 180px; }
+    .ed-node img { max-width: 180px; }
+    .hospital-node img { max-width: 190px; }
+    .mortality-node img { max-height: 120px; }
+
+    .lab-node {
+      grid-template-rows: 22px minmax(0, 1fr);
+      justify-items: stretch;
+    }
+
+    .lab-node .node-title {
+      width: 210px;
+      text-align: center;
+    }
+
+    .lab-row {
+      display: grid;
+      grid-template-columns: 210px 110px;
+      gap: 12px;
+      min-height: 0;
+      align-items: center;
+    }
+
+    .lab-row img { max-width: 205px; max-height: 145px; justify-self: center; }
+    .lab-node .node-systems { flex-direction: column; align-items: stretch; gap: 6px; padding: 0; }
+    .lab-node .system-tag { width: 100%; }
 
     .mortality-node .node-systems { flex-direction: column; gap: 4px; padding-top: 4px; }
     .mortality-node .system-tag { min-height: 27px; padding-top: 3px; padding-bottom: 3px; }
@@ -364,13 +385,13 @@
                 <path d="M 0 0 L 10 5 L 0 10 z" fill="#0a6670"></path>
               </marker>
             </defs>
-            <path class="patient-path" d="M 158 292 H 178 V 108 H 188"></path>
-            <path class="patient-path" d="M 158 292 H 198"></path>
-            <path class="patient-path" d="M 432 335 H 476"></path>
-            <path class="patient-path" d="M 732 335 H 760"></path>
-            <path class="specimen-path" d="M 432 108 H 598"></path>
-            <path class="specimen-path" d="M 315 232 V 204 H 574 V 170 H 598"></path>
-            <path class="specimen-path" d="M 604 214 V 196 H 704 V 188"></path>
+            <path class="patient-path" d="M 132 305 H 160 V 108 H 190"></path>
+            <path class="patient-path" d="M 132 305 H 160 V 345 H 190"></path>
+            <path class="patient-path" d="M 380 345 H 450"></path>
+            <path class="patient-path" d="M 660 345 H 745"></path>
+            <path class="specimen-path" d="M 380 108 H 565"></path>
+            <path class="specimen-path" d="M 285 250 V 215 H 545 V 150 H 565"></path>
+            <path class="specimen-path" d="M 555 235 V 205 H 670 V 188"></path>
           </svg>
 
           <div class="path-node person-node">
@@ -388,10 +409,12 @@
 
           <div class="path-node lab-node">
             <div class="node-title">Virologic testing</div>
-            <img src="assets/slide-04-lab.webp" alt="A clinical virology laboratory">
-            <div class="node-systems">
-              <button class="system-tag" type="button" data-system="icls" data-category="virologic"><span>ICLS</span></button>
-              <button class="system-tag" type="button" data-system="nrevss" data-category="virologic"><span>NREVSS</span></button>
+            <div class="lab-row">
+              <img src="assets/slide-04-lab.webp" alt="A clinical virology laboratory">
+              <div class="node-systems">
+                <button class="system-tag" type="button" data-system="icls" data-category="virologic"><span>ICLS</span></button>
+                <button class="system-tag" type="button" data-system="nrevss" data-category="virologic"><span>NREVSS</span></button>
+              </div>
             </div>
           </div>
 

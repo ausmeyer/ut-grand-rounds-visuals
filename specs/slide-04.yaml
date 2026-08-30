@@ -23,6 +23,7 @@ visual:
     - arrange the six illustrations independently with generous whitespace
     - use only horizontal and vertical connector segments
     - keep every surveillance-system label outside the illustration artwork
+    - arrange ICLS and NREVSS as a vertical label column to the right of virologic testing
     - selecting a system pins its full name and reported signal in the sidebar
     - selecting a surveillance layer emphasizes only systems in that layer
     - selected system and layer are stored in the URL fragment
