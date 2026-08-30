@@ -1,13 +1,5 @@
 [
   {
-    "id": "vaccine-manufacturing",
-    "date": "2026-03-12",
-    "category": "vaccine",
-    "short": "Vaccine manufacturing begins",
-    "detail": "Manufacturing typically begins after U.S. strain selection in late February or early March for the upcoming Northern Hemisphere season.",
-    "source": "https://www.fda.gov/consumers/consumer-updates/fdas-critical-role-ensuring-safe-and-effective-flu-vaccines"
-  },
-  {
     "id": "vaccine-distribution",
     "date": "2026-08-03",
     "category": "vaccine",
@@ -83,5 +75,13 @@
     "category": "vaccine",
     "short": "Select next season’s strain",
     "detail": "Select the Northern Hemisphere vaccine strain for the next influenza season."
+  },
+  {
+    "id": "vaccine-manufacturing",
+    "date": "2027-03-01",
+    "category": "vaccine",
+    "short": "Vaccine manufacturing begins",
+    "detail": "Manufacturing for the next Northern Hemisphere season begins after U.S. strain selection in late February or early March.",
+    "source": "https://www.fda.gov/consumers/consumer-updates/fdas-critical-role-ensuring-safe-and-effective-flu-vaccines"
   }
 ]

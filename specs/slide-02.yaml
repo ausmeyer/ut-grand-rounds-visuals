@@ -8,7 +8,7 @@ format:
   minimum_height_px: 540
 visual:
   type: progressive simulated national influenza epidemic curve
-  period: 2026-03-01 through 2027-05-31
+  period: 2026-06-01 through 2027-05-31
   metric: simulated percent of outpatient visits with influenza-like illness
   onset_threshold_percent: 2.5
   simulated_peak_date: 2027-01-20
