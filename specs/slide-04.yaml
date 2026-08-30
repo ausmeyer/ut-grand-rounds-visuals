@@ -19,11 +19,20 @@ visual:
     - surveillance layer dropdown
     - clickable surveillance-system labels
   behavior:
+    - arrange the six illustrations independently with generous whitespace
+    - use only horizontal and vertical connector segments
+    - keep every surveillance-system label outside the illustration artwork
     - selecting a system pins its full name and reported signal in the sidebar
     - selecting a surveillance layer emphasizes only systems in that layer
     - selected system and layer are stored in the URL fragment
 systems_source: ../data/slide-04-systems.json
-illustration: ../docs/assets/slide-04-care-pathway.webp
+illustrations:
+  - ../docs/assets/slide-04-person.webp
+  - ../docs/assets/slide-04-clinic.webp
+  - ../docs/assets/slide-04-ed.webp
+  - ../docs/assets/slide-04-hospital.webp
+  - ../docs/assets/slide-04-lab.webp
+  - ../docs/assets/slide-04-mortality.webp
 editorial_point: No single stream measures influenza directly; complementary systems observe different parts of the illness and healthcare journey.
 sources:
   - https://www.cdc.gov/fluview/overview/index.html

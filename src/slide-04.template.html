@@ -105,12 +105,13 @@
     .path-key {
       position: absolute;
       z-index: 5;
-      top: 10px;
-      left: 14px;
+      top: 12px;
+      left: 12px;
       display: flex;
-      gap: 18px;
+      flex-direction: column;
+      gap: 6px;
       color: var(--muted);
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
     }
 
@@ -118,32 +119,11 @@
     .key-line { width: 25px; height: 0; border-top: 2px solid var(--line); }
     .key-line.specimen { border-top-color: var(--focus); border-top-style: dashed; }
 
-    .figure-stage {
-      position: absolute;
-      inset: 36px 8px 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
     .figure {
-      position: relative;
-      width: 100%;
-      max-width: 900px;
-      aspect-ratio: 1899 / 828;
-    }
-
-    .care-art {
       position: absolute;
       inset: 0;
-      display: block;
       width: 100%;
       height: 100%;
-      object-fit: contain;
-      opacity: .94;
-      filter: contrast(.92);
-      pointer-events: none;
-      user-select: none;
     }
 
     .connectors {
@@ -158,25 +138,69 @@
     .patient-path {
       fill: none;
       stroke: var(--line);
-      stroke-width: 2.3;
-      stroke-linecap: round;
-      opacity: .78;
+      stroke-width: 3.2;
+      stroke-linecap: square;
+      stroke-linejoin: miter;
+      opacity: .96;
       marker-end: url(#arrow-patient);
     }
 
     .specimen-path {
       fill: none;
       stroke: var(--focus);
-      stroke-width: 2.1;
-      stroke-linecap: round;
-      stroke-dasharray: 6 5;
-      opacity: .72;
+      stroke-width: 3;
+      stroke-linecap: square;
+      stroke-linejoin: miter;
+      stroke-dasharray: 8 6;
+      opacity: .92;
       marker-end: url(#arrow-specimen);
     }
 
-    .system-tag {
+    .path-node {
       position: absolute;
-      z-index: 4;
+      z-index: 2;
+      display: grid;
+      grid-template-rows: 22px minmax(0, 1fr) auto;
+      justify-items: center;
+      min-width: 0;
+      text-align: center;
+    }
+
+    .path-node.person-node { grid-template-rows: minmax(0, 1fr) 22px; }
+
+    .node-title {
+      align-self: center;
+      color: #3e4d53;
+      font-size: 12px;
+      font-weight: 830;
+      letter-spacing: .06em;
+      line-height: 1;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .path-node img {
+      display: block;
+      align-self: center;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: contrast(.94);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .node-systems {
+      display: flex;
+      min-height: 32px;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding-top: 2px;
+    }
+
+    .system-tag {
+      position: static;
       min-height: 31px;
       border: 1.5px solid currentColor;
       border-radius: 8px;
@@ -213,14 +237,22 @@
     .system-tag.is-muted { opacity: .12; pointer-events: none; }
     .system-tag:focus-visible, select:focus-visible { outline: 3px solid rgb(8 127 140 / 26%); outline-offset: 2px; }
 
-    .tag-ilinet { left: 25.5%; top: 35%; }
-    .tag-nssp { left: 24.5%; top: 80%; }
-    .tag-flusurv-net { left: 50.5%; top: 84%; }
-    .tag-nhsn { left: 64.5%; top: 84%; }
-    .tag-icls { left: 69%; top: 9%; }
-    .tag-nrevss { left: 79.5%; top: 9%; }
-    .tag-nchs { right: .5%; top: 67%; }
-    .tag-pediatric-mortality { right: .5%; top: 78%; }
+    .person-node { left: 22px; top: 142px; width: 136px; height: 296px; }
+    .clinic-node { left: 188px; top: 20px; width: 244px; height: 174px; }
+    .lab-node { left: 598px; top: 18px; width: 274px; height: 188px; }
+    .ed-node { left: 198px; top: 232px; width: 234px; height: 214px; }
+    .hospital-node { left: 476px; top: 214px; width: 256px; height: 236px; }
+    .mortality-node { left: 760px; top: 232px; width: 150px; height: 224px; }
+
+    .person-node img { max-height: 270px; }
+    .clinic-node img { max-width: 230px; }
+    .lab-node img { max-width: 252px; }
+    .ed-node img { max-width: 222px; }
+    .hospital-node img { max-width: 234px; }
+    .mortality-node img { max-height: 142px; }
+
+    .mortality-node .node-systems { flex-direction: column; gap: 4px; padding-top: 4px; }
+    .mortality-node .system-tag { min-height: 27px; padding-top: 3px; padding-bottom: 3px; }
 
     .side-panel {
       display: grid;
@@ -299,6 +331,7 @@
       .side-panel { padding: 12px; }
       .system-tag { padding: 4px 7px; font-size: 12px; }
       .layer-control select { width: 190px; }
+      .figure { transform: scale(.94); transform-origin: left center; width: 106%; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -329,35 +362,71 @@
           <span class="key-item"><span class="key-line specimen"></span>Specimen / laboratory signal</span>
         </div>
 
-        <div class="figure-stage">
-          <div class="figure">
-            <img class="care-art" src="assets/slide-04-care-pathway.webp" alt="A person with influenza symptoms, an outpatient clinic, an emergency department, a hospital, a laboratory, and a respectful grave marker">
-            <svg class="connectors" viewBox="0 0 1000 436" preserveAspectRatio="none" aria-hidden="true">
-              <defs>
-                <marker id="arrow-patient" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b9699"></path>
-                </marker>
-                <marker id="arrow-specimen" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#0a6670"></path>
-                </marker>
-              </defs>
-              <path class="patient-path" d="M 183 225 C 220 196, 247 164, 295 142"></path>
-              <path class="patient-path" d="M 185 238 C 226 270, 250 306, 302 326"></path>
-              <path class="patient-path" d="M 457 327 C 500 326, 530 325, 565 324"></path>
-              <path class="patient-path" d="M 756 325 C 806 326, 842 325, 872 316"></path>
-              <path class="specimen-path" d="M 424 145 C 540 105, 653 92, 756 103"></path>
-              <path class="specimen-path" d="M 429 301 C 545 270, 654 190, 759 116"></path>
-              <path class="specimen-path" d="M 662 268 C 690 211, 720 158, 765 118"></path>
-            </svg>
+        <div class="figure">
+          <svg class="connectors" viewBox="0 0 930 476" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <marker id="arrow-patient" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b9699"></path>
+              </marker>
+              <marker id="arrow-specimen" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#0a6670"></path>
+              </marker>
+            </defs>
+            <path class="patient-path" d="M 158 292 H 178 V 108 H 188"></path>
+            <path class="patient-path" d="M 158 292 H 198"></path>
+            <path class="patient-path" d="M 432 335 H 476"></path>
+            <path class="patient-path" d="M 732 335 H 760"></path>
+            <path class="specimen-path" d="M 432 108 H 598"></path>
+            <path class="specimen-path" d="M 315 232 V 204 H 574 V 170 H 598"></path>
+            <path class="specimen-path" d="M 604 214 V 196 H 704 V 188"></path>
+          </svg>
 
-            <button class="system-tag tag-ilinet" type="button" data-system="ilinet" data-category="outpatient"><span>ILINet</span></button>
-            <button class="system-tag tag-nssp" type="button" data-system="nssp" data-category="outpatient"><span>NSSP</span></button>
-            <button class="system-tag tag-flusurv-net" type="button" data-system="flusurv-net" data-category="inpatient"><span>FluSurv-NET</span></button>
-            <button class="system-tag tag-nhsn" type="button" data-system="nhsn" data-category="inpatient"><span>NHSN</span></button>
-            <button class="system-tag tag-icls" type="button" data-system="icls" data-category="virologic"><span>ICLS</span></button>
-            <button class="system-tag tag-nrevss" type="button" data-system="nrevss" data-category="virologic"><span>NREVSS</span></button>
-            <button class="system-tag tag-nchs" type="button" data-system="nchs" data-category="mortality"><span>NCHS</span></button>
-            <button class="system-tag tag-pediatric-mortality" type="button" data-system="pediatric-mortality" data-category="mortality"><span>Pediatric deaths</span></button>
+          <div class="path-node person-node">
+            <img src="assets/slide-04-person.webp" alt="A person with influenza symptoms sneezing into a tissue">
+            <div class="node-title">Symptomatic illness</div>
+          </div>
+
+          <div class="path-node clinic-node">
+            <div class="node-title">Outpatient clinic</div>
+            <img src="assets/slide-04-clinic.webp" alt="An outpatient clinic">
+            <div class="node-systems">
+              <button class="system-tag" type="button" data-system="ilinet" data-category="outpatient"><span>ILINet</span></button>
+            </div>
+          </div>
+
+          <div class="path-node lab-node">
+            <div class="node-title">Virologic testing</div>
+            <img src="assets/slide-04-lab.webp" alt="A clinical virology laboratory">
+            <div class="node-systems">
+              <button class="system-tag" type="button" data-system="icls" data-category="virologic"><span>ICLS</span></button>
+              <button class="system-tag" type="button" data-system="nrevss" data-category="virologic"><span>NREVSS</span></button>
+            </div>
+          </div>
+
+          <div class="path-node ed-node">
+            <div class="node-title">Emergency department</div>
+            <img src="assets/slide-04-ed.webp" alt="A hospital emergency department entrance">
+            <div class="node-systems">
+              <button class="system-tag" type="button" data-system="nssp" data-category="outpatient"><span>NSSP</span></button>
+            </div>
+          </div>
+
+          <div class="path-node hospital-node">
+            <div class="node-title">Hospital admission</div>
+            <img src="assets/slide-04-hospital.webp" alt="An inpatient hospital">
+            <div class="node-systems">
+              <button class="system-tag" type="button" data-system="flusurv-net" data-category="inpatient"><span>FluSurv-NET</span></button>
+              <button class="system-tag" type="button" data-system="nhsn" data-category="inpatient"><span>NHSN</span></button>
+            </div>
+          </div>
+
+          <div class="path-node mortality-node">
+            <div class="node-title">Mortality</div>
+            <img src="assets/slide-04-mortality.webp" alt="A respectful grave marker with flowers">
+            <div class="node-systems">
+              <button class="system-tag" type="button" data-system="nchs" data-category="mortality"><span>NCHS</span></button>
+              <button class="system-tag" type="button" data-system="pediatric-mortality" data-category="mortality"><span>Pediatric deaths</span></button>
+            </div>
           </div>
         </div>
       </div>
