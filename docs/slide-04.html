@@ -74,7 +74,7 @@
     }
 
     select {
-      width: 222px;
+      width: 350px;
       height: 34px;
       border: 1px solid #bac4c1;
       border-radius: 8px;
@@ -360,7 +360,7 @@
         <label for="layer-select">Surveillance layer</label>
         <select id="layer-select" aria-label="Surveillance layer">
           <option value="all">All systems</option>
-          <option value="outpatient">Outpatient &amp; emergency care</option>
+          <option value="outpatient">Outpatient and Emergency Care</option>
           <option value="inpatient">Inpatient</option>
           <option value="virologic">Virologic</option>
           <option value="mortality">Mortality</option>
@@ -474,7 +474,7 @@
     const systemById = new Map(systems.map((system) => [system.id, system]));
     const categoryNames = {
       all: "Complementary signals",
-      outpatient: "Outpatient & emergency care",
+      outpatient: "Outpatient and Emergency Care",
       inpatient: "Inpatient surveillance",
       virologic: "Virologic surveillance",
       mortality: "Mortality surveillance"
