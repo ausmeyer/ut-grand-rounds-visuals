@@ -218,7 +218,7 @@
     }
 
     .speed-control select {
-      width: 72px;
+      width: 88px;
       height: 34px;
       padding-right: 24px;
     }
@@ -308,7 +308,6 @@
             <option value="0.5">0.5</option>
             <option value="1" selected>1</option>
             <option value="2">2</option>
-            <option value="4">4</option>
           </select>
         </div>
       </div>
@@ -388,6 +387,7 @@
     let pinnedEvent = null;
     let playing = false;
     let playbackSpeed = 1;
+    let playbackPosition = 0;
     let timer = null;
 
     function dateForDay(day) {
@@ -443,6 +443,7 @@
       const day = Number(params.get("day"));
       const view = params.get("view");
       if (Number.isFinite(day)) selectedDay = Math.max(0, Math.min(totalDays, Math.round(day)));
+      playbackPosition = selectedDay;
       if (["all", "vaccine", "clinical", "public-health", "surveillance"].includes(view)) selectedView = view;
       slider.max = totalDays;
       slider.value = selectedDay;
@@ -543,21 +544,24 @@
 
     function startPlaying() {
       if (selectedDay >= totalDays) selectedDay = 0;
+      playbackPosition = selectedDay;
       playing = true;
       playButton.textContent = "Ⅱ Pause";
       playButton.setAttribute("aria-label", "Pause timeline");
       timer = window.setInterval(() => {
-        selectedDay = Math.min(totalDays, selectedDay + Math.max(1, Math.round(2 * playbackSpeed)));
+        playbackPosition = Math.min(totalDays, playbackPosition + playbackSpeed);
+        selectedDay = Math.floor(playbackPosition);
         slider.value = selectedDay;
         hoveredEvent = null;
         draw();
-        if (selectedDay >= totalDays) stopPlaying();
+        if (playbackPosition >= totalDays) stopPlaying();
       }, 55);
     }
 
     slider.addEventListener("input", () => {
       stopPlaying();
       selectedDay = Number(slider.value);
+      playbackPosition = selectedDay;
       hoveredEvent = null;
       draw();
     });
@@ -571,6 +575,7 @@
     resetButton.addEventListener("click", () => {
       stopPlaying();
       selectedDay = 0;
+      playbackPosition = 0;
       slider.value = 0;
       hoveredEvent = null;
       pinnedEvent = null;
