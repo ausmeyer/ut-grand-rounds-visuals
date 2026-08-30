@@ -4,7 +4,7 @@ route: slide-02.html
 format:
   responsive: true
   target_aspect_ratio: "16:9"
-  minimum_height_px: 520
+  minimum_height_px: 620
 visual:
   type: progressive simulated national influenza epidemic curve
   period: 2026-06-01 through 2027-03-31
