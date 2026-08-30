@@ -122,7 +122,6 @@
     .event-guide { stroke-width: 1.5; stroke-dasharray: 3 4; transition: opacity .18s ease; }
     .event-dot { stroke: #fff; stroke-width: 2; cursor: pointer; transition: opacity .18s ease, r .18s ease; }
     .event-hit { fill: transparent; cursor: pointer; }
-    .peak-label { fill: var(--curve); font-size: 13px; font-weight: 820; }
     .today-guide { stroke: var(--curve); stroke-width: 1.5; opacity: .35; }
 
     .side-panel {
@@ -369,7 +368,6 @@
 
     const actualOnsetDay = values.findIndex((value) => value >= threshold);
     const peakDay = values.reduce((best, value, day) => value > values[best] ? day : best, 0);
-    const peakValue = values[peakDay];
 
     const svg = document.getElementById("chart");
     const slider = document.getElementById("date-slider");
@@ -510,7 +508,6 @@
         </g>
         ${eventMarkup}
         <circle class="reveal-dot" cx="${x(selectedDay)}" cy="${y(values[selectedDay])}" r="6"></circle>
-        ${selectedDay >= peakDay ? `<text class="peak-label" x="${x(peakDay)}" y="${y(peakValue) - 13}" text-anchor="middle">Peak ${peakValue.toFixed(1)}%</text>` : ""}
       `;
 
       svg.querySelectorAll(".event").forEach((group) => {
