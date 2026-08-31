@@ -67,7 +67,7 @@
       color: var(--ink);
       font-weight: 740;
     }
-    select { width: 215px; padding: 0 34px 0 10px; font-size: 13px; }
+    select { width: 245px; padding: 0 34px 0 10px; font-size: 13px; }
     button { width: 34px; padding: 0; font-size: 17px; cursor: pointer; }
     button:hover { border-color: var(--accent); color: var(--accent); }
     button:disabled { cursor: default; opacity: .35; }
@@ -165,6 +165,15 @@
     .focus-area { fill: var(--accent-open); opacity: .72; }
     .focus-dot { fill: #fff; stroke: var(--accent); stroke-width: 2.5; }
     .focus-label { fill: var(--accent); font-size: 11px; font-weight: 840; paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
+    .timeline-line { stroke: #aeb9b6; stroke-width: 3; }
+    .timeline-arrow { fill: #aeb9b6; }
+    .timeline-node { fill: #fff; stroke: var(--accent); stroke-width: 4; }
+    .timeline-year { fill: var(--accent); font-size: 25px; font-weight: 860; letter-spacing: -.03em; }
+    .timeline-title { fill: var(--ink); font-size: 12.5px; font-weight: 830; }
+    .timeline-copy { fill: var(--muted); font-size: 10.5px; font-weight: 670; }
+    .timeline-takeaway { fill: color-mix(in srgb, var(--accent) 8%, #fff); stroke: color-mix(in srgb, var(--accent) 24%, #fff); }
+    .timeline-takeaway-strong { fill: var(--ink); font-size: 13px; font-weight: 840; }
+    .timeline-takeaway-copy { fill: #3c5057; font-size: 12px; font-weight: 700; }
 
     .reading-note {
       display: grid;
@@ -209,6 +218,7 @@
           <option value="signal">1 · Observed signal</option>
           <option value="seasons">2 · Variation across seasons</option>
           <option value="geography">3 · Variation across locations</option>
+          <option value="history" id="history-option" hidden>4 · How the signal changed</option>
         </select>
         <button id="next-button" type="button" aria-label="Next view">→</button>
       </div>
@@ -257,7 +267,8 @@
     "use strict";
     const config = /*__SLIDE_CONFIG__*/;
     const data = /*__SLIDE_DATA__*/;
-    const states = ["signal", "seasons", "geography"];
+    const hasHistory = Array.isArray(config.historyTimeline) && config.historyTimeline.length > 0;
+    const states = hasHistory ? ["signal", "seasons", "geography", "history"] : ["signal", "seasons", "geography"];
     const stateSelect = document.getElementById("state-select");
     const backButton = document.getElementById("back-button");
     const nextButton = document.getElementById("next-button");
@@ -281,6 +292,7 @@
     document.getElementById("network-since").textContent = config.networkSince;
     document.getElementById("change-copy").textContent = config.change;
     document.getElementById("limitation").textContent = config.limitation;
+    document.getElementById("history-option").hidden = !hasHistory;
 
     const SVG_NS = "http://www.w3.org/2000/svg";
     const bounds = { left: 62, right: 884, top: 18, bottom: 276 };
@@ -321,7 +333,39 @@
       return d.trim();
     }
 
+    function renderHistory() {
+      document.getElementById("chart-subtitle").textContent = config.historySubtitle;
+      chart.replaceChildren(
+        element("title", { id: "chart-title" }, `${config.name} surveillance history`),
+        element("desc", { id: "chart-desc" }, "A four-point timeline showing how BioSense evolved into NSSP and how the displayed influenza signal became diagnosis-based."),
+      );
+
+      const startX = 104;
+      const endX = 806;
+      const lineY = 124;
+      chart.appendChild(element("line", { x1: startX, x2: endX, y1: lineY, y2: lineY, class: "timeline-line" }));
+      chart.appendChild(element("path", { d: `M${endX},${lineY - 7} L${endX + 14},${lineY} L${endX},${lineY + 7} Z`, class: "timeline-arrow" }));
+
+      config.historyTimeline.forEach((milestone, index) => {
+        const x = startX + (index / Math.max(1, config.historyTimeline.length - 1)) * (endX - startX);
+        chart.appendChild(element("text", { x, y: 68, class: "timeline-year", "text-anchor": "middle" }, milestone.year));
+        chart.appendChild(element("text", { x, y: 92, class: "timeline-title", "text-anchor": "middle" }, milestone.title));
+        chart.appendChild(element("circle", { cx: x, cy: lineY, r: 8, class: "timeline-node" }));
+        milestone.lines.forEach((line, lineIndex) => {
+          chart.appendChild(element("text", { x, y: 157 + (lineIndex * 15), class: "timeline-copy", "text-anchor": "middle" }, line));
+        });
+      });
+
+      chart.appendChild(element("rect", { x: 93, y: 213, width: 728, height: 62, rx: 10, class: "timeline-takeaway" }));
+      chart.appendChild(element("text", { x: 112, y: 238, class: "timeline-takeaway-strong" }, config.historyTakeaway[0]));
+      chart.appendChild(element("text", { x: 112, y: 258, class: "timeline-takeaway-copy" }, config.historyTakeaway[1]));
+    }
+
     function render(state) {
+      if (state === "history") {
+        renderHistory();
+        return;
+      }
       chart.replaceChildren(
         element("title", { id: "chart-title" }, `${config.name} seasonal surveillance data`),
         element("desc", { id: "chart-desc" }, "The selected view compares one season, historical seasons, or reporting locations."),

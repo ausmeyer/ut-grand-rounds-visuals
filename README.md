@@ -75,6 +75,10 @@ Slides 5–9 each support three addressable views for duplication in Slides.com:
 - `#state=seasons` adds historical seasons for the selected location.
 - `#state=geography` shows the 2024/25 reporting locations and highlights one.
 
+Slide 6 (NSSP) also supports `#state=history`, a four-era timeline from the
+2003 BioSense early-warning system through the diagnosis-based influenza
+measure used in the current public product.
+
 Slide 11 supports `#state=1` through `#state=5`, sequentially adding ILINet,
 NSSP, NREVSS, NHSN, and FluSurv-NET. Every location-season is min-max scaled
 independently; calendar weeks are never shifted.

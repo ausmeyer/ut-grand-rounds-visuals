@@ -29,6 +29,8 @@ system_slide_states:
   - signal
   - seasons
   - geography
+nssp_additional_state:
+  - history
 overlay_states:
   1: ILINet
   2: NSSP
@@ -51,6 +53,7 @@ editorial_points:
   - Each system observes a different encounter, specimen stream, population, and denominator.
   - Geographic coverage must be described in system-specific units rather than as one comparable location count.
   - Network history and the currently comparable public extract are not always the same period.
+  - NSSP remains syndromic surveillance infrastructure, while the public influenza measure shown is defined from discharge diagnoses and clinical terms.
   - Similar seasonal timing does not make the surveillance measures interchangeable.
 sources:
   - https://www.cdc.gov/fluview/overview/index.html
@@ -59,3 +62,8 @@ sources:
   - https://www.cdc.gov/flu/whats-new/2025-2026-influenza-activity.html
   - https://www.cdc.gov/flu/weekly/weeklyarchives2015-2016/Week52.htm
   - https://stacks.cdc.gov/view/cdc/133124/cdc_133124_DS1.pdf
+  - https://www.cdc.gov/nssp/php/about/about-nssp-and-the-biosense-platform.html
+  - https://www.cdc.gov/nssp/php/onboarding-resources/companion-guide-ed-data-respiratory-illness.html
+  - https://www.cdc.gov/mmwr/preview/mmwrhtml/su5401a21.htm
+  - https://stacks.cdc.gov/view/cdc/13171
+  - https://stacks.cdc.gov/view/cdc/60038/cdc_60038_DS1.pdf

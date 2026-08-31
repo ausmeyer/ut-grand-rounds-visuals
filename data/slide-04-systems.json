@@ -12,7 +12,7 @@
   {
     "id": "nssp",
     "short": "NSSP",
-    "name": "National Syndromic Surveillance System",
+    "name": "National Syndromic Surveillance Program",
     "category": "outpatient",
     "stage": "Emergency department",
     "reports": "The percentage of emergency-department visits with an influenza discharge diagnosis, overall and by age group.",
