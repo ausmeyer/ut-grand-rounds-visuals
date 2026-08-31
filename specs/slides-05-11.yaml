@@ -51,7 +51,7 @@ data:
     - nrevss_state_seasons.csv
   overlay_transformation: min-max scale each surveillance system-season across all included locations to [0, 1]
   overlay_time_alignment: preserve the original MMWR seasonal week; do not shift curves
-  overlay_summary: week-specific median of the shared system-season scaled curves for each system
+  overlay_summary: week-specific median across scaled national or network aggregate seasons for each system
 editorial_points:
   - Each system observes a different encounter, specimen stream, population, and denominator.
   - Geographic coverage must be described in system-specific units rather than as one comparable location count.

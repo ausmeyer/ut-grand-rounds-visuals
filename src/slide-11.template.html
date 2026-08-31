@@ -87,7 +87,7 @@
       <div class="plot"><svg id="chart" viewBox="0 0 1180 360" role="img" aria-labelledby="chart-title chart-desc"></svg></div>
       <footer class="footer">
         <div class="interpretation" id="interpretation"></div>
-        <div class="method"><span class="count" id="curve-count"></span><br>Thin lines are location–seasons on shared system-season scales; thick lines are week-specific medians.</div>
+        <div class="method"><span class="count" id="curve-count"></span><br>Thin lines are location–seasons; thick lines are medians of national/network seasons.</div>
       </footer>
     </section>
   </main>
@@ -147,7 +147,7 @@
       const active = activeIds.map((id) => systemById.get(id));
       chart.replaceChildren(
         element("title", { id: "chart-title" }, "System-season scaled surveillance curves"),
-        element("desc", { id: "chart-desc" }, "All locations within each surveillance system and season share one min-max scale between zero and one; calendar weeks are not shifted."),
+        element("desc", { id: "chart-desc" }, "All locations within each surveillance system and season share one min-max scale between zero and one. Thick lines summarize the scaled national or network aggregate seasons. Calendar weeks are not shifted."),
       );
       const xScale = (x) => bounds.left + ((x - 1) / 39) * (bounds.right - bounds.left);
       const yScale = (y) => bounds.bottom - y * (bounds.bottom - bounds.top);
@@ -178,15 +178,15 @@
       });
 
       const labelOffsets = {
-        ilinet: { x: 8, y: 22, anchor: "start" },
-        nssp: { x: -10, y: -10, anchor: "end" },
-        nrevss: { x: 8, y: -7, anchor: "start" },
-        nhsn: { x: 8, y: -18, anchor: "start" },
-        flusurv: { x: 8, y: 2, anchor: "start" },
+        ilinet: { x: -10, y: 19, anchor: "end" },
+        nssp: { x: -12, y: -11, anchor: "end" },
+        nrevss: { x: 8, y: -8, anchor: "start" },
+        nhsn: { x: 10, y: 20, anchor: "start" },
+        flusurv: { x: 10, y: -12, anchor: "start" },
       };
       active.forEach((system) => {
-        chart.appendChild(element("path", { d: pathFor(system.median, xScale, yScale), class: "median", stroke: system.color }));
-        const peak = system.median.reduce((best, point) => point[1] > best[1] ? point : best, system.median[0]);
+        chart.appendChild(element("path", { d: pathFor(system.summary, xScale, yScale), class: "median", stroke: system.color }));
+        const peak = system.summary.reduce((best, point) => point[1] > best[1] ? point : best, system.summary[0]);
         const offset = labelOffsets[system.id] || { x: 8, y: -7, anchor: "start" };
         chart.appendChild(element("circle", { cx: xScale(peak[0]), cy: yScale(peak[1]), r: 4.2, class: "median-dot", stroke: system.color }));
         chart.appendChild(element("text", {
@@ -201,7 +201,7 @@
       const totalLocations = active.reduce((sum, system) => sum + system.locationCount, 0);
       document.getElementById("curve-count").textContent = `${totalCurves.toLocaleString()} curves from ${totalLocations} system-specific locations`;
       document.getElementById("interpretation").textContent = step === order.length
-        ? "The systems broadly trace the same seasonal wave, while differences in their median timing are consistent with observing different points in testing, care-seeking, and hospitalization."
+        ? "The national and network summaries trace the same seasonal wave, while their timing differs as surveillance moves from testing to care-seeking and hospitalization."
         : `${active[active.length - 1].name} has been added without changing the calendar alignment of any curve.`;
     }
 

@@ -82,3 +82,5 @@ measure used in the current public product.
 Slide 11 supports `#state=1` through `#state=5`, sequentially adding ILINet,
 NSSP, NREVSS, NHSN, and FluSurv-NET. Within each surveillance system-season,
 all included locations share one min-max scale; calendar weeks are never shifted.
+Thick lines are week-specific medians across the matching scaled national or
+network aggregate seasons, rather than summaries that weight locations equally.

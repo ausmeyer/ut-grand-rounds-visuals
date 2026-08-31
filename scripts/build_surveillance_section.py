@@ -286,8 +286,7 @@ def system_payload(spec: dict, cache: dict[str, list[dict]]) -> dict:
 def normalized_overlay(cache: dict[str, list[dict]]) -> dict:
     by_system = []
     for spec in SYSTEMS:
-        rows = cache[spec["geoFile"]]
-        curves = grouped_curves(rows)
+        curves = grouped_curves(cache[spec["geoFile"]])
         if spec["id"] == "flusurv":
             curves = [curve for curve in curves if curve["location"] in STATE_NAMES]
 
@@ -296,8 +295,22 @@ def normalized_overlay(cache: dict[str, list[dict]]) -> dict:
         for curve in eligible:
             curves_by_season[curve["season"]].append(curve)
 
+        aggregate_curves = grouped_curves(
+            cache[spec["mainFile"]],
+            {spec["mainLocation"]},
+        )
+        aggregate_by_season = {
+            curve["season"]: curve
+            for curve in aggregate_curves
+            if len(curve["points"]) >= 12
+        }
+
         normalized = []
+        normalized_aggregates = []
         for season, season_curves in curves_by_season.items():
+            aggregate = aggregate_by_season.get(season)
+            if aggregate is None:
+                continue
             values = [point[1] for curve in season_curves for point in curve["points"]]
             lo, hi = min(values), max(values)
             if hi <= lo:
@@ -309,27 +322,36 @@ def normalized_overlay(cache: dict[str, list[dict]]) -> dict:
                     "season": season,
                     "points": [[x, round((y - lo) / (hi - lo), 4)] for x, y in curve["points"]],
                 })
+            normalized_aggregates.append({
+                "id": aggregate["id"],
+                "location": aggregate["location"],
+                "season": season,
+                "points": [[x, round((y - lo) / (hi - lo), 4)] for x, y in aggregate["points"]],
+            })
 
-        medians = []
-        for x in sorted({point[0] for curve in normalized for point in curve["points"]}):
+        summary = []
+        minimum_summary_seasons = max(2, math.ceil(len(normalized_aggregates) / 2))
+        for x in sorted({point[0] for curve in normalized_aggregates for point in curve["points"]}):
             vals = [
                 point[1]
-                for curve in normalized
+                for curve in normalized_aggregates
                 for point in curve["points"]
                 if point[0] == x
             ]
-            if vals:
-                medians.append([x, round(statistics.median(vals), 4)])
+            if len(vals) >= minimum_summary_seasons:
+                summary.append([x, round(statistics.median(vals), 4)])
 
         by_system.append({
             "id": spec["id"],
             "name": spec["name"],
             "color": spec["color"],
             "curves": normalized,
-            "median": medians,
+            "summary": summary,
             "curveCount": len(normalized),
             "locationCount": len({curve["location"] for curve in normalized}),
             "seasonCount": len({curve["season"] for curve in normalized}),
+            "summarySeasonCount": len(normalized_aggregates),
+            "summaryMinimumSeasons": minimum_summary_seasons,
         })
     return {"systems": by_system}
 
