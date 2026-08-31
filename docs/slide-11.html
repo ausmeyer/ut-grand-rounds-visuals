@@ -184,11 +184,18 @@
         nhsn: { x: 10, y: 20, anchor: "start" },
         flusurv: { x: 10, y: -12, anchor: "start" },
       };
+      const summaryLabels = active.map((system) => ({
+        system,
+        peak: system.summary.reduce((best, point) => point[1] > best[1] ? point : best, system.summary[0]),
+        offset: labelOffsets[system.id] || { x: 8, y: -7, anchor: "start" },
+      }));
       active.forEach((system) => {
         chart.appendChild(element("path", { d: pathFor(system.summary, xScale, yScale), class: "median", stroke: system.color }));
-        const peak = system.summary.reduce((best, point) => point[1] > best[1] ? point : best, system.summary[0]);
-        const offset = labelOffsets[system.id] || { x: 8, y: -7, anchor: "start" };
+      });
+      summaryLabels.forEach(({ system, peak }) => {
         chart.appendChild(element("circle", { cx: xScale(peak[0]), cy: yScale(peak[1]), r: 4.2, class: "median-dot", stroke: system.color }));
+      });
+      summaryLabels.forEach(({ system, peak, offset }) => {
         chart.appendChild(element("text", {
           x: xScale(peak[0]) + offset.x,
           y: Math.max(bounds.top + 12, yScale(peak[1]) + offset.y),
