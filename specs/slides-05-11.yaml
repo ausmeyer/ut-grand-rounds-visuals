@@ -42,7 +42,9 @@ data:
   files:
     - ilinet_national_seasons.csv
     - ilinet_state_seasons.csv
+    - nssp_national_seasons.csv
     - nssp_state_seasons.csv
+    - nhsn_national_seasons.csv
     - nhsn_state_seasons.csv
     - flusurv_state_seasons.csv
     - nrevss_state_seasons.csv
