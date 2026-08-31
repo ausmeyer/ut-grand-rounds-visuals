@@ -137,20 +137,13 @@
 
     .visual {
       display: grid;
-      grid-template-rows: 58px minmax(0, 1fr) 67px;
+      grid-template-rows: 30px minmax(0, 1fr) 67px;
       min-width: 0;
       min-height: 0;
       padding: 13px 16px 11px;
     }
-    .chart-heading { min-width: 0; }
-    .chart-heading h1 {
-      margin: 0;
-      font-size: 24px;
-      line-height: 1.08;
-      letter-spacing: -.03em;
-      white-space: nowrap;
-    }
-    .chart-heading p { margin: 5px 0 0; color: var(--muted); font-size: 12px; font-weight: 650; }
+    .chart-heading { display: flex; align-items: center; min-width: 0; }
+    .chart-heading p { margin: 0; color: var(--muted); font-size: 12px; font-weight: 650; }
 
     .chart-wrap { position: relative; min-width: 0; min-height: 0; }
     svg { display: block; width: 100%; height: 100%; overflow: visible; }
@@ -243,11 +236,10 @@
 
       <section class="visual">
         <header class="chart-heading">
-          <h1 id="question"></h1>
           <p id="chart-subtitle"></p>
         </header>
         <div class="chart-wrap">
-          <svg id="chart" viewBox="0 0 900 320" role="img" aria-labelledby="chart-title chart-desc">
+          <svg id="chart" viewBox="0 0 900 350" role="img" aria-labelledby="chart-title chart-desc">
             <title id="chart-title">Seasonal influenza surveillance time series</title>
             <desc id="chart-desc">A line chart that can show one selected season, historical seasons, or locations.</desc>
           </svg>
@@ -265,7 +257,7 @@
 
   <script>
     "use strict";
-    const config = {"id":"flusurv","slide":8,"name":"FluSurv-NET","fullName":"Influenza Hospitalization Surveillance Network","color":"#c66a2b","image":"assets/slide-04-hospital.webp","imageAlt":"A monochrome illustration of a hospital participating in a surveillance catchment","question":"FluSurv-NET turns hospitalizations into population-based rates","observation":"Laboratory-confirmed influenza hospitalizations among residents of defined catchments","unit":"hospitalizations per 100,000","mainFile":"flusurv_state_seasons.csv","geoFile":"flusurv_state_seasons.csv","mainLocation":"FluSurv-NET","geoHighlight":"California","focusSeason":"2024/25","series":"Network extract shown: 2009/10–2025/26","coverage":">90 counties in 14 states; ≈10% of the U.S. population","age":"All ages with detailed age-specific hospitalization rates","timeliness":"Weekly rates; recent weeks revised for reporting lag","change":"2003 pediatric · 2005 adult · 2025 year-round surveillance","limitation":"Its defined catchments support detailed rates but are not complete national coverage.","source":"https://www.cdc.gov/fluview/overview/influenza-hospitalization-surveillance.html","networkSince":"Pediatric surveillance 2003/04; adults 2005/06"};
+    const config = {"id":"flusurv","slide":8,"name":"FluSurv-NET","fullName":"Influenza Hospitalization Surveillance Network","color":"#c66a2b","image":"assets/slide-04-hospital.webp","imageAlt":"A monochrome illustration of a hospital participating in a surveillance catchment","observation":"Laboratory-confirmed influenza hospitalizations among residents of defined catchments","unit":"hospitalizations per 100,000","mainFile":"flusurv_state_seasons.csv","geoFile":"flusurv_state_seasons.csv","mainLocation":"FluSurv-NET","aggregateLabel":"all EIP and IHSP sites combined","geoHighlight":"California","focusSeason":"2024/25","series":"Network extract shown: 2009/10–2025/26","coverage":">90 counties in 14 states; ≈10% of the U.S. population","age":"All ages with detailed age-specific hospitalization rates","timeliness":"Weekly rates; recent weeks revised for reporting lag","change":"2003 pediatric · 2005 adult · 2025 year-round surveillance","limitation":"Its defined catchments support detailed rates but are not complete national coverage.","source":"https://www.cdc.gov/fluview/overview/influenza-hospitalization-surveillance.html","networkSince":"Pediatric surveillance 2003/04; adults 2005/06"};
     const data = {"focus":{"id":"flusurv-net-2024-25","location":"FluSurv-NET","season":"2024/25","points":[[1.0,0.1],[2.0,0.1],[3.0,0.1],[4.0,0.1],[5.0,0.1],[6.0,0.1],[7.0,0.2],[8.0,0.2],[9.0,0.2],[10.0,0.3],[11.0,0.4],[12.0,0.5],[13.0,0.6],[14.0,1.2],[15.0,2.1],[16.0,3.9],[17.0,7.8],[19.0,10.3],[20.0,8.6],[21.0,9.3],[22.0,11.1],[23.0,13.4],[24.0,13.5],[25.0,10.6],[26.0,8.4],[27.0,6.7],[28.0,4.8],[29.0,3.8],[30.0,2.6],[31.0,2.0],[32.0,1.6],[33.0,1.1],[34.0,0.8],[35.0,1.0]]},"seasons":[{"id":"flusurv-net-2009-10","location":"FluSurv-NET","season":"2009/10","points":[[1.0,0.8295],[2.0,0.7944],[3.0,1.0476],[4.0,1.6123],[5.0,2.8],[6.0,3.8],[7.0,4.0],[8.0,3.5],[9.0,2.7],[10.0,1.8],[11.0,1.3],[12.0,0.8],[13.0,0.5],[14.0,0.4],[15.0,0.3],[16.0,0.3],[17.0,0.3],[19.0,0.2],[20.0,0.2],[21.0,0.2],[22.0,0.2],[23.0,0.2],[24.0,0.2],[25.0,0.2],[26.0,0.2],[27.0,0.2],[28.0,0.2],[29.0,0.1],[30.0,0.1],[31.0,0.1],[32.0,0.1],[33.0,0.1],[34.0,0.0],[35.0,0.0]]},{"id":"flusurv-net-2010-11","location":"FluSurv-NET","season":"2010/11","points":[[5.0,0.0],[6.0,0.1],[7.0,0.1],[8.0,0.1],[9.0,0.1],[10.0,0.1],[11.0,0.1],[12.0,0.1],[13.0,0.2],[14.0,0.3],[15.0,0.4],[16.0,0.6],[17.0,0.8],[19.0,0.9],[20.0,1.0],[21.0,1.2],[22.0,1.5],[23.0,1.8],[24.0,1.6],[25.0,2.0],[26.0,2.1],[27.0,1.8],[28.0,1.4],[29.0,1.2],[30.0,0.7],[31.0,0.5],[32.0,0.4],[33.0,0.3],[34.0,0.2],[35.0,0.1]]},{"id":"flusurv-net-2011-12","location":"FluSurv-NET","season":"2011/12","points":[[5.0,0.0],[6.0,0.0],[7.0,0.0],[8.0,0.0],[9.0,0.0],[10.0,0.0],[11.0,0.0],[12.0,0.0],[13.0,0.0],[14.0,0.0],[15.0,0.1],[16.0,0.1],[17.0,0.1],[19.0,0.1],[20.0,0.1],[21.0,0.1],[22.0,0.1],[23.0,0.2],[24.0,0.2],[25.0,0.3],[26.0,0.4],[27.0,0.6],[28.0,0.8],[29.0,1.1],[30.0,1.1],[31.0,0.8],[32.0,0.7],[33.0,0.7],[34.0,0.6],[35.0,0.4]]},{"id":"flusurv-net-2012-13","location":"FluSurv-NET","season":"2012/13","points":[[5.0,0.0],[6.0,0.0],[7.0,0.1],[8.0,0.0],[9.0,0.1],[10.0,0.2],[11.0,0.3],[12.0,0.5],[13.0,0.8],[14.0,1.4],[15.0,1.9],[16.0,3.1],[17.0,5.0],[19.0,5.4],[20.0,4.9],[21.0,3.8],[22.0,3.1],[23.0,2.6],[24.0,2.0],[25.0,1.7],[26.0,1.3],[27.0,1.2],[28.0,1.0],[29.0,0.9],[30.0,0.7],[31.0,0.6],[32.0,0.6],[33.0,0.4],[34.0,0.2],[35.0,0.2]]},{"id":"flusurv-net-2013-14","location":"FluSurv-NET","season":"2013/14","points":[[5.0,0.0],[6.0,0.1],[7.0,0.1],[8.0,0.1],[9.0,0.1],[10.0,0.1],[11.0,0.2],[12.0,0.4],[13.0,0.6],[14.0,1.0],[15.0,1.1],[16.0,2.0],[17.0,3.1],[19.0,3.9],[20.0,3.8],[21.0,3.1],[22.0,2.5],[23.0,2.1],[24.0,1.8],[25.0,1.3],[26.0,1.0],[27.0,0.9],[28.0,0.7],[29.0,0.7],[30.0,0.7],[31.0,0.7],[32.0,0.8],[33.0,0.8],[34.0,0.7],[35.0,0.8]]},{"id":"flusurv-net-2014-15","location":"FluSurv-NET","season":"2014/15","points":[[5.0,0.1],[6.0,0.1],[7.0,0.2],[8.0,0.1],[9.0,0.1],[10.0,0.2],[11.0,0.2],[12.0,0.5],[13.0,1.2],[14.0,2.3],[15.0,3.6],[16.0,6.0],[17.0,9.0],[18.0,8.5],[19.0,6.1],[20.0,4.2],[21.0,3.1],[22.0,2.7],[23.0,2.5],[24.0,2.0],[25.0,1.6],[26.0,1.4],[27.0,1.3],[28.0,1.2],[29.0,1.2],[30.0,1.1],[31.0,1.0],[32.0,1.0],[33.0,0.7],[34.0,0.5],[35.0,0.3]]},{"id":"flusurv-net-2015-16","location":"FluSurv-NET","season":"2015/16","points":[[5.0,0.1],[6.0,0.1],[7.0,0.1],[8.0,0.1],[9.0,0.1],[10.0,0.1],[11.0,0.1],[12.0,0.1],[13.0,0.1],[14.0,0.1],[15.0,0.1],[16.0,0.2],[17.0,0.2],[19.0,0.4],[20.0,0.3],[21.0,0.4],[22.0,0.6],[23.0,0.8],[24.0,1.2],[25.0,2.0],[26.0,2.5],[27.0,3.3],[28.0,4.2],[29.0,3.4],[30.0,3.0],[31.0,2.6],[32.0,1.9],[33.0,1.4],[34.0,1.2],[35.0,0.8]]},{"id":"flusurv-net-2016-17","location":"FluSurv-NET","season":"2016/17","points":[[5.0,0.1],[6.0,0.1],[7.0,0.1],[8.0,0.1],[9.0,0.1],[10.0,0.2],[11.0,0.2],[12.0,0.3],[13.0,0.4],[14.0,0.6],[15.0,0.8],[16.0,1.6],[17.0,3.3],[19.0,4.2],[20.0,3.8],[21.0,3.8],[22.0,3.4],[23.0,3.8],[24.0,4.7],[25.0,5.1],[26.0,5.4],[27.0,3.3],[28.0,2.9],[29.0,2.8],[30.0,3.1],[31.0,2.8],[32.0,2.0],[33.0,1.4],[34.0,1.0],[35.0,0.6]]},{"id":"flusurv-net-2017-18","location":"FluSurv-NET","season":"2017/18","points":[[5.0,0.1],[6.0,0.1],[7.0,0.2],[8.0,0.2],[9.0,0.3],[10.0,0.3],[11.0,0.4],[12.0,0.8],[13.0,1.2],[14.0,1.4],[15.0,2.3],[16.0,4.6],[17.0,8.2],[19.0,10.2],[20.0,9.8],[21.0,8.9],[22.0,8.5],[23.0,7.8],[24.0,7.0],[25.0,6.3],[26.0,5.2],[27.0,3.6],[28.0,2.8],[29.0,2.8],[30.0,2.3],[31.0,2.2],[32.0,1.9],[33.0,1.3],[34.0,1.0],[35.0,1.0]]},{"id":"flusurv-net-2018-19","location":"FluSurv-NET","season":"2018/19","points":[[5.0,0.1],[6.0,0.1],[7.0,0.1],[8.0,0.1],[9.0,0.2],[10.0,0.2],[11.0,0.2],[12.0,0.3],[13.0,0.6],[14.0,0.7],[15.0,1.2],[16.0,1.9],[17.0,2.9],[19.0,3.0],[20.0,2.5],[21.0,2.1],[22.0,2.3],[23.0,3.0],[24.0,3.5],[25.0,3.8],[26.0,4.6],[27.0,4.6],[28.0,5.2],[29.0,5.5],[30.0,4.8],[31.0,3.6],[32.0,2.7],[33.0,1.8],[34.0,1.1],[35.0,0.8]]},{"id":"flusurv-net-2019-20","location":"FluSurv-NET","season":"2019/20","points":[[5.0,0.1],[6.0,0.1],[7.0,0.2],[8.0,0.2],[9.0,0.2],[10.0,0.3],[11.0,0.4],[12.0,0.6],[13.0,0.9],[14.0,1.3],[15.0,1.7],[16.0,2.4],[17.0,4.5],[19.0,5.3],[20.0,4.5],[21.0,4.2],[22.0,4.6],[23.0,5.3],[24.0,6.0],[25.0,5.0],[26.0,5.0],[27.0,4.4],[28.0,4.0],[29.0,2.8],[30.0,1.3],[31.0,0.3],[32.0,0.1],[33.0,0.1],[34.0,0.1],[35.0,0.0]]},{"id":"flusurv-net-2021-22","location":"FluSurv-NET","season":"2021/22","points":[[5.0,0.0],[6.0,0.0],[7.0,0.0],[8.0,0.0],[9.0,0.0],[10.0,0.1],[11.0,0.1],[12.0,0.2],[13.0,0.3],[14.0,0.4],[15.0,0.6],[16.0,0.7],[17.0,1.0],[19.0,0.6],[20.0,0.4],[21.0,0.3],[22.0,0.2],[23.0,0.2],[24.0,0.2],[25.0,0.2],[26.0,0.3],[27.0,0.3],[28.0,0.4],[29.0,0.6],[30.0,0.7],[31.0,0.9],[32.0,1.1],[33.0,1.1],[34.0,1.2],[35.0,1.2],[36.0,1.1],[37.0,1.0],[38.0,0.8],[39.0,0.6],[40.0,0.5]]},{"id":"flusurv-net-2022-23","location":"FluSurv-NET","season":"2022/23","points":[[5.0,0.4],[6.0,0.6],[7.0,0.9],[8.0,1.7],[9.0,2.5],[10.0,3.2],[11.0,3.9],[12.0,6.9],[13.0,8.7],[14.0,7.3],[15.0,6.4],[16.0,5.6],[17.0,5.2],[19.0,3.0],[20.0,1.3],[21.0,0.8],[22.0,0.5],[23.0,0.4],[24.0,0.3],[25.0,0.3],[26.0,0.3],[27.0,0.2],[28.0,0.3],[29.0,0.3],[30.0,0.3],[31.0,0.2],[32.0,0.2],[33.0,0.2],[34.0,0.2],[35.0,0.2]]},{"id":"flusurv-net-2023-24","location":"FluSurv-NET","season":"2023/24","points":[[5.0,0.2],[6.0,0.2],[7.0,0.3],[8.0,0.3],[9.0,0.5],[10.0,0.8],[11.0,0.9],[12.0,1.4],[13.0,2.1],[14.0,2.9],[15.0,4.1],[16.0,6.7],[17.0,8.9],[19.0,6.9],[20.0,5.4],[21.0,4.2],[22.0,3.9],[23.0,3.5],[24.0,3.5],[25.0,3.3],[26.0,3.3],[27.0,3.3],[28.0,2.7],[29.0,2.1],[30.0,1.9],[31.0,1.7],[32.0,1.7],[33.0,1.3],[34.0,0.9],[35.0,0.7],[36.0,0.5],[37.0,0.4],[38.0,0.3],[39.0,0.3],[40.0,0.3]]},{"id":"flusurv-net-2024-25","location":"FluSurv-NET","season":"2024/25","points":[[1.0,0.1],[2.0,0.1],[3.0,0.1],[4.0,0.1],[5.0,0.1],[6.0,0.1],[7.0,0.2],[8.0,0.2],[9.0,0.2],[10.0,0.3],[11.0,0.4],[12.0,0.5],[13.0,0.6],[14.0,1.2],[15.0,2.1],[16.0,3.9],[17.0,7.8],[19.0,10.3],[20.0,8.6],[21.0,9.3],[22.0,11.1],[23.0,13.4],[24.0,13.5],[25.0,10.6],[26.0,8.4],[27.0,6.7],[28.0,4.8],[29.0,3.8],[30.0,2.6],[31.0,2.0],[32.0,1.6],[33.0,1.1],[34.0,0.8],[35.0,1.0]]},{"id":"flusurv-net-2025-26","location":"FluSurv-NET","season":"2025/26","points":[[5.0,0.1],[6.0,0.2],[7.0,0.2],[8.0,0.2],[9.0,0.3],[10.0,0.5],[11.0,0.7],[12.0,1.2],[13.0,1.8],[14.0,2.9],[15.0,4.7],[16.0,8.2],[17.0,13.2],[18.0,12.6],[19.0,7.3],[20.0,4.3],[21.0,3.5],[22.0,3.5],[23.0,3.5],[24.0,3.0],[25.0,3.0],[26.0,2.4],[27.0,2.1],[28.0,1.6],[29.0,1.4],[30.0,1.2],[31.0,1.0],[32.0,0.7],[33.0,0.7],[34.0,0.5],[35.0,0.4],[36.0,0.3],[37.0,0.3],[38.0,0.2],[39.0,0.1],[40.0,0.1]]}],"geography":[{"id":"california-2024-25","location":"California","season":"2024/25","points":[[1.0,0.1],[2.0,0.1],[3.0,0.2],[4.0,0.3],[5.0,0.2],[6.0,0.2],[7.0,0.3],[8.0,0.4],[9.0,0.4],[10.0,0.4],[11.0,0.6],[12.0,0.8],[13.0,0.7],[14.0,1.6],[15.0,2.5],[16.0,3.2],[17.0,6.9],[19.0,8.7],[20.0,7.7],[21.0,8.7],[22.0,10.5],[23.0,10.5],[24.0,9.7],[25.0,7.7],[26.0,6.3],[27.0,4.7],[28.0,1.5],[29.0,2.5],[30.0,1.6],[31.0,1.3],[32.0,1.0],[33.0,0.8],[34.0,0.8],[35.0,1.0]]},{"id":"colorado-2024-25","location":"Colorado","season":"2024/25","points":[[1.0,0.0],[2.0,0.0],[3.0,0.0],[4.0,0.1],[5.0,0.0],[6.0,0.2],[7.0,0.1],[8.0,0.1],[9.0,0.3],[10.0,0.2],[11.0,0.3],[12.0,0.6],[13.0,0.6],[14.0,1.2],[15.0,2.0],[16.0,3.5],[17.0,6.9],[19.0,8.9],[20.0,7.4],[21.0,6.3],[22.0,7.4],[23.0,8.0],[24.0,9.1],[25.0,6.8],[26.0,6.3],[27.0,4.5],[28.0,3.4],[29.0,2.5],[30.0,1.9],[31.0,1.7],[32.0,1.3],[33.0,0.7],[34.0,0.6],[35.0,1.1]]},{"id":"connecticut-2024-25","location":"Connecticut","season":"2024/25","points":[[1.0,0.2],[2.0,0.1],[3.0,0.2],[4.0,0.0],[5.0,0.2],[6.0,0.2],[7.0,0.1],[8.0,0.6],[9.0,0.0],[10.0,0.2],[11.0,0.4],[12.0,0.1],[13.0,0.5],[14.0,0.9],[15.0,2.2],[16.0,2.7],[17.0,6.9],[19.0,13.0],[20.0,10.3],[21.0,12.6],[22.0,16.2],[23.0,21.0],[24.0,22.6],[25.0,16.3],[26.0,12.4],[27.0,9.5],[28.0,6.9],[29.0,4.2],[30.0,3.6],[31.0,1.9],[32.0,2.1],[33.0,2.4],[34.0,0.9],[35.0,1.2]]},{"id":"georgia-2024-25","location":"Georgia","season":"2024/25","points":[[1.0,0.1],[2.0,0.0],[3.0,0.0],[4.0,0.2],[5.0,0.0],[6.0,0.1],[7.0,0.1],[8.0,0.2],[9.0,0.3],[10.0,0.2],[11.0,0.5],[12.0,0.4],[13.0,0.4],[14.0,0.7],[15.0,2.3],[16.0,4.5],[17.0,9.3],[19.0,12.2],[20.0,9.5],[21.0,11.2],[22.0,13.3],[23.0,13.4],[24.0,11.9],[25.0,6.1],[26.0,4.2],[27.0,4.6],[28.0,3.8],[29.0,3.3],[30.0,1.9],[31.0,2.0],[32.0,1.5],[33.0,0.9],[34.0,0.6],[35.0,0.6]]},{"id":"maryland-2024-25","location":"Maryland","season":"2024/25","points":[[1.0,0.1],[2.0,0.1],[3.0,0.2],[4.0,0.0],[5.0,0.1],[6.0,0.2],[7.0,0.1],[8.0,0.0],[9.0,0.2],[10.0,0.1],[11.0,0.3],[12.0,0.5],[13.0,0.4],[14.0,0.6],[15.0,1.2],[16.0,2.4],[17.0,4.5],[19.0,8.4],[20.0,7.4],[21.0,10.5],[22.0,13.3],[23.0,19.2],[24.0,21.0],[25.0,18.8],[26.0,12.4],[27.0,9.0],[28.0,6.0],[29.0,4.0],[30.0,3.0],[31.0,2.4],[32.0,2.2],[33.0,1.3],[34.0,1.1],[35.0,0.9]]},{"id":"minnesota-2024-25","location":"Minnesota","season":"2024/25","points":[[1.0,0.0],[2.0,0.1],[3.0,0.1],[4.0,0.1],[5.0,0.1],[6.0,0.0],[7.0,0.1],[8.0,0.0],[9.0,0.0],[10.0,0.2],[11.0,0.3],[12.0,0.1],[13.0,0.3],[14.0,1.1],[15.0,1.5],[16.0,4.0],[17.0,10.8],[19.0,16.7],[20.0,15.5],[21.0,13.9],[22.0,13.9],[23.0,13.8],[24.0,9.8],[25.0,7.2],[26.0,5.4],[27.0,4.1],[28.0,3.1],[29.0,2.5],[30.0,1.6],[31.0,1.1],[32.0,0.9],[33.0,0.8],[34.0,0.4],[35.0,0.5]]},{"id":"new-york-2024-25","location":"New York","season":"2024/25","points":[[1.0,0.1],[2.0,0.15],[3.0,0.1],[4.0,0.1],[5.0,0.0],[6.0,0.05],[7.0,0.05],[8.0,0.15],[9.0,0.2],[10.0,0.15],[11.0,0.3],[12.0,0.4],[13.0,0.5],[14.0,1.45],[15.0,1.45],[16.0,2.4],[17.0,6.4],[19.0,9.2],[20.0,8.3],[21.0,10.15],[22.0,11.1],[23.0,17.45],[24.0,17.2],[25.0,15.8],[26.0,13.2],[27.0,12.2],[28.0,7.9],[29.0,6.05],[30.0,5.55],[31.0,3.85],[32.0,3.05],[33.0,2.55],[34.0,1.85],[35.0,2.3]]},{"id":"oregon-2024-25","location":"Oregon","season":"2024/25","points":[[1.0,0.1],[2.0,0.0],[3.0,0.1],[4.0,0.1],[5.0,0.0],[6.0,0.1],[7.0,0.2],[8.0,0.2],[9.0,0.0],[10.0,0.3],[11.0,0.3],[12.0,0.7],[13.0,1.2],[14.0,2.2],[15.0,4.5],[16.0,8.6],[17.0,12.1],[19.0,8.3],[20.0,6.1],[21.0,5.0],[22.0,4.9],[23.0,7.1],[24.0,7.1],[25.0,6.4],[26.0,5.5],[27.0,3.7],[28.0,2.8],[29.0,2.3],[30.0,1.5],[31.0,1.2],[32.0,1.0],[33.0,0.6],[34.0,0.2],[35.0,1.2]]},{"id":"tennessee-2024-25","location":"Tennessee","season":"2024/25","points":[[1.0,0.2],[2.0,0.1],[3.0,0.2],[4.0,0.2],[5.0,0.2],[6.0,0.5],[7.0,0.5],[8.0,0.5],[9.0,0.6],[10.0,0.4],[11.0,0.6],[12.0,0.6],[13.0,0.7],[14.0,1.4],[15.0,3.1],[16.0,6.1],[17.0,11.5],[19.0,11.4],[20.0,5.6],[21.0,6.4],[22.0,7.8],[23.0,13.2],[24.0,12.2],[25.0,7.3],[26.0,5.2],[27.0,5.6],[28.0,5.2],[29.0,4.4],[30.0,2.7],[31.0,1.9],[32.0,1.1],[33.0,0.9],[34.0,0.0],[35.0,1.2]]}],"summary":{"seasonCount":16,"locationCount":9}};
     const hasHistory = Array.isArray(config.historyTimeline) && config.historyTimeline.length > 0;
     const states = hasHistory ? ["signal", "seasons", "geography", "history"] : ["signal", "seasons", "geography"];
@@ -288,14 +280,13 @@
     document.getElementById("age-fact").textContent = config.age;
     document.getElementById("timeliness-fact").textContent = config.timeliness;
     document.getElementById("source-link").href = config.source;
-    document.getElementById("question").textContent = config.question;
     document.getElementById("network-since").textContent = config.networkSince;
     document.getElementById("change-copy").textContent = config.change;
     document.getElementById("limitation").textContent = config.limitation;
     document.getElementById("history-option").hidden = !hasHistory;
 
     const SVG_NS = "http://www.w3.org/2000/svg";
-    const bounds = { left: 62, right: 884, top: 18, bottom: 276 };
+    const bounds = { left: 62, right: 884, top: 18, bottom: 306 };
     const monthTicks = [
       [1, "Sep"], [5, "Oct"], [9, "Nov"], [13, "Dec"], [18, "Jan"],
       [22, "Feb"], [26, "Mar"], [31, "Apr"], [35, "May"],
@@ -377,15 +368,16 @@
 
       let curves;
       let subtitle;
+      const aggregateLabel = config.aggregateLabel || config.mainLocation;
       if (state === "signal") {
         curves = [data.focus];
-        subtitle = `${config.focusSeason} · ${config.mainLocation} · ${config.unit}`;
+        subtitle = `${config.focusSeason} · ${aggregateLabel}`;
       } else if (state === "seasons") {
         curves = data.seasons;
-        subtitle = `${data.summary.seasonCount} available seasons · ${config.mainLocation} · selected season in color`;
+        subtitle = `${data.summary.seasonCount} available seasons · ${aggregateLabel}`;
       } else {
         curves = data.geography;
-        subtitle = `${config.focusSeason} · ${data.summary.locationCount} reporting locations in this extract · ${config.geoHighlight} highlighted`;
+        subtitle = `${config.focusSeason} · ${data.summary.locationCount} reporting locations in this extract`;
       }
       document.getElementById("chart-subtitle").textContent = subtitle;
 
@@ -406,11 +398,11 @@
       monthTicks.forEach(([week, label]) => {
         const x = xScale(week);
         chart.appendChild(element("line", { x1: x, x2: x, y1: bounds.top, y2: bounds.bottom, class: "gridline", opacity: ".45" }));
-        chart.appendChild(element("text", { x, y: 300, class: "axis-label", "text-anchor": "middle" }, label));
+        chart.appendChild(element("text", { x, y: 330, class: "axis-label", "text-anchor": "middle" }, label));
       });
       chart.appendChild(element("line", { x1: bounds.left, x2: bounds.right, y1: bounds.bottom, y2: bounds.bottom, class: "axis-line" }));
       chart.appendChild(element("line", { x1: bounds.left, x2: bounds.left, y1: bounds.top, y2: bounds.bottom, class: "axis-line" }));
-      chart.appendChild(element("text", { x: 13, y: 148, class: "axis-title", transform: "rotate(-90 13 148)", "text-anchor": "middle" }, config.unit));
+      chart.appendChild(element("text", { x: 13, y: 163, class: "axis-title", transform: "rotate(-90 13 163)", "text-anchor": "middle" }, config.unit));
 
       let focusCurve = data.focus;
       if (state === "seasons") {

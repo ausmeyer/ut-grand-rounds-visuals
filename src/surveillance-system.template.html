@@ -137,20 +137,13 @@
 
     .visual {
       display: grid;
-      grid-template-rows: 58px minmax(0, 1fr) 67px;
+      grid-template-rows: 30px minmax(0, 1fr) 67px;
       min-width: 0;
       min-height: 0;
       padding: 13px 16px 11px;
     }
-    .chart-heading { min-width: 0; }
-    .chart-heading h1 {
-      margin: 0;
-      font-size: 24px;
-      line-height: 1.08;
-      letter-spacing: -.03em;
-      white-space: nowrap;
-    }
-    .chart-heading p { margin: 5px 0 0; color: var(--muted); font-size: 12px; font-weight: 650; }
+    .chart-heading { display: flex; align-items: center; min-width: 0; }
+    .chart-heading p { margin: 0; color: var(--muted); font-size: 12px; font-weight: 650; }
 
     .chart-wrap { position: relative; min-width: 0; min-height: 0; }
     svg { display: block; width: 100%; height: 100%; overflow: visible; }
@@ -243,11 +236,10 @@
 
       <section class="visual">
         <header class="chart-heading">
-          <h1 id="question"></h1>
           <p id="chart-subtitle"></p>
         </header>
         <div class="chart-wrap">
-          <svg id="chart" viewBox="0 0 900 320" role="img" aria-labelledby="chart-title chart-desc">
+          <svg id="chart" viewBox="0 0 900 350" role="img" aria-labelledby="chart-title chart-desc">
             <title id="chart-title">Seasonal influenza surveillance time series</title>
             <desc id="chart-desc">A line chart that can show one selected season, historical seasons, or locations.</desc>
           </svg>
@@ -288,14 +280,13 @@
     document.getElementById("age-fact").textContent = config.age;
     document.getElementById("timeliness-fact").textContent = config.timeliness;
     document.getElementById("source-link").href = config.source;
-    document.getElementById("question").textContent = config.question;
     document.getElementById("network-since").textContent = config.networkSince;
     document.getElementById("change-copy").textContent = config.change;
     document.getElementById("limitation").textContent = config.limitation;
     document.getElementById("history-option").hidden = !hasHistory;
 
     const SVG_NS = "http://www.w3.org/2000/svg";
-    const bounds = { left: 62, right: 884, top: 18, bottom: 276 };
+    const bounds = { left: 62, right: 884, top: 18, bottom: 306 };
     const monthTicks = [
       [1, "Sep"], [5, "Oct"], [9, "Nov"], [13, "Dec"], [18, "Jan"],
       [22, "Feb"], [26, "Mar"], [31, "Apr"], [35, "May"],
@@ -377,15 +368,16 @@
 
       let curves;
       let subtitle;
+      const aggregateLabel = config.aggregateLabel || config.mainLocation;
       if (state === "signal") {
         curves = [data.focus];
-        subtitle = `${config.focusSeason} · ${config.mainLocation} · ${config.unit}`;
+        subtitle = `${config.focusSeason} · ${aggregateLabel}`;
       } else if (state === "seasons") {
         curves = data.seasons;
-        subtitle = `${data.summary.seasonCount} available seasons · ${config.mainLocation} · selected season in color`;
+        subtitle = `${data.summary.seasonCount} available seasons · ${aggregateLabel}`;
       } else {
         curves = data.geography;
-        subtitle = `${config.focusSeason} · ${data.summary.locationCount} reporting locations in this extract · ${config.geoHighlight} highlighted`;
+        subtitle = `${config.focusSeason} · ${data.summary.locationCount} reporting locations in this extract`;
       }
       document.getElementById("chart-subtitle").textContent = subtitle;
 
@@ -406,11 +398,11 @@
       monthTicks.forEach(([week, label]) => {
         const x = xScale(week);
         chart.appendChild(element("line", { x1: x, x2: x, y1: bounds.top, y2: bounds.bottom, class: "gridline", opacity: ".45" }));
-        chart.appendChild(element("text", { x, y: 300, class: "axis-label", "text-anchor": "middle" }, label));
+        chart.appendChild(element("text", { x, y: 330, class: "axis-label", "text-anchor": "middle" }, label));
       });
       chart.appendChild(element("line", { x1: bounds.left, x2: bounds.right, y1: bounds.bottom, y2: bounds.bottom, class: "axis-line" }));
       chart.appendChild(element("line", { x1: bounds.left, x2: bounds.left, y1: bounds.top, y2: bounds.bottom, class: "axis-line" }));
-      chart.appendChild(element("text", { x: 13, y: 148, class: "axis-title", transform: "rotate(-90 13 148)", "text-anchor": "middle" }, config.unit));
+      chart.appendChild(element("text", { x: 13, y: 163, class: "axis-title", transform: "rotate(-90 13 163)", "text-anchor": "middle" }, config.unit));
 
       let focusCurve = data.focus;
       if (state === "seasons") {

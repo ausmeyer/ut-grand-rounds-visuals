@@ -28,7 +28,7 @@
     button:disabled { cursor: default; opacity: .35; }
     .frame {
       display: grid;
-      grid-template-rows: 58px minmax(0, 1fr) 54px;
+      grid-template-rows: 54px minmax(0, 1fr) 28px;
       min-height: 0;
       overflow: hidden;
       border: 1px solid var(--line);
@@ -55,16 +55,13 @@
     .median-dot { fill: #fff; stroke-width: 2.5; }
     .median-label { font-size: 10.5px; font-weight: 840; paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
     .footer {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 22px;
+      display: flex;
+      justify-content: flex-end;
       align-items: center;
       border-top: 1px solid var(--line);
-      padding-top: 8px;
+      padding-top: 6px;
     }
-    .interpretation { color: #34464d; font-size: 12px; font-weight: 690; line-height: 1.3; }
-    .method { color: var(--muted); font-size: 10px; font-weight: 650; line-height: 1.3; text-align: right; }
-    .count { color: #0a6670; font-weight: 830; }
+    .count { color: #0a6670; font-size: 11.5px; font-weight: 830; }
     @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
   </style>
 </head>
@@ -84,10 +81,9 @@
         <div><h1 id="title"></h1><p class="subtitle" id="subtitle"></p></div>
         <div class="legend" id="legend"></div>
       </header>
-      <div class="plot"><svg id="chart" viewBox="0 0 1180 360" role="img" aria-labelledby="chart-title chart-desc"></svg></div>
+      <div class="plot"><svg id="chart" viewBox="0 0 1180 385" role="img" aria-labelledby="chart-title chart-desc"></svg></div>
       <footer class="footer">
-        <div class="interpretation" id="interpretation"></div>
-        <div class="method"><span class="count" id="curve-count"></span><br>Thin lines are location–seasons; thick lines are medians of national/network seasons.</div>
+        <span class="count" id="curve-count"></span>
       </footer>
     </section>
   </main>
@@ -103,7 +99,7 @@
     const nextButton = document.getElementById("next-button");
     const legend = document.getElementById("legend");
     const SVG_NS = "http://www.w3.org/2000/svg";
-    const bounds = { left: 64, right: 1162, top: 16, bottom: 315 };
+    const bounds = { left: 64, right: 1162, top: 16, bottom: 340 };
     const monthTicks = [[1,"Sep"],[5,"Oct"],[9,"Nov"],[13,"Dec"],[18,"Jan"],[22,"Feb"],[26,"Mar"],[31,"Apr"],[35,"May"]];
 
     document.getElementById("title").textContent = config.title;
@@ -161,11 +157,11 @@
       monthTicks.forEach(([week, label]) => {
         const x = xScale(week);
         chart.appendChild(element("line", { x1: x, x2: x, y1: bounds.top, y2: bounds.bottom, class: "gridline", opacity: ".42" }));
-        chart.appendChild(element("text", { x, y: 341, class: "axis-label", "text-anchor": "middle" }, label));
+        chart.appendChild(element("text", { x, y: 366, class: "axis-label", "text-anchor": "middle" }, label));
       });
       chart.appendChild(element("line", { x1: bounds.left, x2: bounds.right, y1: bounds.bottom, y2: bounds.bottom, class: "axis-line" }));
       chart.appendChild(element("line", { x1: bounds.left, x2: bounds.left, y1: bounds.top, y2: bounds.bottom, class: "axis-line" }));
-      chart.appendChild(element("text", { x: 14, y: 166, class: "axis-title", transform: "rotate(-90 14 166)", "text-anchor": "middle" }, "System-season scaled activity"));
+      chart.appendChild(element("text", { x: 14, y: 178, class: "axis-title", transform: "rotate(-90 14 178)", "text-anchor": "middle" }, "System-season scaled activity"));
 
       active.forEach((system) => {
         const opacity = active.length === 1 ? .12 : Math.max(.025, .075 / Math.sqrt(active.length));
@@ -207,9 +203,6 @@
       const totalCurves = active.reduce((sum, system) => sum + system.curveCount, 0);
       const totalLocations = active.reduce((sum, system) => sum + system.locationCount, 0);
       document.getElementById("curve-count").textContent = `${totalCurves.toLocaleString()} curves from ${totalLocations} system-specific locations`;
-      document.getElementById("interpretation").textContent = step === order.length
-        ? "The national and network summaries trace the same seasonal wave, while their timing differs as surveillance moves from testing to care-seeking and hospitalization."
-        : `${active[active.length - 1].name} has been added without changing the calendar alignment of any curve.`;
     }
 
     function setStep(step, updateHash = true) {
