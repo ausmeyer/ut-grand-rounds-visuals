@@ -204,6 +204,9 @@
 
     .button-group { display: flex; align-items: center; gap: 7px; }
 
+    .milestone-controls { display: flex; gap: 3px; }
+    button.milestone-button { width: 34px; padding: 0; font-size: 16px; }
+
     .speed-control {
       display: flex;
       align-items: center;
@@ -238,6 +241,7 @@
 
     button.primary { min-width: 76px; border-color: var(--focus); background: var(--focus); color: #fff; }
     button:hover { filter: brightness(.97); }
+    button:disabled { opacity: .42; cursor: default; filter: none; }
     button:focus-visible, select:focus-visible, input:focus-visible { outline: 3px solid rgb(8 127 140 / 25%); outline-offset: 2px; }
 
     .slider-wrap { display: grid; gap: 3px; }
@@ -302,6 +306,10 @@
     <footer class="controls">
       <div class="button-group">
         <button class="primary" id="play-button" type="button" aria-label="Play timeline">▶ Play</button>
+        <div class="milestone-controls" aria-label="Milestone navigation">
+          <button class="milestone-button" id="previous-milestone-button" type="button" aria-label="Previous milestone" title="Previous milestone">←</button>
+          <button class="milestone-button" id="next-milestone-button" type="button" aria-label="Next milestone" title="Next milestone">→</button>
+        </div>
         <button id="reset-button" type="button">Restart</button>
         <div class="speed-control">
           <label for="speed-select">Speed</label>
@@ -372,6 +380,8 @@
     const svg = document.getElementById("chart");
     const slider = document.getElementById("date-slider");
     const playButton = document.getElementById("play-button");
+    const previousMilestoneButton = document.getElementById("previous-milestone-button");
+    const nextMilestoneButton = document.getElementById("next-milestone-button");
     const resetButton = document.getElementById("reset-button");
     const speedSelect = document.getElementById("speed-select");
     const viewSelect = document.getElementById("view-select");
@@ -535,6 +545,8 @@
         status.textContent = "Declining after peak";
         status.classList.add("declining");
       }
+      previousMilestoneButton.disabled = selectedDay <= 0;
+      nextMilestoneButton.disabled = selectedDay >= totalDays;
       setCard(latestVisibleEvent());
       writeFragment();
     }
@@ -572,6 +584,25 @@
     });
 
     playButton.addEventListener("click", () => { playing ? stopPlaying() : startPlaying(); });
+
+    function jumpToMilestone(direction) {
+      stopPlaying();
+      const milestoneDays = [0, ...filteredEvents().map((event) => event.day), totalDays]
+        .filter((day, index, days) => days.indexOf(day) === index)
+        .sort((a, b) => a - b);
+      const targetDay = direction > 0
+        ? milestoneDays.find((day) => day > selectedDay) ?? totalDays
+        : [...milestoneDays].reverse().find((day) => day < selectedDay) ?? 0;
+      selectedDay = targetDay;
+      playbackPosition = targetDay;
+      slider.value = targetDay;
+      hoveredEvent = null;
+      pinnedEvent = filteredEvents().find((event) => event.day === targetDay) || null;
+      draw();
+    }
+
+    previousMilestoneButton.addEventListener("click", () => jumpToMilestone(-1));
+    nextMilestoneButton.addEventListener("click", () => jumpToMilestone(1));
 
     speedSelect.addEventListener("change", () => {
       playbackSpeed = Number(speedSelect.value);

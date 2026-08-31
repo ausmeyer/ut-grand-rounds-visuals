@@ -15,6 +15,7 @@ visual:
   controls:
     - date slider
     - play/pause
+    - previous/next milestone
     - restart
     - playback speed selector
     - annotation category dropdown
