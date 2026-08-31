@@ -308,12 +308,16 @@
       return node;
     }
 
-    function niceMax(raw) {
+    function plotMax(raw) {
       if (!Number.isFinite(raw) || raw <= 0) return 1;
-      const exponent = 10 ** Math.floor(Math.log10(raw));
-      const fraction = raw / exponent;
-      const nice = fraction <= 1 ? 1 : fraction <= 2 ? 2 : fraction <= 5 ? 5 : 10;
-      return nice * exponent;
+      const padded = raw * 1.05;
+      const increment = 10 ** (Math.floor(Math.log10(padded)) - 1);
+      return Math.ceil(padded / increment) * increment;
+    }
+
+    function tickLabel(value, yMax) {
+      const decimals = yMax >= 100 ? 0 : yMax >= 2 ? 1 : 2;
+      return Number(value.toFixed(decimals)).toString();
     }
 
     function pathFor(points, xScale, yScale, closeToBottom = false) {
@@ -389,7 +393,7 @@
       if (state === "geography" && config.mainLocation !== config.geoHighlight) {
         values.push(...data.focus.points.map((point) => point[1]));
       }
-      const yMax = niceMax(Math.max(...values) * 1.04);
+      const yMax = plotMax(Math.max(...values));
       const xScale = (x) => bounds.left + ((x - 1) / 39) * (bounds.right - bounds.left);
       const yScale = (y) => bounds.bottom - (y / yMax) * (bounds.bottom - bounds.top);
 
@@ -397,7 +401,7 @@
         const value = (yMax / 4) * i;
         const y = yScale(value);
         chart.appendChild(element("line", { x1: bounds.left, x2: bounds.right, y1: y, y2: y, class: "gridline" }));
-        chart.appendChild(element("text", { x: bounds.left - 10, y: y + 4, class: "axis-label", "text-anchor": "end" }, Number.isInteger(value) ? value.toString() : value.toFixed(1)));
+        chart.appendChild(element("text", { x: bounds.left - 10, y: y + 4, class: "axis-label", "text-anchor": "end" }, tickLabel(value, yMax)));
       }
       monthTicks.forEach(([week, label]) => {
         const x = xScale(week);
