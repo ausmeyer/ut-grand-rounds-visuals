@@ -291,18 +291,24 @@ def normalized_overlay(cache: dict[str, list[dict]]) -> dict:
         if spec["id"] == "flusurv":
             curves = [curve for curve in curves if curve["location"] in STATE_NAMES]
 
+        eligible = [curve for curve in curves if len(curve["points"]) >= 12]
+        curves_by_season: dict[str, list[dict]] = defaultdict(list)
+        for curve in eligible:
+            curves_by_season[curve["season"]].append(curve)
+
         normalized = []
-        for curve in curves:
-            values = [point[1] for point in curve["points"]]
+        for season, season_curves in curves_by_season.items():
+            values = [point[1] for curve in season_curves for point in curve["points"]]
             lo, hi = min(values), max(values)
-            if len(values) < 12 or hi <= lo:
+            if hi <= lo:
                 continue
-            normalized.append({
-                "id": curve["id"],
-                "location": curve["location"],
-                "season": curve["season"],
-                "points": [[x, round((y - lo) / (hi - lo), 4)] for x, y in curve["points"]],
-            })
+            for curve in season_curves:
+                normalized.append({
+                    "id": curve["id"],
+                    "location": curve["location"],
+                    "season": season,
+                    "points": [[x, round((y - lo) / (hi - lo), 4)] for x, y in curve["points"]],
+                })
 
         medians = []
         for x in sorted({point[0] for curve in normalized for point in curve["points"]}):
@@ -387,7 +393,7 @@ def main() -> None:
 
     overlay_config = {
         "title": "Seasonal timing across surveillance systems",
-        "subtitle": "Every location–season is independently min–max scaled; calendar weeks are not shifted.",
+        "subtitle": "Locations share one min–max scale within each surveillance system and season; calendar weeks are not shifted.",
         "order": ["ilinet", "nssp", "nrevss", "nhsn", "flusurv"],
     }
     render(OVERLAY_TEMPLATE, ROOT / "docs" / "slide-11.html", overlay_config, normalized_overlay(cache))

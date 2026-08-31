@@ -87,7 +87,7 @@
       <div class="plot"><svg id="chart" viewBox="0 0 1180 360" role="img" aria-labelledby="chart-title chart-desc"></svg></div>
       <footer class="footer">
         <div class="interpretation" id="interpretation"></div>
-        <div class="method"><span class="count" id="curve-count"></span><br>Thin lines are location–seasons; thick lines are week-specific medians.</div>
+        <div class="method"><span class="count" id="curve-count"></span><br>Thin lines are location–seasons on shared system-season scales; thick lines are week-specific medians.</div>
       </footer>
     </section>
   </main>
@@ -146,8 +146,8 @@
       const activeIds = order.slice(0, step);
       const active = activeIds.map((id) => systemById.get(id));
       chart.replaceChildren(
-        element("title", { id: "chart-title" }, "Min-max scaled seasonal surveillance curves"),
-        element("desc", { id: "chart-desc" }, "Each location-season is independently scaled between zero and one without shifting its calendar week."),
+        element("title", { id: "chart-title" }, "System-season scaled surveillance curves"),
+        element("desc", { id: "chart-desc" }, "All locations within each surveillance system and season share one min-max scale between zero and one; calendar weeks are not shifted."),
       );
       const xScale = (x) => bounds.left + ((x - 1) / 39) * (bounds.right - bounds.left);
       const yScale = (y) => bounds.bottom - y * (bounds.bottom - bounds.top);
@@ -165,7 +165,7 @@
       });
       chart.appendChild(element("line", { x1: bounds.left, x2: bounds.right, y1: bounds.bottom, y2: bounds.bottom, class: "axis-line" }));
       chart.appendChild(element("line", { x1: bounds.left, x2: bounds.left, y1: bounds.top, y2: bounds.bottom, class: "axis-line" }));
-      chart.appendChild(element("text", { x: 14, y: 166, class: "axis-title", transform: "rotate(-90 14 166)", "text-anchor": "middle" }, "Within-curve scaled activity"));
+      chart.appendChild(element("text", { x: 14, y: 166, class: "axis-title", transform: "rotate(-90 14 166)", "text-anchor": "middle" }, "System-season scaled activity"));
 
       active.forEach((system) => {
         const opacity = active.length === 1 ? .12 : Math.max(.025, .075 / Math.sqrt(active.length));

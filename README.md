@@ -80,5 +80,5 @@ Slide 6 (NSSP) also supports `#state=history`, a four-era timeline from the
 measure used in the current public product.
 
 Slide 11 supports `#state=1` through `#state=5`, sequentially adding ILINet,
-NSSP, NREVSS, NHSN, and FluSurv-NET. Every location-season is min-max scaled
-independently; calendar weeks are never shifted.
+NSSP, NREVSS, NHSN, and FluSurv-NET. Within each surveillance system-season,
+all included locations share one min-max scale; calendar weeks are never shifted.
