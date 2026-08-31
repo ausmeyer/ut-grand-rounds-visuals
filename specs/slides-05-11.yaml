@@ -47,6 +47,7 @@ data:
     - nhsn_national_seasons.csv
     - nhsn_state_seasons.csv
     - flusurv_state_seasons.csv
+    - nrevss_national_seasons.csv
     - nrevss_state_seasons.csv
   overlay_transformation: min-max scale each system-location-season independently to [0, 1]
   overlay_time_alignment: preserve the original MMWR seasonal week; do not shift curves
