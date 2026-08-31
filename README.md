@@ -14,14 +14,19 @@ src/        HTML source templates
 scripts/    Reproducible build scripts
 ```
 
-Slides 2 and 4 are implemented currently.
+Slides 2, 4, and the surveillance-data section (slides 5–11) are implemented.
 
 ## Build
 
 ```bash
 python3 scripts/build_slide_02.py
 python3 scripts/build_slide_04.py
+python3 scripts/build_surveillance_section.py
 ```
+
+`build_surveillance_section.py` reads the already-downloaded CSV files from
+`../data/processed/` and embeds compact chart data directly into the published
+HTML pages.
 
 ## Preview locally
 
@@ -32,7 +37,8 @@ python3 -m http.server 8000 --directory docs
 ```
 
 Then open `http://localhost:8000/slide-02.html` or
-`http://localhost:8000/slide-04.html`.
+`http://localhost:8000/slide-04.html`. Slides 5–11 use the corresponding
+numbered filenames.
 
 ## Publish and embed
 
@@ -62,3 +68,13 @@ Slide 4 also supports URL fragments:
 - `layer=outpatient`, `layer=inpatient`, `layer=virologic`, or
   `layer=mortality` emphasizes one surveillance layer.
 - Add `system=ilinet` (or another system ID) to open with that system selected.
+
+Slides 5–9 each support three addressable views for duplication in Slides.com:
+
+- `#state=signal` shows one selected 2024/25 curve.
+- `#state=seasons` adds historical seasons for the selected location.
+- `#state=geography` shows the 2024/25 reporting locations and highlights one.
+
+Slide 11 supports `#state=1` through `#state=5`, sequentially adding ILINet,
+NSSP, NREVSS, NHSN, and FluSurv-NET. Every location-season is min-max scaled
+independently; calendar weeks are never shifted.

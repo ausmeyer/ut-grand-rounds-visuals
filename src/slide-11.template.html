@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Normalized surveillance overlay</title>
+  <style>
+    :root { --ink: #14242b; --muted: #647278; --paper: #fbfaf6; --grid: #d9dedb; --line: #d5dad6; }
+    * { box-sizing: border-box; }
+    html, body { width: 1240px; height: 540px; margin: 0; overflow: hidden; }
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-variant-numeric: tabular-nums;
+    }
+    button, select { font: inherit; }
+    .app { display: grid; grid-template-rows: 38px minmax(0, 1fr); gap: 8px; width: 1240px; height: 540px; padding: 10px 16px 8px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .eyebrow { color: #0a6670; font-size: 12px; font-weight: 840; letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; }
+    .controls { display: flex; align-items: center; gap: 7px; }
+    .controls label { margin-right: 2px; color: var(--muted); font-size: 10.5px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+    select, button { height: 32px; border: 1px solid #b9c3c0; border-radius: 8px; background: #fff; color: var(--ink); font-weight: 740; }
+    select { width: 232px; padding: 0 34px 0 10px; font-size: 13px; }
+    button { width: 34px; padding: 0; font-size: 17px; cursor: pointer; }
+    button:hover { border-color: #0a6670; color: #0a6670; }
+    button:disabled { cursor: default; opacity: .35; }
+    .frame {
+      display: grid;
+      grid-template-rows: 58px minmax(0, 1fr) 54px;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 13px 16px 10px;
+      background: #fff;
+      box-shadow: 0 8px 24px rgb(28 49 50 / 7%);
+    }
+    .heading { display: flex; align-items: start; justify-content: space-between; gap: 18px; }
+    h1 { margin: 0; font-size: 25px; line-height: 1.12; letter-spacing: -.032em; white-space: nowrap; }
+    .subtitle { margin: 5px 0 0; color: var(--muted); font-size: 11.5px; font-weight: 650; }
+    .legend { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px 14px; width: 500px; padding-top: 3px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; color: #42535a; font-size: 10.5px; font-weight: 760; opacity: .18; transition: opacity .2s ease; }
+    .legend-item.active { opacity: 1; }
+    .legend-line { width: 22px; height: 0; border-top: 3px solid var(--legend-color); }
+    .plot { min-height: 0; }
+    svg { display: block; width: 100%; height: 100%; overflow: visible; }
+    .gridline { stroke: var(--grid); stroke-width: 1; }
+    .axis-line { stroke: #879396; stroke-width: 1.25; }
+    .axis-label { fill: var(--muted); font-size: 11px; font-weight: 680; }
+    .axis-title { fill: var(--muted); font-size: 10.5px; font-weight: 790; letter-spacing: .02em; }
+    .individual { fill: none; stroke-width: .85; stroke-linecap: round; stroke-linejoin: round; }
+    .median { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    .median-dot { fill: #fff; stroke-width: 2.5; }
+    .median-label { font-size: 10.5px; font-weight: 840; paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
+    .footer {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 22px;
+      align-items: center;
+      border-top: 1px solid var(--line);
+      padding-top: 8px;
+    }
+    .interpretation { color: #34464d; font-size: 12px; font-weight: 690; line-height: 1.3; }
+    .method { color: var(--muted); font-size: 10px; font-weight: 650; line-height: 1.3; text-align: right; }
+    .count { color: #0a6670; font-weight: 830; }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="eyebrow">Do the systems describe the same seasonal wave?</div>
+      <div class="controls">
+        <label for="state-select">Systems shown</label>
+        <button id="back-button" type="button" aria-label="Remove the most recently added system">←</button>
+        <select id="state-select" aria-label="Number of surveillance systems shown"></select>
+        <button id="next-button" type="button" aria-label="Add the next surveillance system">→</button>
+      </div>
+    </header>
+    <section class="frame">
+      <header class="heading">
+        <div><h1 id="title"></h1><p class="subtitle" id="subtitle"></p></div>
+        <div class="legend" id="legend"></div>
+      </header>
+      <div class="plot"><svg id="chart" viewBox="0 0 1180 360" role="img" aria-labelledby="chart-title chart-desc"></svg></div>
+      <footer class="footer">
+        <div class="interpretation" id="interpretation"></div>
+        <div class="method"><span class="count" id="curve-count"></span><br>Thin lines are location–seasons; thick lines are week-specific medians.</div>
+      </footer>
+    </section>
+  </main>
+  <script>
+    "use strict";
+    const config = /*__SLIDE_CONFIG__*/;
+    const data = /*__SLIDE_DATA__*/;
+    const systemById = new Map(data.systems.map((system) => [system.id, system]));
+    const order = config.order;
+    const chart = document.getElementById("chart");
+    const stateSelect = document.getElementById("state-select");
+    const backButton = document.getElementById("back-button");
+    const nextButton = document.getElementById("next-button");
+    const legend = document.getElementById("legend");
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    const bounds = { left: 64, right: 1162, top: 16, bottom: 315 };
+    const monthTicks = [[1,"Sep"],[5,"Oct"],[9,"Nov"],[13,"Dec"],[18,"Jan"],[22,"Feb"],[26,"Mar"],[31,"Apr"],[35,"May"]];
+
+    document.getElementById("title").textContent = config.title;
+    document.getElementById("subtitle").textContent = config.subtitle;
+
+    function element(name, attrs = {}, text = null) {
+      const node = document.createElementNS(SVG_NS, name);
+      Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value));
+      if (text !== null) node.textContent = text;
+      return node;
+    }
+
+    function pathFor(points, xScale, yScale) {
+      let d = "";
+      let previousX = null;
+      points.forEach(([x, y]) => {
+        const command = previousX === null || x - previousX > 2.1 ? "M" : "L";
+        d += `${command}${xScale(x).toFixed(2)},${yScale(y).toFixed(2)} `;
+        previousX = x;
+      });
+      return d.trim();
+    }
+
+    order.forEach((id, index) => {
+      const system = systemById.get(id);
+      const option = document.createElement("option");
+      option.value = String(index + 1);
+      option.textContent = `${index + 1} · through ${system.name}`;
+      stateSelect.appendChild(option);
+
+      const item = document.createElement("div");
+      item.className = "legend-item";
+      item.dataset.system = id;
+      item.style.setProperty("--legend-color", system.color);
+      item.innerHTML = `<span class="legend-line"></span><span>${system.name}</span>`;
+      legend.appendChild(item);
+    });
+
+    function render(step) {
+      const activeIds = order.slice(0, step);
+      const active = activeIds.map((id) => systemById.get(id));
+      chart.replaceChildren(
+        element("title", { id: "chart-title" }, "Min-max scaled seasonal surveillance curves"),
+        element("desc", { id: "chart-desc" }, "Each location-season is independently scaled between zero and one without shifting its calendar week."),
+      );
+      const xScale = (x) => bounds.left + ((x - 1) / 39) * (bounds.right - bounds.left);
+      const yScale = (y) => bounds.bottom - y * (bounds.bottom - bounds.top);
+
+      for (let i = 0; i <= 4; i += 1) {
+        const value = i / 4;
+        const y = yScale(value);
+        chart.appendChild(element("line", { x1: bounds.left, x2: bounds.right, y1: y, y2: y, class: "gridline" }));
+        chart.appendChild(element("text", { x: bounds.left - 10, y: y + 4, class: "axis-label", "text-anchor": "end" }, value.toFixed(2).replace("0.", ".")));
+      }
+      monthTicks.forEach(([week, label]) => {
+        const x = xScale(week);
+        chart.appendChild(element("line", { x1: x, x2: x, y1: bounds.top, y2: bounds.bottom, class: "gridline", opacity: ".42" }));
+        chart.appendChild(element("text", { x, y: 341, class: "axis-label", "text-anchor": "middle" }, label));
+      });
+      chart.appendChild(element("line", { x1: bounds.left, x2: bounds.right, y1: bounds.bottom, y2: bounds.bottom, class: "axis-line" }));
+      chart.appendChild(element("line", { x1: bounds.left, x2: bounds.left, y1: bounds.top, y2: bounds.bottom, class: "axis-line" }));
+      chart.appendChild(element("text", { x: 14, y: 166, class: "axis-title", transform: "rotate(-90 14 166)", "text-anchor": "middle" }, "Within-curve scaled activity"));
+
+      active.forEach((system) => {
+        const opacity = active.length === 1 ? .12 : Math.max(.025, .075 / Math.sqrt(active.length));
+        system.curves.forEach((curve) => {
+          chart.appendChild(element("path", {
+            d: pathFor(curve.points, xScale, yScale), class: "individual",
+            stroke: system.color, opacity,
+          }));
+        });
+      });
+
+      const labelOffsets = {
+        ilinet: { x: 8, y: 22, anchor: "start" },
+        nssp: { x: -10, y: -10, anchor: "end" },
+        nrevss: { x: 8, y: -7, anchor: "start" },
+        nhsn: { x: 8, y: -18, anchor: "start" },
+        flusurv: { x: 8, y: 2, anchor: "start" },
+      };
+      active.forEach((system) => {
+        chart.appendChild(element("path", { d: pathFor(system.median, xScale, yScale), class: "median", stroke: system.color }));
+        const peak = system.median.reduce((best, point) => point[1] > best[1] ? point : best, system.median[0]);
+        const offset = labelOffsets[system.id] || { x: 8, y: -7, anchor: "start" };
+        chart.appendChild(element("circle", { cx: xScale(peak[0]), cy: yScale(peak[1]), r: 4.2, class: "median-dot", stroke: system.color }));
+        chart.appendChild(element("text", {
+          x: xScale(peak[0]) + offset.x,
+          y: Math.max(bounds.top + 12, yScale(peak[1]) + offset.y),
+          class: "median-label", fill: system.color, "text-anchor": offset.anchor,
+        }, system.name));
+      });
+
+      document.querySelectorAll(".legend-item").forEach((item) => item.classList.toggle("active", activeIds.includes(item.dataset.system)));
+      const totalCurves = active.reduce((sum, system) => sum + system.curveCount, 0);
+      const totalLocations = active.reduce((sum, system) => sum + system.locationCount, 0);
+      document.getElementById("curve-count").textContent = `${totalCurves.toLocaleString()} curves from ${totalLocations} system-specific locations`;
+      document.getElementById("interpretation").textContent = step === order.length
+        ? "The systems broadly trace the same seasonal wave, while differences in their median timing are consistent with observing different points in testing, care-seeking, and hospitalization."
+        : `${active[active.length - 1].name} has been added without changing the calendar alignment of any curve.`;
+    }
+
+    function setStep(step, updateHash = true) {
+      step = Math.min(order.length, Math.max(1, Number(step) || 1));
+      stateSelect.value = String(step);
+      backButton.disabled = step === 1;
+      nextButton.disabled = step === order.length;
+      render(step);
+      if (updateHash) history.replaceState(null, "", `#state=${step}`);
+    }
+
+    stateSelect.addEventListener("change", () => setStep(stateSelect.value));
+    backButton.addEventListener("click", () => setStep(Number(stateSelect.value) - 1));
+    nextButton.addEventListener("click", () => setStep(Number(stateSelect.value) + 1));
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft") backButton.click();
+      if (event.key === "ArrowRight") nextButton.click();
+    });
+    window.addEventListener("hashchange", () => setStep(new URLSearchParams(location.hash.slice(1)).get("state"), false));
+    setStep(new URLSearchParams(location.hash.slice(1)).get("state") || 1, false);
+  </script>
+</body>
+</html>

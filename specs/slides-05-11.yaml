@@ -1,0 +1,61 @@
+section: influenza surveillance data
+slides:
+  - slide: 5
+    route: slide-05.html
+    system: ILINet
+  - slide: 6
+    route: slide-06.html
+    system: NSSP
+  - slide: 7
+    route: slide-07.html
+    system: NHSN
+  - slide: 8
+    route: slide-08.html
+    system: FluSurv-NET
+  - slide: 9
+    route: slide-09.html
+    system: NREVSS
+  - slide: 10
+    route: slide-10.html
+    visual: surveillance synthesis matrix
+  - slide: 11
+    route: slide-11.html
+    visual: sequential normalized curve overlay
+format:
+  responsive: false
+  target_width_px: 1240
+  target_height_px: 540
+system_slide_states:
+  - signal
+  - seasons
+  - geography
+overlay_states:
+  1: ILINet
+  2: NSSP
+  3: NREVSS
+  4: NHSN
+  5: FluSurv-NET
+data:
+  source_directory: ../../data/processed
+  files:
+    - ilinet_national_seasons.csv
+    - ilinet_state_seasons.csv
+    - nssp_state_seasons.csv
+    - nhsn_state_seasons.csv
+    - flusurv_state_seasons.csv
+    - nrevss_state_seasons.csv
+  overlay_transformation: min-max scale each system-location-season independently to [0, 1]
+  overlay_time_alignment: preserve the original MMWR seasonal week; do not shift curves
+  overlay_summary: week-specific median of the independently scaled curves for each system
+editorial_points:
+  - Each system observes a different encounter, specimen stream, population, and denominator.
+  - Geographic coverage must be described in system-specific units rather than as one comparable location count.
+  - Network history and the currently comparable public extract are not always the same period.
+  - Similar seasonal timing does not make the surveillance measures interchangeable.
+sources:
+  - https://www.cdc.gov/fluview/overview/index.html
+  - https://www.cdc.gov/fluview/overview/influenza-hospitalization-surveillance.html
+  - https://www.cdc.gov/nhsn/psc/hospital-respiratory-reporting.html
+  - https://www.cdc.gov/flu/whats-new/2025-2026-influenza-activity.html
+  - https://www.cdc.gov/flu/weekly/weeklyarchives2015-2016/Week52.htm
+  - https://stacks.cdc.gov/view/cdc/133124/cdc_133124_DS1.pdf
