@@ -28,7 +28,7 @@
     button:disabled { cursor: default; opacity: .35; }
     .frame {
       display: grid;
-      grid-template-rows: 54px minmax(0, 1fr) 28px;
+      grid-template-rows: 32px minmax(0, 1fr) 28px;
       min-height: 0;
       overflow: hidden;
       border: 1px solid var(--line);
@@ -37,9 +37,8 @@
       background: #fff;
       box-shadow: 0 8px 24px rgb(28 49 50 / 7%);
     }
-    .heading { display: flex; align-items: start; justify-content: space-between; gap: 18px; }
-    h1 { margin: 0; font-size: 25px; line-height: 1.12; letter-spacing: -.032em; white-space: nowrap; }
-    .subtitle { margin: 5px 0 0; color: var(--muted); font-size: 11.5px; font-weight: 650; }
+    .heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 11.5px; font-weight: 650; }
     .legend { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px 14px; width: 500px; padding-top: 3px; }
     .legend-item { display: flex; align-items: center; gap: 6px; color: #42535a; font-size: 10.5px; font-weight: 760; opacity: .18; transition: opacity .2s ease; }
     .legend-item.active { opacity: 1; }
@@ -78,7 +77,7 @@
     </header>
     <section class="frame">
       <header class="heading">
-        <div><h1 id="title"></h1><p class="subtitle" id="subtitle"></p></div>
+        <p class="subtitle" id="subtitle"></p>
         <div class="legend" id="legend"></div>
       </header>
       <div class="plot"><svg id="chart" viewBox="0 0 1180 385" role="img" aria-labelledby="chart-title chart-desc"></svg></div>
@@ -102,7 +101,6 @@
     const bounds = { left: 64, right: 1162, top: 16, bottom: 340 };
     const monthTicks = [[1,"Sep"],[5,"Oct"],[9,"Nov"],[13,"Dec"],[18,"Jan"],[22,"Feb"],[26,"Mar"],[31,"Apr"],[35,"May"]];
 
-    document.getElementById("title").textContent = config.title;
     document.getElementById("subtitle").textContent = config.subtitle;
 
     function element(name, attrs = {}, text = null) {

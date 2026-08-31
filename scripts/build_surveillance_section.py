@@ -56,7 +56,7 @@ SYSTEMS = [
         "age": "0–4 · 5–24 · 25–49 · 50–64 · ≥65 years",
         "timeliness": "Weekly outpatient visit counts",
         "change": "2021/22 · ILI definition no longer excludes another known cause",
-        "limitation": "ILI is syndromic—not laboratory-confirmed influenza—and the mix of reporting providers changes.",
+        "limitation": "ILI is syndromic rather than laboratory-confirmed influenza, and the mix of reporting providers changes.",
         "source": "https://www.cdc.gov/fluview/overview/index.html",
         "networkSince": "Public archive shown from 1997/98",
     },
@@ -83,10 +83,10 @@ SYSTEMS = [
         "limitation": "The signal still reflects who seeks ED care and how clinicians test, diagnose, and code.",
         "source": "https://www.cdc.gov/nssp/php/onboarding-resources/companion-guide-ed-data-respiratory-illness.html",
         "networkSince": "BioSense launched in 2003; the comparable influenza extract shown begins in 2022/23",
-        "historySubtitle": "The platform broadened from bioterrorism early warning to all-hazards situational awareness—and its data became richer.",
+        "historySubtitle": "The platform broadened from bioterrorism early warning to all-hazards situational awareness, and its data became richer.",
         "historyTakeaway": [
             "NSSP is still syndromic surveillance infrastructure.",
-            "The influenza curve shown here is diagnosis-based—not a symptom-only syndrome.",
+            "The influenza curve shown here is diagnosis-based rather than a symptom-only syndrome.",
         ],
         "historyTimeline": [
             {
@@ -410,7 +410,6 @@ def main() -> None:
     print("Wrote docs/slide-10.html")
 
     overlay_config = {
-        "title": "Seasonal timing across surveillance systems",
         "subtitle": "Locations share one min–max scale within each surveillance system and season; calendar weeks are not shifted.",
         "order": ["ilinet", "nssp", "nrevss", "nhsn", "flusurv"],
     }
