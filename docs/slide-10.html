@@ -26,19 +26,22 @@
     }
     header { display: flex; align-items: end; justify-content: space-between; height: 74px; padding: 14px 18px 12px; }
     .eyebrow { margin-bottom: 5px; color: #0a6670; font-size: 11px; font-weight: 840; letter-spacing: .12em; text-transform: uppercase; }
-    h1 { margin: 0; font-size: 26px; line-height: 1.12; letter-spacing: -.032em; white-space: nowrap; }
-    .header-note { width: 280px; color: var(--muted); font-size: 11.5px; font-weight: 650; line-height: 1.32; text-align: right; }
-    .matrix { display: grid; grid-template-rows: 34px repeat(5, 76px); padding: 0 16px 14px; }
+    h1 { margin: 0; font-size: 25px; line-height: 1.12; letter-spacing: -.032em; white-space: nowrap; }
+    .header-note { width: 280px; flex-shrink: 0; color: var(--muted); font-size: 11.5px; font-weight: 650; line-height: 1.32; text-align: right; }
+    .matrix { display: grid; grid-template-rows: 34px repeat(5, 76px); padding: 0 16px; }
     .row {
       display: grid;
-      grid-template-columns: 128px 202px 176px 132px 126px 146px 1fr;
+      grid-template-columns: 122px 149px 171px 223px 193px 112px 1fr;
       align-items: center;
       min-width: 0;
       border-top: 1px solid var(--line);
     }
     .row:last-child { border-bottom: 1px solid var(--line); }
     .header-row { border-top: 0; color: var(--muted); }
-    .cell { min-width: 0; padding: 0 9px; font-size: 12px; font-weight: 650; line-height: 1.25; }
+    .cell { min-width: 0; padding: 0 8px; font-size: 11.5px; font-weight: 650; line-height: 1.25; }
+    .detail { display: block; margin-top: 4px; color: var(--muted); font-size: 10.5px; font-weight: 600; line-height: 1.25; }
+    .series { font-weight: 800; }
+    .age-band { white-space: nowrap; }
     .header-row .cell { font-size: 9.5px; font-weight: 840; letter-spacing: .065em; text-transform: uppercase; }
     .system-cell { display: flex; align-items: center; gap: 10px; padding-left: 4px; font-size: 15px; font-weight: 860; letter-spacing: -.015em; }
     .system-rule { width: 5px; height: 42px; border-radius: 3px; background: var(--row-color); }
@@ -52,6 +55,8 @@
       font-weight: 780;
     }
     footer { display: flex; justify-content: space-between; padding: 6px 18px 0; color: var(--muted); font-size: 9.5px; font-weight: 650; }
+    footer a { color: inherit; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -62,20 +67,20 @@
           <div class="eyebrow">Five complementary views of influenza</div>
           <h1 id="title"></h1>
         </div>
-        <div class="header-note">“Location” means providers, EDs, hospitals, defined catchments, or laboratories depending on the system.</div>
+        <div class="header-note">All plotted curves combine all ages.<br>Age groups below describe available reporting detail.</div>
       </header>
       <div class="matrix" id="matrix">
         <div class="row header-row">
           <div class="cell">System</div><div class="cell">Observed signal</div><div class="cell">Geographic breadth</div>
-          <div class="cell">History</div><div class="cell">Age</div><div class="cell">Reporting speed</div><div class="cell">Interpretive limit</div>
+          <div class="cell">History / plotted series</div><div class="cell">Available age groups</div><div class="cell">Reporting cadence</div><div class="cell">Interpretive limit</div>
         </div>
       </div>
-      <footer><span>Coverage descriptions are system-specific and should not be compared as identical denominators.</span><span>CDC FluView methods · local downloaded extracts</span></footer>
+      <footer><span>Series ranges and location counts match slides 5–9; current full-network coverage is listed separately.</span><a href="https://github.com/ausmeyer/ut-grand-rounds-visuals/blob/main/specs/surveillance-metadata-evidence.md" target="_blank" rel="noopener">CDC sources · checked Sep 18, 2026 ↗</a></footer>
     </section>
   </main>
   <script>
     "use strict";
-    const config = {"title":"Each surveillance system trades breadth, depth, and specificity","rows":[{"name":"ILINet","color":"#2677a8","observes":"Outpatient ILI visits","breadth":"≈4,000 providers","history":"1997/98 archive","age":"5 age groups","speed":"Weekly","limit":"Syndromic; provider mix varies"},{"name":"NSSP","color":"#0a6670","observes":"ED influenza diagnoses","breadth":"≈83% of U.S. EDs","history":"2003 network · 2022/23 extract","age":"4 age groups","speed":"Often <24 h","limit":"Care-seeking and coding shape the signal"},{"name":"NHSN","color":"#d97706","observes":"Admissions and occupancy","breadth":"Required hospital reporting","history":"2020/21 extract","age":"Age-stratified","speed":"Weekly","limit":"Current HRD framework begins in 2024"},{"name":"FluSurv-NET","color":"#c66a2b","observes":"Population-based hospitalizations","breadth":">90 counties · 14 states","history":"2003/04 network","age":"Detailed age rates","speed":"Weekly + revisions","limit":"Deep characterization in defined catchments"},{"name":"NREVSS","color":"#7654a3","observes":"Tests and percent positive","breadth":"≈300 clinical labs","history":"1989 network","age":"When available","speed":"Weekly","limit":"Testing practice and participation vary"}]};
+    const config = {"title":"Each surveillance system trades breadth, depth, and specificity","rows":[{"id":"ilinet","slide":5,"name":"ILINet","fullName":"U.S. Outpatient Influenza-like Illness Surveillance Network","color":"#2677a8","image":"assets/slide-04-clinic.webp","imageAlt":"A monochrome illustration of an outpatient clinic","observation":"Percent of outpatient visits meeting the influenza-like illness definition","signal":"% outpatient visits for ILI","unit":"% outpatient visits for ILI","mainFile":"ilinet_national_seasons.csv","geoFile":"ilinet_state_seasons.csv","mainLocation":"United States","geoHighlight":"Texas","focusSeason":"2024/25","coverage":"≈4,000 providers in the full network","ageSummary":"5 age groups","ageDetail":"0–4 · 5–24 · 25–49 · 50–64 · ≥65 years","timeliness":"Weekly","change":"2021/22 · ILI definition no longer excludes another known cause","limitation":"ILI includes other respiratory pathogens; reporting providers change.","source":"https://www.cdc.gov/fluview/overview/index.html","networkSince":"National archive begins in 1997/98; state histories can be shorter.","series":"1997/98–2025/26 · 29 seasons","geography":"50 states + DC shown (2024/25)"},{"id":"nssp","slide":6,"name":"NSSP","fullName":"National Syndromic Surveillance Program","color":"#0a6670","image":"assets/slide-04-ed.webp","imageAlt":"A monochrome illustration of an emergency department","observation":"Percent of ED visits assigned an influenza discharge diagnosis","signal":"% ED visits with influenza diagnosis","unit":"% ED visits with influenza diagnosis","mainFile":"nssp_national_seasons.csv","geoFile":"nssp_state_seasons.csv","mainLocation":"United States","geoHighlight":"Texas","focusSeason":"2024/25","coverage":"≈85% of U.S. EDs in the full network","ageSummary":"4 FluView age groups","ageDetail":"0–4 · 5–17 · 18–64 · ≥65 years","timeliness":"Weekly public reports; ED feeds often <24 h","change":"The public influenza curve uses the standardized CDC Influenza DD v1 definition.","limitation":"Testing, care-seeking, and diagnostic coding shape the signal.","source":"https://www.cdc.gov/nssp/php/onboarding-resources/companion-guide-ed-data-respiratory-illness.html","networkSince":"BioSense/NSSP: 2003–2026. Current public influenza series: 2022–2026.","historySubtitle":"The platform broadened from bioterrorism early warning to all-hazards situational awareness, and its data became richer.","historyTakeaway":["NSSP is still syndromic surveillance infrastructure.","The influenza curve shown here is diagnosis-based rather than a symptom-only syndrome."],"historyTimeline":[{"year":"2003","title":"BioSense launches","lines":["Early warning after the 2001 attacks","Prediagnostic + diagnostic feeds"]},{"year":"2011","title":"BioSense 2.0","lines":["Shared, collaborative platform","More civilian ED data"]},{"year":"2014","title":"Becomes NSSP","lines":["State and local practitioners lead","All-hazards situational awareness"]},{"year":"2020","title":"Influenza DD v1","lines":["Standardized influenza definition","Discharge diagnoses + clinical terms"]}],"series":"2022/23–2025/26 · 4 seasons","geography":"50 states + DC shown (2024/25)"},{"id":"nhsn","slide":7,"name":"NHSN","fullName":"National Healthcare Safety Network Hospital Respiratory Data","color":"#d97706","image":"assets/slide-04-hospital.webp","imageAlt":"A monochrome illustration of an inpatient hospital","observation":"New admissions with laboratory-confirmed influenza per 100,000 people","signal":"Influenza admissions per 100,000 people","unit":"admissions per 100,000","mainFile":"nhsn_national_seasons.csv","geoFile":"nhsn_state_seasons.csv","mainLocation":"United States","geoHighlight":"Texas","focusSeason":"2024/25","coverage":"Required hospital reporting nationally","ageSummary":"6 age groups + unknown","ageDetail":"0–4 · 5–17 · 18–49 · 50–64 · 65–74 · ≥75 years","timeliness":"Weekly","change":"HRD requirements began Nov 2024; the 6 age groups apply to that framework.","limitation":"Reporting requirements changed; completeness and revisions affect recent data.","source":"https://www.cdc.gov/nhsn/psc/hospital-respiratory-reporting.html","networkSince":"Hospital Respiratory Data (HRD): 2024–2026. Earlier reporting included.","series":"2020/21–2025/26 · 6 seasons","geography":"50 states + DC shown (2024/25)"},{"id":"flusurv","slide":8,"name":"FluSurv-NET","fullName":"Influenza Hospitalization Surveillance Network","color":"#c66a2b","image":"assets/slide-04-hospital.webp","imageAlt":"A monochrome illustration of a hospital participating in a surveillance catchment","observation":"Laboratory-confirmed influenza hospitalizations among residents of defined catchments","signal":"Influenza hospitalizations per 100,000 catchment residents","unit":"hospitalizations per 100,000","mainFile":"flusurv_state_seasons.csv","geoFile":"flusurv_state_seasons.csv","mainLocation":"FluSurv-NET","aggregateLabel":"all EIP and IHSP sites combined","geoHighlight":"California","focusSeason":"2024/25","coverage":"Full network: >90 counties in 14 states","ageSummary":"5 broad age groups","ageDetail":"0–4 · 5–17 · 18–49 · 50–64 · ≥65 years; finer splits available","timeliness":"Weekly; revised for lag","change":"2003 pediatric · 2005 adult · 2025 year-round surveillance","limitation":"Rates describe defined catchments; national generalization is limited.","source":"https://www.cdc.gov/fluview/overview/influenza-hospitalization-surveillance.html","networkSince":"Children: 2003–2026; adults: 2005–2026. No 2020/21 curve in this extract.","series":"2009/10–2025/26 · 16 seasons","geography":"9 state catchments shown (2024/25)"},{"id":"nrevss","slide":9,"name":"NREVSS","fullName":"National Respiratory and Enteric Virus Surveillance System","color":"#7654a3","image":"assets/slide-04-lab.webp","imageAlt":"A monochrome illustration of a clinical virology laboratory","observation":"Percent of clinical laboratory specimens positive for influenza","signal":"% clinical specimens positive for influenza","unit":"% clinical specimens positive","mainFile":"nrevss_national_seasons.csv","geoFile":"nrevss_state_seasons.csv","mainLocation":"United States","geoHighlight":"Texas","focusSeason":"2024/25","coverage":"≈300 clinical labs in the full network","ageSummary":"All ages pooled","ageDetail":"No age breakdown in the clinical-lab series shown","timeliness":"Weekly","change":"2015/16 · clinical and public-health laboratory reports separated","limitation":"Testing and lab participation vary; positivity is not population incidence.","source":"https://www.cdc.gov/fluview/overview/index.html","networkSince":"NREVSS: 1989–2026. Separate clinical-lab reporting began in 2015/16.","series":"2016/17–2025/26 · 10 seasons","geography":"44 states shown (2024/25)"}]};
     const data = {};
     document.getElementById("title").textContent = config.title;
     const matrix = document.getElementById("matrix");
@@ -85,12 +90,12 @@
       item.style.setProperty("--row-color", row.color);
       item.innerHTML = `
         <div class="cell system-cell"><span class="system-rule"></span><span>${row.name}</span></div>
-        <div class="cell observes">${row.observes}</div>
-        <div class="cell">${row.breadth}</div>
-        <div class="cell">${row.history}</div>
-        <div class="cell"><span class="depth">${row.age}</span></div>
-        <div class="cell">${row.speed}</div>
-        <div class="cell limit">${row.limit}</div>`;
+        <div class="cell observes">${row.signal}</div>
+        <div class="cell">${row.geography}<span class="detail">${row.coverage}</span></div>
+        <div class="cell"><span class="series">${row.series}</span><span class="detail">${row.networkSince}</span></div>
+        <div class="cell"><span class="depth">${row.ageSummary}</span><span class="detail">${row.ageDetail.replace(/\d+–\d+|≥\d+/g, '<span class="age-band">$&</span>')}</span></div>
+        <div class="cell">${row.timeliness}</div>
+        <div class="cell limit">${row.limitation}</div>`;
       matrix.appendChild(item);
     });
   </script>

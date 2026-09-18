@@ -28,6 +28,14 @@ python3 scripts/build_surveillance_section.py
 `../data/processed/` and embeds compact chart data directly into the published
 HTML pages.
 
+Slides 5–10 share the system descriptions in `SYSTEMS` inside the same build
+script. Season ranges/counts and the selected season's location counts are
+calculated from the plotted curves. History describes the national/network
+seasons view, with older system origins and reporting changes noted separately.
+All plotted curves combine ages; the age groups describe available reporting
+detail. Source checks and coverage caveats are recorded in
+[`specs/surveillance-metadata-evidence.md`](specs/surveillance-metadata-evidence.md).
+
 ## Preview locally
 
 From the repository root:

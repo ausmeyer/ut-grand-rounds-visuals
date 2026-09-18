@@ -86,7 +86,7 @@
 
     .identity {
       display: grid;
-      grid-template-rows: 144px auto auto 1fr auto;
+      grid-template-rows: 104px auto auto 1fr auto;
       gap: 7px;
       min-height: 0;
       border-right: 1px solid #d8ddd9;
@@ -102,7 +102,7 @@
     .illustration img {
       display: block;
       width: 190px;
-      height: 138px;
+      height: 98px;
       object-fit: contain;
       filter: contrast(.94);
     }
@@ -132,6 +132,7 @@
       text-transform: uppercase;
     }
     .fact-value { color: #34464d; font-size: 10.5px; font-weight: 670; line-height: 1.25; }
+    .fact-detail { display: block; margin-top: 2px; font-weight: 600; }
     .source-link { color: var(--accent); font-size: 10px; font-weight: 780; text-decoration: none; }
     .source-link:hover { text-decoration: underline; }
 
@@ -225,9 +226,9 @@
         <div>
           <p class="observation" id="observation"></p>
           <div class="facts">
-            <div class="fact"><div class="fact-label">Series</div><div class="fact-value" id="series-fact"></div></div>
+            <div class="fact"><div class="fact-label">History</div><div class="fact-value" id="series-fact"></div></div>
             <div class="fact"><div class="fact-label">Coverage</div><div class="fact-value" id="coverage-fact"></div></div>
-            <div class="fact"><div class="fact-label">Age</div><div class="fact-value" id="age-fact"></div></div>
+            <div class="fact"><div class="fact-label">Age groups</div><div class="fact-value" id="age-fact"></div></div>
             <div class="fact"><div class="fact-label">Cadence</div><div class="fact-value" id="timeliness-fact"></div></div>
           </div>
         </div>
@@ -276,8 +277,8 @@
     document.getElementById("full-name").textContent = config.fullName;
     document.getElementById("observation").textContent = config.observation;
     document.getElementById("series-fact").textContent = config.series;
-    document.getElementById("coverage-fact").textContent = config.coverage;
-    document.getElementById("age-fact").textContent = config.age;
+    document.getElementById("coverage-fact").innerHTML = `${config.geography}<span class="fact-detail">${config.coverage}</span>`;
+    document.getElementById("age-fact").innerHTML = `${config.ageSummary}<span class="fact-detail">${config.ageDetail}</span>`;
     document.getElementById("timeliness-fact").textContent = config.timeliness;
     document.getElementById("source-link").href = config.source;
     document.getElementById("network-since").textContent = config.networkSince;
@@ -371,13 +372,13 @@
       const aggregateLabel = config.aggregateLabel || config.mainLocation;
       if (state === "signal") {
         curves = [data.focus];
-        subtitle = `${config.focusSeason} · ${aggregateLabel}`;
+        subtitle = `${config.focusSeason} · ${aggregateLabel} · all ages`;
       } else if (state === "seasons") {
         curves = data.seasons;
-        subtitle = `${data.summary.seasonCount} available seasons · ${aggregateLabel}`;
+        subtitle = `${data.summary.seasonRange} · ${data.summary.seasonCount} seasons · ${aggregateLabel} · all ages`;
       } else {
         curves = data.geography;
-        subtitle = `${config.focusSeason} · ${data.summary.locationCount} reporting locations in this extract`;
+        subtitle = `${config.focusSeason} · ${data.summary.geographyLabel} in this extract · all ages`;
       }
       document.getElementById("chart-subtitle").textContent = subtitle;
 

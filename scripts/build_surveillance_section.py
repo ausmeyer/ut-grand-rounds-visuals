@@ -45,20 +45,21 @@ SYSTEMS = [
         "image": "assets/slide-04-clinic.webp",
         "imageAlt": "A monochrome illustration of an outpatient clinic",
         "observation": "Percent of outpatient visits meeting the influenza-like illness definition",
+        "signal": "% outpatient visits for ILI",
         "unit": "% outpatient visits for ILI",
         "mainFile": "ilinet_national_seasons.csv",
         "geoFile": "ilinet_state_seasons.csv",
         "mainLocation": "United States",
         "geoHighlight": "Texas",
         "focusSeason": "2024/25",
-        "series": "Public national extract: 1997/98–2025/26",
-        "coverage": "≈4,000 providers; all states plus DC, PR, and USVI",
-        "age": "0–4 · 5–24 · 25–49 · 50–64 · ≥65 years",
-        "timeliness": "Weekly outpatient visit counts",
+        "coverage": "≈4,000 providers in the full network",
+        "ageSummary": "5 age groups",
+        "ageDetail": "0–4 · 5–24 · 25–49 · 50–64 · ≥65 years",
+        "timeliness": "Weekly",
         "change": "2021/22 · ILI definition no longer excludes another known cause",
-        "limitation": "ILI is syndromic rather than laboratory-confirmed influenza, and the mix of reporting providers changes.",
+        "limitation": "ILI includes other respiratory pathogens; reporting providers change.",
         "source": "https://www.cdc.gov/fluview/overview/index.html",
-        "networkSince": "Public archive shown from 1997/98",
+        "networkSince": "National archive begins in 1997/98; state histories can be shorter.",
     },
     {
         "id": "nssp",
@@ -69,20 +70,21 @@ SYSTEMS = [
         "image": "assets/slide-04-ed.webp",
         "imageAlt": "A monochrome illustration of an emergency department",
         "observation": "Percent of ED visits assigned an influenza discharge diagnosis",
+        "signal": "% ED visits with influenza diagnosis",
         "unit": "% ED visits with influenza diagnosis",
         "mainFile": "nssp_national_seasons.csv",
         "geoFile": "nssp_state_seasons.csv",
         "mainLocation": "United States",
         "geoHighlight": "Texas",
         "focusSeason": "2024/25",
-        "series": "Downloaded extract: 2022/23–2025/26",
-        "coverage": "51 jurisdictions in this extract; ≈83% of U.S. EDs nationally",
-        "age": "Public products: 0–4 · 5–17 · 18–64 · ≥65 years",
-        "timeliness": "Often available within 24 hours",
+        "coverage": "≈85% of U.S. EDs in the full network",
+        "ageSummary": "4 FluView age groups",
+        "ageDetail": "0–4 · 5–17 · 18–64 · ≥65 years",
+        "timeliness": "Weekly public reports; ED feeds often <24 h",
         "change": "The public influenza curve uses the standardized CDC Influenza DD v1 definition.",
-        "limitation": "The signal still reflects who seeks ED care and how clinicians test, diagnose, and code.",
+        "limitation": "Testing, care-seeking, and diagnostic coding shape the signal.",
         "source": "https://www.cdc.gov/nssp/php/onboarding-resources/companion-guide-ed-data-respiratory-illness.html",
-        "networkSince": "BioSense launched in 2003; the comparable influenza extract shown begins in 2022/23",
+        "networkSince": "BioSense/NSSP: 2003–2026. Current public influenza series: 2022–2026.",
         "historySubtitle": "The platform broadened from bioterrorism early warning to all-hazards situational awareness, and its data became richer.",
         "historyTakeaway": [
             "NSSP is still syndromic surveillance infrastructure.",
@@ -120,20 +122,21 @@ SYSTEMS = [
         "image": "assets/slide-04-hospital.webp",
         "imageAlt": "A monochrome illustration of an inpatient hospital",
         "observation": "New admissions with laboratory-confirmed influenza per 100,000 people",
+        "signal": "Influenza admissions per 100,000 people",
         "unit": "admissions per 100,000",
         "mainFile": "nhsn_national_seasons.csv",
         "geoFile": "nhsn_state_seasons.csv",
         "mainLocation": "United States",
         "geoHighlight": "Texas",
         "focusSeason": "2024/25",
-        "series": "Downloaded extract: 2020/21–2025/26",
-        "coverage": "51 jurisdictions; required reporting from acute-care and critical-access hospitals",
-        "age": "Age-stratified admissions; adult and pediatric occupancy",
-        "timeliness": "Weekly facility-aggregated reporting",
-        "change": "Oct–Nov 2024 · current Hospital Respiratory Data framework began",
-        "limitation": "The current comparable framework is short, and facility completeness and revisions affect recent values.",
+        "coverage": "Required hospital reporting nationally",
+        "ageSummary": "6 age groups + unknown",
+        "ageDetail": "0–4 · 5–17 · 18–49 · 50–64 · 65–74 · ≥75 years",
+        "timeliness": "Weekly",
+        "change": "HRD requirements began Nov 2024; the 6 age groups apply to that framework.",
+        "limitation": "Reporting requirements changed; completeness and revisions affect recent data.",
         "source": "https://www.cdc.gov/nhsn/psc/hospital-respiratory-reporting.html",
-        "networkSince": "Earlier values precede the current HRD framework",
+        "networkSince": "Hospital Respiratory Data (HRD): 2024–2026. Earlier reporting included.",
     },
     {
         "id": "flusurv",
@@ -144,6 +147,7 @@ SYSTEMS = [
         "image": "assets/slide-04-hospital.webp",
         "imageAlt": "A monochrome illustration of a hospital participating in a surveillance catchment",
         "observation": "Laboratory-confirmed influenza hospitalizations among residents of defined catchments",
+        "signal": "Influenza hospitalizations per 100,000 catchment residents",
         "unit": "hospitalizations per 100,000",
         "mainFile": "flusurv_state_seasons.csv",
         "geoFile": "flusurv_state_seasons.csv",
@@ -151,14 +155,14 @@ SYSTEMS = [
         "aggregateLabel": "all EIP and IHSP sites combined",
         "geoHighlight": "California",
         "focusSeason": "2024/25",
-        "series": "Network extract shown: 2009/10–2025/26",
-        "coverage": ">90 counties in 14 states; ≈10% of the U.S. population",
-        "age": "All ages with detailed age-specific hospitalization rates",
-        "timeliness": "Weekly rates; recent weeks revised for reporting lag",
+        "coverage": "Full network: >90 counties in 14 states",
+        "ageSummary": "5 broad age groups",
+        "ageDetail": "0–4 · 5–17 · 18–49 · 50–64 · ≥65 years; finer splits available",
+        "timeliness": "Weekly; revised for lag",
         "change": "2003 pediatric · 2005 adult · 2025 year-round surveillance",
-        "limitation": "Its defined catchments support detailed rates but are not complete national coverage.",
+        "limitation": "Rates describe defined catchments; national generalization is limited.",
         "source": "https://www.cdc.gov/fluview/overview/influenza-hospitalization-surveillance.html",
-        "networkSince": "Pediatric surveillance 2003/04; adults 2005/06",
+        "networkSince": "Children: 2003–2026; adults: 2005–2026. No 2020/21 curve in this extract.",
     },
     {
         "id": "nrevss",
@@ -169,20 +173,21 @@ SYSTEMS = [
         "image": "assets/slide-04-lab.webp",
         "imageAlt": "A monochrome illustration of a clinical virology laboratory",
         "observation": "Percent of clinical laboratory specimens positive for influenza",
+        "signal": "% clinical specimens positive for influenza",
         "unit": "% clinical specimens positive",
         "mainFile": "nrevss_national_seasons.csv",
         "geoFile": "nrevss_state_seasons.csv",
         "mainLocation": "United States",
         "geoHighlight": "Texas",
         "focusSeason": "2024/25",
-        "series": "Downloaded clinical-lab extract: 2016/17–2025/26",
-        "coverage": "≈300 clinical laboratories across all states and several territories",
-        "age": "Age reported when available; richer age detail in public-health laboratory data",
-        "timeliness": "Weekly testing totals and positives",
+        "coverage": "≈300 clinical labs in the full network",
+        "ageSummary": "All ages pooled",
+        "ageDetail": "No age breakdown in the clinical-lab series shown",
+        "timeliness": "Weekly",
         "change": "2015/16 · clinical and public-health laboratory reports separated",
-        "limitation": "Participation and testing practices vary; percent positive is not population incidence.",
+        "limitation": "Testing and lab participation vary; positivity is not population incidence.",
         "source": "https://www.cdc.gov/fluview/overview/index.html",
-        "networkSince": "NREVSS has monitored respiratory viruses since 1989",
+        "networkSince": "NREVSS: 1989–2026. Separate clinical-lab reporting began in 2015/16.",
     },
 ]
 
@@ -268,13 +273,24 @@ def system_payload(spec: dict, cache: dict[str, list[dict]]) -> dict:
     if not geo_curves:
         raise ValueError(f"No geographic curves for {spec['name']} in {spec['focusSeason']}")
 
+    seasons = sorted({curve["season"] for curve in main_curves})
+    locations = {curve["location"] for curve in geo_curves}
+    if spec["id"] == "flusurv":
+        geography = f"{len(locations)} state catchments"
+    elif "District of Columbia" in locations:
+        geography = f"{len(locations) - 1} states + DC"
+    else:
+        geography = f"{len(locations)} states"
+
     return {
         "focus": focus,
         "seasons": main_curves,
         "geography": geo_curves,
         "summary": {
-            "seasonCount": len(main_curves),
-            "locationCount": len({curve["location"] for curve in geo_curves}),
+            "seasonCount": len(seasons),
+            "seasonRange": f"{seasons[0]}–{seasons[-1]}",
+            "locationCount": len(locations),
+            "geographyLabel": geography,
         },
     }
 
@@ -365,46 +381,24 @@ def render(template: Path, output: Path, config: dict, data: dict) -> None:
 def main() -> None:
     required = sorted({spec["mainFile"] for spec in SYSTEMS} | {spec["geoFile"] for spec in SYSTEMS})
     cache = {filename: read_rows(filename) for filename in required}
+    matrix_rows = []
 
     for spec in SYSTEMS:
+        payload = system_payload(spec, cache)
+        summary = payload["summary"]
+        config = {
+            **spec,
+            "series": f"{summary['seasonRange']} · {summary['seasonCount']} seasons",
+            "geography": f"{summary['geographyLabel']} shown ({spec['focusSeason']})",
+        }
         output = ROOT / "docs" / f"slide-{spec['slide']:02d}.html"
-        render(SYSTEM_TEMPLATE, output, spec, system_payload(spec, cache))
+        render(SYSTEM_TEMPLATE, output, config, payload)
+        matrix_rows.append(config)
         print(f"Wrote {output.relative_to(ROOT)}")
 
     matrix_config = {
         "title": "Each surveillance system trades breadth, depth, and specificity",
-        "rows": [
-            {
-                "name": "ILINet", "color": "#2677a8", "observes": "Outpatient ILI visits",
-                "breadth": "≈4,000 providers", "history": "1997/98 archive",
-                "age": "5 age groups", "speed": "Weekly",
-                "limit": "Syndromic; provider mix varies",
-            },
-            {
-                "name": "NSSP", "color": "#0a6670", "observes": "ED influenza diagnoses",
-                "breadth": "≈83% of U.S. EDs", "history": "2003 network · 2022/23 extract",
-                "age": "4 age groups", "speed": "Often <24 h",
-                "limit": "Care-seeking and coding shape the signal",
-            },
-            {
-                "name": "NHSN", "color": "#d97706", "observes": "Admissions and occupancy",
-                "breadth": "Required hospital reporting", "history": "2020/21 extract",
-                "age": "Age-stratified", "speed": "Weekly",
-                "limit": "Current HRD framework begins in 2024",
-            },
-            {
-                "name": "FluSurv-NET", "color": "#c66a2b", "observes": "Population-based hospitalizations",
-                "breadth": ">90 counties · 14 states", "history": "2003/04 network",
-                "age": "Detailed age rates", "speed": "Weekly + revisions",
-                "limit": "Deep characterization in defined catchments",
-            },
-            {
-                "name": "NREVSS", "color": "#7654a3", "observes": "Tests and percent positive",
-                "breadth": "≈300 clinical labs", "history": "1989 network",
-                "age": "When available", "speed": "Weekly",
-                "limit": "Testing practice and participation vary",
-            },
-        ],
+        "rows": matrix_rows,
     }
     render(MATRIX_TEMPLATE, ROOT / "docs" / "slide-10.html", matrix_config, {})
     print("Wrote docs/slide-10.html")
