@@ -372,13 +372,13 @@
       const aggregateLabel = config.aggregateLabel || config.mainLocation;
       if (state === "signal") {
         curves = [data.focus];
-        subtitle = `${config.focusSeason} · ${aggregateLabel} · all ages`;
+        subtitle = `${config.focusSeason} · ${aggregateLabel}`;
       } else if (state === "seasons") {
         curves = data.seasons;
-        subtitle = `${data.summary.seasonRange} · ${data.summary.seasonCount} seasons · ${aggregateLabel} · all ages`;
+        subtitle = `${data.summary.seasonRange} · ${data.summary.seasonCount} seasons · ${aggregateLabel}`;
       } else {
         curves = data.geography;
-        subtitle = `${config.focusSeason} · ${data.summary.geographyLabel} in this extract · all ages`;
+        subtitle = `${config.focusSeason} · ${data.summary.geographyLabel}`;
       }
       document.getElementById("chart-subtitle").textContent = subtitle;
 

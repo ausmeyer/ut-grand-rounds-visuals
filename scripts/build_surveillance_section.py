@@ -182,7 +182,7 @@ SYSTEMS = [
         "focusSeason": "2024/25",
         "coverage": "≈300 clinical labs in the full network",
         "ageSummary": "All ages pooled",
-        "ageDetail": "No age breakdown in the clinical-lab series shown",
+        "ageDetail": "No age breakdown in the clinical-lab series",
         "timeliness": "Weekly",
         "change": "2015/16 · clinical and public-health laboratory reports separated",
         "limitation": "Testing and lab participation vary; positivity is not population incidence.",
@@ -389,7 +389,7 @@ def main() -> None:
         config = {
             **spec,
             "series": f"{summary['seasonRange']} · {summary['seasonCount']} seasons",
-            "geography": f"{summary['geographyLabel']} shown ({spec['focusSeason']})",
+            "geography": f"{summary['geographyLabel']} ({spec['focusSeason']})",
         }
         output = ROOT / "docs" / f"slide-{spec['slide']:02d}.html"
         render(SYSTEM_TEMPLATE, output, config, payload)
