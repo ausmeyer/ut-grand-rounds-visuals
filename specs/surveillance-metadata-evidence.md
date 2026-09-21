@@ -21,6 +21,14 @@ Verified September 18, 2026. This ledger covers the descriptions reconciled acro
 
 Could not verify: none of the replacement age, history, or plotted-coverage claims above.
 
+September 21, 2026 coverage clarification:
+
+| ID | Claim | Claim type | Exact source | PMID/DOI/URL | Supporting passage or result | Status | Contradictions | Limitations |
+|----|-------|------------|--------------|--------------|------------------------------|--------|----------------|-------------|
+| C15 | Current FluSurv-NET coverage comprises 12 EIP states and 2 IHSP states, spanning more than 90 counties or county equivalents. | methods fact | CDC, U.S. Influenza Surveillance: Purpose and Methods, December 2, 2025, Hospitalization Surveillance; CDC, Influenza Hospitalization Surveillance Network, January 30, 2026, Surveillance Area; both inspected September 21, 2026 | [CDC methods](https://www.cdc.gov/fluview/overview/index.html), [FluSurv-NET](https://www.cdc.gov/fluview/overview/influenza-hospitalization-surveillance.html) | EIP: CA, CO, CT, GA, MD, MI, MN, NM, NY, OR, TN, WA. IHSP: NC, UT. The network spans >90 counties or county equivalents. | verified | none found in inspected sources | Current network coverage, not a claim that all locations are present throughout every historical season or in the downloaded geography plot. |
+
+Slide 8's coverage box and slide 10's geographic breadth now show the full network composition from C15. The geography plot caption still reports the nine catchments actually drawn in the 2024/25 extract (CA, CO, CT, GA, MD, MN, NY, OR, TN). Curve values and network aggregates are unchanged.
+
 Unsafe to keep as written: “Age-stratified,” “Detailed age rates,” and “When available” were too vague to compare systems. Network inception alone also did not describe the time span of the plotted series. Those descriptions were replaced with explicit groups, season ranges, counts, and separately identified system history.
 
 The table and individual plot configurations now come from the same SYSTEMS records. Plotted season ranges and geographic counts are computed from each plot payload at build time. The shared history span describes the national/network seasons view; the geography view remains the selected 2024/25 season. Current reporting capabilities should not be assumed to apply unchanged across each entire historical span.

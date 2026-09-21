@@ -81,7 +81,7 @@ SYSTEMS = [
         "ageSummary": "4 FluView age groups",
         "ageDetail": "0–4 · 5–17 · 18–64 · ≥65 years",
         "timeliness": "Weekly public reports; ED feeds often <24 h",
-        "change": "The public influenza curve uses the standardized CDC Influenza DD v1 definition.",
+        "change": "",
         "limitation": "Testing, care-seeking, and diagnostic coding shape the signal.",
         "source": "https://www.cdc.gov/nssp/php/onboarding-resources/companion-guide-ed-data-respiratory-illness.html",
         "networkSince": "BioSense/NSSP: 2003–2026. Current public influenza series: 2022–2026.",
@@ -133,7 +133,7 @@ SYSTEMS = [
         "ageSummary": "6 age groups + unknown",
         "ageDetail": "0–4 · 5–17 · 18–49 · 50–64 · 65–74 · ≥75 years",
         "timeliness": "Weekly",
-        "change": "HRD requirements began Nov 2024; the 6 age groups apply to that framework.",
+        "change": "",
         "limitation": "Reporting requirements changed; completeness and revisions affect recent data.",
         "source": "https://www.cdc.gov/nhsn/psc/hospital-respiratory-reporting.html",
         "networkSince": "Hospital Respiratory Data (HRD): 2024–2026. Earlier reporting included.",
@@ -155,7 +155,8 @@ SYSTEMS = [
         "aggregateLabel": "all EIP and IHSP sites combined",
         "geoHighlight": "California",
         "focusSeason": "2024/25",
-        "coverage": "Full network: >90 counties in 14 states",
+        "networkGeography": "12 states in EIP · 2 states in IHSP",
+        "coverage": "Full network: >90 counties",
         "ageSummary": "5 broad age groups",
         "ageDetail": "0–4 · 5–17 · 18–49 · 50–64 · ≥65 years; finer splits available",
         "timeliness": "Weekly; revised for lag",
@@ -389,7 +390,7 @@ def main() -> None:
         config = {
             **spec,
             "series": f"{summary['seasonRange']} · {summary['seasonCount']} seasons",
-            "geography": f"{summary['geographyLabel']} ({spec['focusSeason']})",
+            "geography": spec.get("networkGeography", f"{summary['geographyLabel']} ({spec['focusSeason']})"),
         }
         output = ROOT / "docs" / f"slide-{spec['slide']:02d}.html"
         render(SYSTEM_TEMPLATE, output, config, payload)
@@ -397,14 +398,12 @@ def main() -> None:
         print(f"Wrote {output.relative_to(ROOT)}")
 
     matrix_config = {
-        "title": "Each surveillance system trades breadth, depth, and specificity",
         "rows": matrix_rows,
     }
     render(MATRIX_TEMPLATE, ROOT / "docs" / "slide-10.html", matrix_config, {})
     print("Wrote docs/slide-10.html")
 
     overlay_config = {
-        "subtitle": "Locations share one min–max scale within each surveillance system and season; calendar weeks are not shifted.",
         "order": ["ilinet", "nssp", "nrevss", "nhsn", "flusurv"],
     }
     render(OVERLAY_TEMPLATE, ROOT / "docs" / "slide-11.html", overlay_config, normalized_overlay(cache))

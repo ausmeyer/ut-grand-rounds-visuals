@@ -28,7 +28,7 @@
     button:disabled { cursor: default; opacity: .35; }
     .frame {
       display: grid;
-      grid-template-rows: 32px minmax(0, 1fr) 28px;
+      grid-template-rows: minmax(0, 1fr) 28px;
       min-height: 0;
       overflow: hidden;
       border: 1px solid var(--line);
@@ -37,13 +37,12 @@
       background: #fff;
       box-shadow: 0 8px 24px rgb(28 49 50 / 7%);
     }
-    .heading { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
-    .subtitle { margin: 0; color: var(--muted); font-size: 11.5px; font-weight: 650; }
-    .legend { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px 14px; width: 500px; padding-top: 3px; }
-    .legend-item { display: flex; align-items: center; gap: 6px; color: #42535a; font-size: 10.5px; font-weight: 760; opacity: .18; transition: opacity .2s ease; }
+    .plot-row { display: grid; grid-template-columns: minmax(0, 1fr) 150px; gap: 20px; min-height: 0; }
+    .legend { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 16px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; color: #42535a; font-size: 12px; font-weight: 760; opacity: .18; transition: opacity .2s ease; }
     .legend-item.active { opacity: 1; }
     .legend-line { width: 22px; height: 0; border-top: 3px solid var(--legend-color); }
-    .plot { min-height: 0; }
+    .plot { min-width: 0; min-height: 0; }
     svg { display: block; width: 100%; height: 100%; overflow: visible; }
     .gridline { stroke: var(--grid); stroke-width: 1; }
     .axis-line { stroke: #879396; stroke-width: 1.25; }
@@ -76,11 +75,10 @@
       </div>
     </header>
     <section class="frame">
-      <header class="heading">
-        <p class="subtitle" id="subtitle"></p>
+      <div class="plot-row">
+        <div class="plot"><svg id="chart" viewBox="0 0 1004 423" role="img" aria-labelledby="chart-title chart-desc"></svg></div>
         <div class="legend" id="legend"></div>
-      </header>
-      <div class="plot"><svg id="chart" viewBox="0 0 1180 385" role="img" aria-labelledby="chart-title chart-desc"></svg></div>
+      </div>
       <footer class="footer">
         <span class="count" id="curve-count"></span>
       </footer>
@@ -98,10 +96,8 @@
     const nextButton = document.getElementById("next-button");
     const legend = document.getElementById("legend");
     const SVG_NS = "http://www.w3.org/2000/svg";
-    const bounds = { left: 64, right: 1162, top: 16, bottom: 340 };
+    const bounds = { left: 64, right: 986, top: 16, bottom: 378 };
     const monthTicks = [[1,"Sep"],[5,"Oct"],[9,"Nov"],[13,"Dec"],[18,"Jan"],[22,"Feb"],[26,"Mar"],[31,"Apr"],[35,"May"]];
-
-    document.getElementById("subtitle").textContent = config.subtitle;
 
     function element(name, attrs = {}, text = null) {
       const node = document.createElementNS(SVG_NS, name);
@@ -155,11 +151,11 @@
       monthTicks.forEach(([week, label]) => {
         const x = xScale(week);
         chart.appendChild(element("line", { x1: x, x2: x, y1: bounds.top, y2: bounds.bottom, class: "gridline", opacity: ".42" }));
-        chart.appendChild(element("text", { x, y: 366, class: "axis-label", "text-anchor": "middle" }, label));
+        chart.appendChild(element("text", { x, y: bounds.bottom + 26, class: "axis-label", "text-anchor": "middle" }, label));
       });
       chart.appendChild(element("line", { x1: bounds.left, x2: bounds.right, y1: bounds.bottom, y2: bounds.bottom, class: "axis-line" }));
       chart.appendChild(element("line", { x1: bounds.left, x2: bounds.left, y1: bounds.top, y2: bounds.bottom, class: "axis-line" }));
-      chart.appendChild(element("text", { x: 14, y: 178, class: "axis-title", transform: "rotate(-90 14 178)", "text-anchor": "middle" }, "System-season scaled activity"));
+      chart.appendChild(element("text", { x: 14, y: 197, class: "axis-title", transform: "rotate(-90 14 197)", "text-anchor": "middle" }, "System-season scaled activity"));
 
       active.forEach((system) => {
         const opacity = active.length === 1 ? .12 : Math.max(.025, .075 / Math.sqrt(active.length));
