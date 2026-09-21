@@ -482,16 +482,16 @@
         <div class="category-label"><span class="category-dot" id="category-dot"></span><span id="category-label">Complementary signals</span></div>
         <div class="side-heading">
           <h2 id="system-title">Different systems answer different questions</h2>
-          <p class="full-name" id="system-name">Select a label on the pathway to see what that surveillance system reports.</p>
+          <p class="full-name" id="system-name">Illness, hospital care, laboratory testing, and deaths</p>
         </div>
         <div class="detail-body">
           <div class="detail-block">
             <div class="detail-label">Reports</div>
-            <p id="reports-text">No single stream measures all influenza illness. Together, these systems describe symptoms, emergency visits, hospitalizations, circulating viruses, and deaths.</p>
+            <p id="reports-text">Outpatient and emergency visits, hospital admissions, laboratory results, and deaths.</p>
           </div>
           <div class="detail-block">
             <div class="detail-label">How to read it</div>
-            <p id="interpretation-text">Each signal has a different population, denominator, timeliness, and degree of laboratory confirmation.</p>
+            <p id="interpretation-text">Use the signals together to follow flu activity and its impact on care. They measure different events, so their counts and percentages are not interchangeable.</p>
           </div>
         </div>
         <a class="source-link" id="source-link" href="https://www.cdc.gov/fluview/overview/index.html" target="_blank" rel="noopener">CDC surveillance methods ↗</a>
@@ -510,6 +510,33 @@
       inpatient: "Inpatient surveillance",
       virologic: "Virologic surveillance",
       mortality: "Mortality surveillance"
+    };
+    const layerDescriptions = {
+      all: {
+        name: "Illness, hospital care, laboratory testing, and deaths",
+        reports: "Outpatient and emergency visits, hospital admissions, laboratory results, and deaths.",
+        interpretation: "Use the signals together to follow flu activity and its impact on care. They measure different events, so their counts and percentages are not interchangeable."
+      },
+      outpatient: {
+        name: "ILINet · NSSP",
+        reports: "ILINet tracks visits for flu-like symptoms. NSSP tracks emergency visits with a flu diagnosis.",
+        interpretation: "Use them to follow demand for outpatient and emergency care. Symptoms are not specific to flu, and diagnoses depend partly on testing and coding."
+      },
+      inpatient: {
+        name: "FluSurv-NET · NHSN",
+        reports: "FluSurv-NET tracks hospitalization rates and patient characteristics in selected communities. NHSN tracks admissions, occupied beds, and hospital capacity nationwide.",
+        interpretation: "Use rates to compare who is being hospitalized and hospital totals to assess pressure on care. Neither system counts infections that never reach the hospital."
+      },
+      virologic: {
+        name: "ICLS · NREVSS",
+        reports: "ICLS focuses on influenza; NREVSS also tracks other respiratory and enteric viruses. Clinical and public-health labs report through these networks.",
+        interpretation: "Use clinical-lab positivity to follow flu activity among tested patients. Use public-health results to identify circulating types and subtypes; many samples arrive already positive."
+      },
+      mortality: {
+        name: "NCHS · Pediatric deaths",
+        reports: "NCHS tracks death-certificate diagnoses. Pediatric surveillance records individual confirmed flu deaths in children.",
+        interpretation: "Use them to follow flu's fatal impact and who is affected. Deaths occur after illness, and reporting delays make the newest weeks incomplete."
+      }
     };
     const categoryColors = {
       all: "#0a6670",
@@ -543,18 +570,13 @@
       categoryDot.style.background = categoryColors[category];
       categoryLabel.textContent = categoryNames[category];
 
-      if (category === "all") {
-        systemTitle.textContent = "Different systems answer different questions";
-        systemName.textContent = "Select a label on the pathway to see what that surveillance system reports.";
-        reportsText.textContent = "No single stream measures all influenza illness. Together, these systems describe symptoms, emergency visits, hospitalizations, circulating viruses, and deaths.";
-        interpretationText.textContent = "Each signal has a different population, denominator, timeliness, and degree of laboratory confirmation.";
-      } else {
-        const count = systems.filter((system) => system.category === category).length;
-        systemTitle.textContent = categoryNames[category];
-        systemName.textContent = `${count} complementary ${count === 1 ? "system" : "systems"} observe this part of the patient journey.`;
-        reportsText.textContent = "Select an emphasized label to see the specific signal it contributes.";
-        interpretationText.textContent = "Compare its unit of observation and reporting delay with the other surveillance layers.";
-      }
+      const description = layerDescriptions[category];
+      systemTitle.textContent = category === "all"
+        ? "Different systems answer different questions"
+        : categoryNames[category];
+      systemName.textContent = description.name;
+      reportsText.textContent = description.reports;
+      interpretationText.textContent = description.interpretation;
       sourceLink.href = "https://www.cdc.gov/fluview/overview/index.html";
       writeHash();
     }

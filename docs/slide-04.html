@@ -482,16 +482,16 @@
         <div class="category-label"><span class="category-dot" id="category-dot"></span><span id="category-label">Complementary signals</span></div>
         <div class="side-heading">
           <h2 id="system-title">Different systems answer different questions</h2>
-          <p class="full-name" id="system-name">Select a label on the pathway to see what that surveillance system reports.</p>
+          <p class="full-name" id="system-name">Illness, hospital care, laboratory testing, and deaths</p>
         </div>
         <div class="detail-body">
           <div class="detail-block">
             <div class="detail-label">Reports</div>
-            <p id="reports-text">No single stream measures all influenza illness. Together, these systems describe symptoms, emergency visits, hospitalizations, circulating viruses, and deaths.</p>
+            <p id="reports-text">Outpatient and emergency visits, hospital admissions, laboratory results, and deaths.</p>
           </div>
           <div class="detail-block">
             <div class="detail-label">How to read it</div>
-            <p id="interpretation-text">Each signal has a different population, denominator, timeliness, and degree of laboratory confirmation.</p>
+            <p id="interpretation-text">Use the signals together to follow flu activity and its impact on care. They measure different events, so their counts and percentages are not interchangeable.</p>
           </div>
         </div>
         <a class="source-link" id="source-link" href="https://www.cdc.gov/fluview/overview/index.html" target="_blank" rel="noopener">CDC surveillance methods ↗</a>
@@ -502,7 +502,7 @@
   <script>
     "use strict";
 
-    const systems = [{"id":"ilinet","short":"ILINet","name":"U.S. Outpatient Influenza-like Illness Surveillance Network","category":"outpatient","stage":"Outpatient clinic","reports":"The weekly percentage of outpatient visits meeting the influenza-like illness definition, reported by age group.","interpretation":"A timely syndromic signal of respiratory illness. It is not laboratory-confirmed influenza and can include other pathogens.","source":"https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-outpatient"},{"id":"nssp","short":"NSSP","name":"National Syndromic Surveillance Program","category":"outpatient","stage":"Emergency department","reports":"The percentage of emergency-department visits with an influenza discharge diagnosis, overall and by age group.","interpretation":"A near-real-time signal from most U.S. emergency departments; it reflects care-seeking, testing, and diagnostic coding.","source":"https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-outpatient"},{"id":"flusurv-net","short":"FluSurv-NET","name":"Influenza Hospitalization Surveillance Network","category":"inpatient","stage":"Hospital admission","reports":"Population-based weekly rates and detailed characteristics of laboratory-confirmed influenza hospitalizations in selected catchment areas.","interpretation":"Rich clinical detail and a defined population denominator, but the network covers about 10% of the U.S. population and recent weeks are revised.","source":"https://www.cdc.gov/fluview/overview/influenza-hospitalization-surveillance.html"},{"id":"nhsn","short":"NHSN","name":"National Healthcare Safety Network Hospital Respiratory Data Module","category":"inpatient","stage":"Hospital admission","reports":"Weekly facility-level counts of new laboratory-confirmed influenza admissions, current hospitalizations, ICU occupancy, and bed capacity.","interpretation":"Broad national hospital coverage and operational situational awareness, using aggregated facility reports.","source":"https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-hospitalization"},{"id":"icls","short":"ICLS","name":"U.S. Influenza Collaborating Laboratories System","category":"virologic","stage":"Public health laboratory","reports":"Influenza-positive specimens by virus type, subtype or lineage, and age; selected viruses undergo genetic, antigenic, and antiviral-susceptibility characterization.","interpretation":"Best for identifying which viruses are circulating and how they are changing, not for estimating community positivity.","source":"https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-virologic"},{"id":"nrevss","short":"NREVSS","name":"National Respiratory and Enteric Virus Surveillance System","category":"virologic","stage":"Clinical laboratory","reports":"The weekly number of respiratory specimens tested, number positive, and percent positive for influenza by virus type.","interpretation":"Clinical laboratory testing helps show the timing and intensity of influenza circulation.","source":"https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-virologic"},{"id":"nchs","short":"NCHS","name":"National Center for Health Statistics Mortality Surveillance","category":"mortality","stage":"Death certificates","reports":"Weekly death-certificate measures for deaths coded with influenza, pneumonia, and/or COVID-19.","interpretation":"A national mortality signal that is delayed and repeatedly revised; influenza-only coding underestimates influenza's full mortality burden.","source":"https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-mortality"},{"id":"pediatric-mortality","short":"Pediatric deaths","name":"Influenza-Associated Pediatric Mortality Surveillance System","category":"mortality","stage":"Notifiable death","reports":"Individual laboratory-confirmed influenza-associated deaths among people younger than 18 years, with demographic and clinical details.","interpretation":"A nationally notifiable severe outcome. Counts are small, case-based, and can arrive after investigation and confirmation.","source":"https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-mortality"}];
+    const systems = [{"id":"ilinet","short":"ILINet","name":"U.S. Outpatient Influenza-like Illness Surveillance Network","category":"outpatient","stage":"Outpatient clinic","reports":"The weekly percentage of outpatient visits meeting the influenza-like illness definition, reported by age group.","interpretation":"Use it to follow how much outpatient care is for flu-like illness. Other respiratory viruses can cause the same symptoms, so this is not a count of confirmed influenza.","source":"https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-outpatient"},{"id":"nssp","short":"NSSP","name":"National Syndromic Surveillance Program","category":"outpatient","stage":"Emergency department","reports":"The percentage of emergency-department visits with an influenza discharge diagnosis, overall and by age group.","interpretation":"Use it to follow how much emergency care involves a flu diagnosis. Testing and coding practices affect the signal; a diagnosis does not always mean a positive test.","source":"https://www.cdc.gov/nssp/php/onboarding-resources/companion-guide-ed-data-respiratory-illness.html"},{"id":"flusurv-net","short":"FluSurv-NET","name":"Influenza Hospitalization Surveillance Network","category":"inpatient","stage":"Hospital admission","reports":"Population-based weekly rates and detailed characteristics of laboratory-confirmed influenza hospitalizations in selected catchment areas.","interpretation":"Use it to compare hospitalization rates across ages and seasons and identify who is most affected. Rates describe monitored communities, not every U.S. hospital.","source":"https://www.cdc.gov/fluview/overview/influenza-hospitalization-surveillance.html"},{"id":"nhsn","short":"NHSN","name":"National Healthcare Safety Network Hospital Respiratory Data Module","category":"inpatient","stage":"Hospital admission","reports":"Weekly facility-level counts of new laboratory-confirmed influenza admissions, current hospitalizations, ICU occupancy, and bed capacity.","interpretation":"Use it to track admissions and pressure on hospital and ICU capacity. These are hospital totals, not detailed records of individual patients.","source":"https://www.cdc.gov/nhsn/psc/hospital-respiratory-reporting.html"},{"id":"icls","short":"ICLS","name":"U.S. Influenza Collaborating Laboratories System","category":"virologic","stage":"Influenza-focused network","reports":"Weekly influenza tests and positive results. Public-health laboratory reports include virus types, subtypes or lineages, and patient ages when available.","interpretation":"Use clinical-lab positivity to follow flu activity and public-health results to identify circulating viruses. Public-health samples often arrive already positive, so their positivity is not a community infection rate.","source":"https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-virologic"},{"id":"nrevss","short":"NREVSS","name":"National Respiratory and Enteric Virus Surveillance System","category":"virologic","stage":"Multiple-virus network","reports":"Weekly test totals and positive results for influenza and other respiratory and enteric viruses, from hospital, commercial, and public-health laboratories.","interpretation":"Use clinical-lab positivity to follow when and where flu is circulating. It describes tested specimens, not the percentage of all people infected.","source":"https://www.cdc.gov/nrevss/php/dashboard/index.html"},{"id":"nchs","short":"NCHS","name":"National Center for Health Statistics Mortality Surveillance","category":"mortality","stage":"Death certificates","reports":"Weekly death-certificate measures for deaths coded with influenza, pneumonia, and/or COVID-19.","interpretation":"Use influenza-coded deaths to follow flu's fatal impact over the season. Recent weeks are incomplete, and death certificates miss some deaths caused by flu.","source":"https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-mortality"},{"id":"pediatric-mortality","short":"Pediatric deaths","name":"Influenza-Associated Pediatric Mortality Surveillance System","category":"mortality","stage":"Notifiable death","reports":"Individual laboratory-confirmed influenza-associated deaths among people younger than 18 years, with demographic and clinical details.","interpretation":"Use it to track reported flu deaths in children and identify their clinical patterns. Recent counts can increase as additional reports arrive.","source":"https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-mortality"}];
     const systemById = new Map(systems.map((system) => [system.id, system]));
     const categoryNames = {
       all: "Complementary signals",
@@ -510,6 +510,33 @@
       inpatient: "Inpatient surveillance",
       virologic: "Virologic surveillance",
       mortality: "Mortality surveillance"
+    };
+    const layerDescriptions = {
+      all: {
+        name: "Illness, hospital care, laboratory testing, and deaths",
+        reports: "Outpatient and emergency visits, hospital admissions, laboratory results, and deaths.",
+        interpretation: "Use the signals together to follow flu activity and its impact on care. They measure different events, so their counts and percentages are not interchangeable."
+      },
+      outpatient: {
+        name: "ILINet · NSSP",
+        reports: "ILINet tracks visits for flu-like symptoms. NSSP tracks emergency visits with a flu diagnosis.",
+        interpretation: "Use them to follow demand for outpatient and emergency care. Symptoms are not specific to flu, and diagnoses depend partly on testing and coding."
+      },
+      inpatient: {
+        name: "FluSurv-NET · NHSN",
+        reports: "FluSurv-NET tracks hospitalization rates and patient characteristics in selected communities. NHSN tracks admissions, occupied beds, and hospital capacity nationwide.",
+        interpretation: "Use rates to compare who is being hospitalized and hospital totals to assess pressure on care. Neither system counts infections that never reach the hospital."
+      },
+      virologic: {
+        name: "ICLS · NREVSS",
+        reports: "ICLS focuses on influenza; NREVSS also tracks other respiratory and enteric viruses. Clinical and public-health labs report through these networks.",
+        interpretation: "Use clinical-lab positivity to follow flu activity among tested patients. Use public-health results to identify circulating types and subtypes; many samples arrive already positive."
+      },
+      mortality: {
+        name: "NCHS · Pediatric deaths",
+        reports: "NCHS tracks death-certificate diagnoses. Pediatric surveillance records individual confirmed flu deaths in children.",
+        interpretation: "Use them to follow flu's fatal impact and who is affected. Deaths occur after illness, and reporting delays make the newest weeks incomplete."
+      }
     };
     const categoryColors = {
       all: "#0a6670",
@@ -543,18 +570,13 @@
       categoryDot.style.background = categoryColors[category];
       categoryLabel.textContent = categoryNames[category];
 
-      if (category === "all") {
-        systemTitle.textContent = "Different systems answer different questions";
-        systemName.textContent = "Select a label on the pathway to see what that surveillance system reports.";
-        reportsText.textContent = "No single stream measures all influenza illness. Together, these systems describe symptoms, emergency visits, hospitalizations, circulating viruses, and deaths.";
-        interpretationText.textContent = "Each signal has a different population, denominator, timeliness, and degree of laboratory confirmation.";
-      } else {
-        const count = systems.filter((system) => system.category === category).length;
-        systemTitle.textContent = categoryNames[category];
-        systemName.textContent = `${count} complementary ${count === 1 ? "system" : "systems"} observe this part of the patient journey.`;
-        reportsText.textContent = "Select an emphasized label to see the specific signal it contributes.";
-        interpretationText.textContent = "Compare its unit of observation and reporting delay with the other surveillance layers.";
-      }
+      const description = layerDescriptions[category];
+      systemTitle.textContent = category === "all"
+        ? "Different systems answer different questions"
+        : categoryNames[category];
+      systemName.textContent = description.name;
+      reportsText.textContent = description.reports;
+      interpretationText.textContent = description.interpretation;
       sourceLink.href = "https://www.cdc.gov/fluview/overview/index.html";
       writeHash();
     }

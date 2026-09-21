@@ -6,7 +6,7 @@
     "category": "outpatient",
     "stage": "Outpatient clinic",
     "reports": "The weekly percentage of outpatient visits meeting the influenza-like illness definition, reported by age group.",
-    "interpretation": "A timely syndromic signal of respiratory illness. It is not laboratory-confirmed influenza and can include other pathogens.",
+    "interpretation": "Use it to follow how much outpatient care is for flu-like illness. Other respiratory viruses can cause the same symptoms, so this is not a count of confirmed influenza.",
     "source": "https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-outpatient"
   },
   {
@@ -16,8 +16,8 @@
     "category": "outpatient",
     "stage": "Emergency department",
     "reports": "The percentage of emergency-department visits with an influenza discharge diagnosis, overall and by age group.",
-    "interpretation": "A near-real-time signal from most U.S. emergency departments; it reflects care-seeking, testing, and diagnostic coding.",
-    "source": "https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-outpatient"
+    "interpretation": "Use it to follow how much emergency care involves a flu diagnosis. Testing and coding practices affect the signal; a diagnosis does not always mean a positive test.",
+    "source": "https://www.cdc.gov/nssp/php/onboarding-resources/companion-guide-ed-data-respiratory-illness.html"
   },
   {
     "id": "flusurv-net",
@@ -26,7 +26,7 @@
     "category": "inpatient",
     "stage": "Hospital admission",
     "reports": "Population-based weekly rates and detailed characteristics of laboratory-confirmed influenza hospitalizations in selected catchment areas.",
-    "interpretation": "Rich clinical detail and a defined population denominator, but the network covers about 10% of the U.S. population and recent weeks are revised.",
+    "interpretation": "Use it to compare hospitalization rates across ages and seasons and identify who is most affected. Rates describe monitored communities, not every U.S. hospital.",
     "source": "https://www.cdc.gov/fluview/overview/influenza-hospitalization-surveillance.html"
   },
   {
@@ -36,17 +36,17 @@
     "category": "inpatient",
     "stage": "Hospital admission",
     "reports": "Weekly facility-level counts of new laboratory-confirmed influenza admissions, current hospitalizations, ICU occupancy, and bed capacity.",
-    "interpretation": "Broad national hospital coverage and operational situational awareness, using aggregated facility reports.",
-    "source": "https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-hospitalization"
+    "interpretation": "Use it to track admissions and pressure on hospital and ICU capacity. These are hospital totals, not detailed records of individual patients.",
+    "source": "https://www.cdc.gov/nhsn/psc/hospital-respiratory-reporting.html"
   },
   {
     "id": "icls",
     "short": "ICLS",
     "name": "U.S. Influenza Collaborating Laboratories System",
     "category": "virologic",
-    "stage": "Public health laboratory",
-    "reports": "Influenza-positive specimens by virus type, subtype or lineage, and age; selected viruses undergo genetic, antigenic, and antiviral-susceptibility characterization.",
-    "interpretation": "Best for identifying which viruses are circulating and how they are changing, not for estimating community positivity.",
+    "stage": "Influenza-focused network",
+    "reports": "Weekly influenza tests and positive results. Public-health laboratory reports include virus types, subtypes or lineages, and patient ages when available.",
+    "interpretation": "Use clinical-lab positivity to follow flu activity and public-health results to identify circulating viruses. Public-health samples often arrive already positive, so their positivity is not a community infection rate.",
     "source": "https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-virologic"
   },
   {
@@ -54,10 +54,10 @@
     "short": "NREVSS",
     "name": "National Respiratory and Enteric Virus Surveillance System",
     "category": "virologic",
-    "stage": "Clinical laboratory",
-    "reports": "The weekly number of respiratory specimens tested, number positive, and percent positive for influenza by virus type.",
-    "interpretation": "Clinical laboratory testing helps show the timing and intensity of influenza circulation.",
-    "source": "https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-virologic"
+    "stage": "Multiple-virus network",
+    "reports": "Weekly test totals and positive results for influenza and other respiratory and enteric viruses, from hospital, commercial, and public-health laboratories.",
+    "interpretation": "Use clinical-lab positivity to follow when and where flu is circulating. It describes tested specimens, not the percentage of all people infected.",
+    "source": "https://www.cdc.gov/nrevss/php/dashboard/index.html"
   },
   {
     "id": "nchs",
@@ -66,7 +66,7 @@
     "category": "mortality",
     "stage": "Death certificates",
     "reports": "Weekly death-certificate measures for deaths coded with influenza, pneumonia, and/or COVID-19.",
-    "interpretation": "A national mortality signal that is delayed and repeatedly revised; influenza-only coding underestimates influenza's full mortality burden.",
+    "interpretation": "Use influenza-coded deaths to follow flu's fatal impact over the season. Recent weeks are incomplete, and death certificates miss some deaths caused by flu.",
     "source": "https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-mortality"
   },
   {
@@ -76,7 +76,7 @@
     "category": "mortality",
     "stage": "Notifiable death",
     "reports": "Individual laboratory-confirmed influenza-associated deaths among people younger than 18 years, with demographic and clinical details.",
-    "interpretation": "A nationally notifiable severe outcome. Counts are small, case-based, and can arrive after investigation and confirmation.",
+    "interpretation": "Use it to track reported flu deaths in children and identify their clinical patterns. Recent counts can increase as additional reports arrive.",
     "source": "https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-mortality"
   }
 ]
