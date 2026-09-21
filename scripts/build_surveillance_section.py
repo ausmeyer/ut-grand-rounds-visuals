@@ -155,8 +155,8 @@ SYSTEMS = [
         "aggregateLabel": "all EIP and IHSP sites combined",
         "geoHighlight": "California",
         "focusSeason": "2024/25",
-        "networkGeography": "12 states in EIP · 2 states in IHSP",
-        "coverage": "Full network: >90 counties",
+        "networkGeography": "Archive: 11 EIP + 8 IHSP states",
+        "coverage": "Current: 14 states, >90 counties",
         "ageSummary": "5 broad age groups",
         "ageDetail": "0–4 · 5–17 · 18–49 · 50–64 · ≥65 years; finer splits available",
         "timeliness": "Weekly; revised for lag",
@@ -277,7 +277,7 @@ def system_payload(spec: dict, cache: dict[str, list[dict]]) -> dict:
     seasons = sorted({curve["season"] for curve in main_curves})
     locations = {curve["location"] for curve in geo_curves}
     if spec["id"] == "flusurv":
-        geography = f"{len(locations)} state catchments"
+        geography = f"{len(locations)} selected state series"
     elif "District of Columbia" in locations:
         geography = f"{len(locations) - 1} states + DC"
     else:
