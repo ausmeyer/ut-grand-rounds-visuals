@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="referrer" content="no-referrer">
+  <title>Audience poll 2</title>
+  <link rel="stylesheet" href="assets/poll-01/poll.css?v=3">
+  <link rel="stylesheet" href="assets/polls-02-03/poll.css?v=1">
+  <script defer src="assets/poll-01/vendor/supabase.js"></script>
+  <script defer src="assets/poll-01/vendor/qrcode.js"></script>
+  <script type="module" src="assets/polls-02-03/app.js?v=1"></script>
+</head>
+<body data-poll="2">
+  <main class="app">
+    <div id="preview-banner" class="preview" hidden>Preview only · Sample responses · Nothing is submitted</div>
+    <header><span class="eyebrow">Audience poll 2</span><span id="state-badge" class="badge">Connecting</span></header>
+    <section id="question-view" hidden>
+      <div><h1 class="question-text"></h1><p class="lead">Choose one answer, then submit.</p>
+        <div class="question-choices"><span>0 weeks</span><span>1 week</span><span>2 weeks</span><span>3 weeks</span><span>4 weeks</span></div>
+        <p class="muted">Use your phone or open the voting link.</p>
+      </div>
+      <aside class="join"><div id="qr"></div><strong>Scan to vote</strong><a id="vote-link" target="_blank" rel="noopener"></a></aside>
+    </section>
+    <section id="vote-view" hidden>
+      <h1 class="question-text"></h1>
+      <form id="vote-form">
+        <fieldset class="answer-options forecast-options"><legend class="slider-label">Weeks in advance</legend>
+          <label><input type="radio" name="lead-weeks" value="0"> 0 weeks</label>
+          <label><input type="radio" name="lead-weeks" value="1"> 1 week</label>
+          <label><input type="radio" name="lead-weeks" value="2"> 2 weeks</label>
+          <label><input type="radio" name="lead-weeks" value="3"> 3 weeks</label>
+          <label><input type="radio" name="lead-weeks" value="4"> 4 weeks</label>
+        </fieldset>
+        <div id="vote-captcha"></div>
+        <button id="submit-vote" type="submit" disabled>Submit answer</button>
+      </form>
+      <p id="vote-message" role="status" aria-live="polite"></p>
+      <p class="muted privacy">No name or email required. You can update your answer while voting is open.</p>
+    </section>
+    <section id="results-view" hidden>
+      <div class="results-heading"><h1>Predicting the inflection at the peak</h1><span id="response-summary"></span></div>
+      <p id="results-wait" class="waiting">Results will appear after voting closes and the presenter reveals them.</p>
+      <div id="histogram" hidden></div><p id="empty-results" hidden>No numeric responses were submitted.</p>
+      <div class="sr-only"><table id="results-table"><caption>Audience response counts</caption><thead><tr><th>Weeks in advance</th><th>Responses</th></tr></thead><tbody></tbody></table></div>
+    </section>
+    <section id="admin-view" hidden>
+      <h1>Poll 2 presenter controls</h1>
+      <form id="login-form">
+        <label>Email<input id="email" type="email" autocomplete="username" required></label>
+        <label>Password<input id="password" type="password" autocomplete="current-password" required></label>
+        <div id="admin-captcha"></div><button type="submit">Sign in</button>
+      </form>
+      <div id="admin-panel" hidden>
+        <form id="new-session-form"><label>New session name<input id="session-name" maxlength="80" placeholder="Rehearsal or presentation date" required></label><button type="submit">New empty session</button></form>
+        <label>Selected session<select id="session-select"><option value="">Choose a session</option></select></label>
+        <p id="admin-count" role="status"></p>
+        <div class="actions"><button type="button" data-action="open" disabled>Open poll</button><button type="button" data-action="close" disabled>Close poll</button><button type="button" data-action="reveal" disabled>Reveal results</button></div>
+        <div id="session-links" hidden>
+          <label>Question iframe URL<input id="question-url" readonly></label>
+          <label>Results iframe URL<input id="results-url" readonly></label>
+          <label>Audience voting URL<input id="audience-url" readonly></label>
+          <div class="actions"><a id="open-question" target="_blank" rel="noopener">Open question</a><a id="open-results" target="_blank" rel="noopener">Open results</a><a id="open-vote" target="_blank" rel="noopener">Open voting form</a></div>
+        </div>
+        <p class="muted">A new session starts empty and preserves old responses. Existing slide links remain bound to their original session.</p>
+        <div class="actions"><button id="delete-session" class="danger" type="button" disabled>Delete selected session</button><button id="sign-out" class="secondary" type="button">Sign out</button></div>
+      </div>
+    </section>
+    <p id="connection-message" role="status" aria-live="polite"></p>
+    <noscript>This poll requires JavaScript.</noscript>
+  </main>
+</body>
+</html>

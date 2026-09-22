@@ -16,22 +16,27 @@ scripts/    Reproducible build scripts
 
 Slides 2, 4, and the surveillance-data section (slides 5–11) are implemented.
 
-Poll 1 is implemented in `docs/poll-01.html`, with question, voting, results,
-and presenter views. Anonymous sign-in is enabled and the public poll status
-function is reachable. Presenter authorization, real CAPTCHA, and live voting
-still need a rehearsal. See the [Poll 1 setup checklist](specs/poll-01-setup.md)
-before collecting audience responses. The existing surveillance builds do not
-modify the poll.
+Polls 1–3 are implemented in `docs/poll-01.html`, `docs/poll-02.html`, and
+`docs/poll-03.html`, each with question, voting, results, and presenter views.
+Poll 1 has been used live. Polls 2–3 reuse its public configuration and presenter
+authorization but require an additional SQL script before live use. See the
+[Poll 1 setup checklist](specs/poll-01-setup.md) and
+[Polls 2–3 setup instructions](specs/polls-02-03-setup.md).
+The existing surveillance builds do not modify the polls.
 
 Local visual previews, which never submit responses:
 
 - `http://localhost:8000/poll-01.html?mode=question&preview=1`
 - `http://localhost:8000/poll-01.html?mode=vote&preview=1`
 - `http://localhost:8000/poll-01.html?mode=results&preview=1`
+- `http://localhost:8000/poll-02.html?mode=vote&preview=1`
+- `http://localhost:8000/poll-02.html?mode=results&preview=1`
+- `http://localhost:8000/poll-03.html?mode=vote&preview=1`
+- `http://localhost:8000/poll-03.html?mode=results&preview=1`
 
 The preview histogram contains explicitly labeled sample responses. For a real
-session, open `poll-01.html?mode=admin` on the deployed site, sign in, create a
-session, and copy its generated iframe and audience URLs. Do not embed preview
+session, open the appropriate `poll-0N.html?mode=admin` on the deployed site,
+sign in, create a session, and copy its generated iframe and audience URLs. Do not embed preview
 URLs or localhost URLs in the live presentation.
 
 Poll dependencies and database/model tests:
@@ -42,8 +47,9 @@ node scripts/vendor_poll_libraries.mjs
 npm test
 ```
 
-Browser checks are in `tests/poll-01.browser.mjs`. Serve `docs/` on port 8765
-and run that script with Playwright installed, or set `POLL_PLAYWRIGHT` to the
+Browser checks are in `tests/poll-01.browser.mjs` and
+`tests/poll-02-03.browser.mjs`. Serve `docs/` on port 8765
+and run those scripts with Playwright installed, or set `POLL_PLAYWRIGHT` to the
 absolute path of an installed Playwright `index.mjs`. The tests use isolated
 Chrome contexts and mocked HTTP responses, not the live Supabase database.
 

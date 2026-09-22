@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/poll-01.test.mjs"
+    "test": "node --test tests/poll-*.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.0",

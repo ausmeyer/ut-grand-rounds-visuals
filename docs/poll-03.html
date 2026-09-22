@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="referrer" content="no-referrer">
+  <title>Audience poll 3</title>
+  <link rel="stylesheet" href="assets/poll-01/poll.css?v=3">
+  <link rel="stylesheet" href="assets/polls-02-03/poll.css?v=1">
+  <script defer src="assets/poll-01/vendor/supabase.js"></script>
+  <script defer src="assets/poll-01/vendor/qrcode.js"></script>
+  <script type="module" src="assets/polls-02-03/app.js?v=1"></script>
+</head>
+<body data-poll="3">
+  <main class="app">
+    <div id="preview-banner" class="preview" hidden>Preview only · Sample responses · Nothing is submitted</div>
+    <header><span class="eyebrow">Audience poll 3</span><span id="state-badge" class="badge">Connecting</span></header>
+    <section id="question-view" hidden>
+      <div><h1 class="question-text"></h1><p class="lead">Choose the first and last week of your preferred window, then submit.</p>
+        <div class="season-key"><span>1</span><span>52</span></div>
+        <p class="muted">Use your phone or open the voting link.</p>
+      </div>
+      <aside class="join"><div id="qr"></div><strong>Scan to vote</strong><a id="vote-link" target="_blank" rel="noopener"></a></aside>
+    </section>
+    <section id="vote-view" hidden>
+      <h1 class="question-text"></h1>
+      <form id="vote-form">
+        <div class="bound-heading"><label for="week-slider">First week</label><output id="start-output" for="week-slider">Choose a week</output></div>
+        <input id="week-slider" class="section-slider" type="range" min="1" max="52" step="1" value="26" aria-label="First week of vaccination window" aria-valuetext="No week selected">
+        <div id="week-ticks" class="slider-ticks dense-ticks" aria-hidden="true"></div>
+        <div class="bound-heading"><label for="end-week-slider">Last week</label><output id="end-output" for="end-week-slider">Choose a week</output></div>
+        <input id="end-week-slider" class="section-slider" type="range" min="1" max="52" step="1" value="26" aria-label="Last week of vaccination window" aria-valuetext="No week selected">
+        <div id="end-week-ticks" class="slider-ticks dense-ticks" aria-hidden="true"></div>
+        <p id="window-note" class="muted" hidden>Window continues into the next calendar year.</p>
+        <fieldset class="answer-options"><legend class="sr-only">Response type</legend>
+          <label><input type="radio" name="answer-kind" value="window" checked> Use my window</label>
+          <label><input type="radio" name="answer-kind" value="not_sure"> Not sure</label>
+        </fieldset>
+        <div id="vote-captcha"></div>
+        <button id="submit-vote" type="submit" disabled>Submit answer</button>
+      </form>
+      <p id="vote-message" role="status" aria-live="polite"></p>
+      <p class="muted privacy">No name or email required. You can update your answer while voting is open.</p>
+    </section>
+    <section id="results-view" hidden>
+      <div class="results-heading"><h1>Recommended vaccination windows</h1><span id="response-summary"></span></div>
+      <p id="results-wait" class="waiting">Results will appear after voting closes and the presenter reveals them.</p>
+      <div id="histogram" hidden></div><p id="empty-results" hidden>No numeric responses were submitted.</p>
+      <div class="sr-only"><table id="results-table"><caption>Audience response counts</caption><thead><tr><th>Week</th><th>Responses including week</th></tr></thead><tbody></tbody></table></div>
+    </section>
+    <section id="admin-view" hidden>
+      <h1>Poll 3 presenter controls</h1>
+      <form id="login-form">
+        <label>Email<input id="email" type="email" autocomplete="username" required></label>
+        <label>Password<input id="password" type="password" autocomplete="current-password" required></label>
+        <div id="admin-captcha"></div><button type="submit">Sign in</button>
+      </form>
+      <div id="admin-panel" hidden>
+        <form id="new-session-form"><label>New session name<input id="session-name" maxlength="80" placeholder="Rehearsal or presentation date" required></label><button type="submit">New empty session</button></form>
+        <label>Selected session<select id="session-select"><option value="">Choose a session</option></select></label>
+        <p id="admin-count" role="status"></p>
+        <div class="actions"><button type="button" data-action="open" disabled>Open poll</button><button type="button" data-action="close" disabled>Close poll</button><button type="button" data-action="reveal" disabled>Reveal results</button></div>
+        <div id="session-links" hidden>
+          <label>Question iframe URL<input id="question-url" readonly></label>
+          <label>Results iframe URL<input id="results-url" readonly></label>
+          <label>Audience voting URL<input id="audience-url" readonly></label>
+          <div class="actions"><a id="open-question" target="_blank" rel="noopener">Open question</a><a id="open-results" target="_blank" rel="noopener">Open results</a><a id="open-vote" target="_blank" rel="noopener">Open voting form</a></div>
+        </div>
+        <p class="muted">A new session starts empty and preserves old responses. Existing slide links remain bound to their original session.</p>
+        <div class="actions"><button id="delete-session" class="danger" type="button" disabled>Delete selected session</button><button id="sign-out" class="secondary" type="button">Sign out</button></div>
+      </div>
+    </section>
+    <p id="connection-message" role="status" aria-live="polite"></p>
+    <noscript>This poll requires JavaScript.</noscript>
+  </main>
+</body>
+</html>
