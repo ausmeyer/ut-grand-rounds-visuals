@@ -73,9 +73,14 @@ function updateVote() {
 function updateState(data) {
   state = data.state;
   const names = { ready:'Not open yet', open:'Voting open', closed:'Voting closed', revealed:'Results revealed' };
-  $('state-badge').textContent = names[state] || 'Unavailable';
+  $('state-badge').textContent = names[state] || (mode === 'admin' && !sessionId ? 'No session selected' : 'Unavailable');
   if (mode === 'vote') updateVote();
   if (mode === 'admin') {
+    $('session-select').disabled = busy;
+    $('new-session-form').querySelector('button').disabled = busy;
+    $('sign-out').disabled = busy;
+    $('delete-session').disabled = busy || !presenter || !sessionId || !['ready','closed','revealed'].includes(state);
+    $('delete-session').title = state === 'open' ? 'Close voting before deleting this session.' : '';
     if (data.response_count !== null && data.response_count !== undefined)
       $('admin-count').textContent = `${data.response_count} ${data.response_count === 1 ? 'response' : 'responses'}`;
     else if (!sessionId) $('admin-count').textContent = 'Choose a session';
@@ -146,6 +151,14 @@ async function refresh() {
     showError(error);
     if (mode === 'vote') { state = null; updateVote(); }
     $('state-badge').textContent = 'Connection unavailable';
+    if (error.code === 'P0002' && mode === 'results') {
+      $('histogram').hidden = true; $('histogram').replaceChildren();
+      $('results-table').querySelector('tbody').replaceChildren();
+      $('response-summary').textContent = ''; $('empty-results').hidden = true;
+      $('results-wait').hidden = false;
+      $('results-wait').textContent = 'This poll session is no longer available.';
+      renderedSession = null;
+    }
   }
 }
 async function pollLoop() {
@@ -194,7 +207,7 @@ $('vote-form').addEventListener('submit', async event => {
   finally { busy=false;updateVote();await refresh(); }
 });
 async function loadSessions(selectId=sessionId) {
-  const sessions=preview?[{id:sessionId,name:'Preview session',state:state||'ready'}]:await rpc('list_sessions');
+  const sessions=preview?(sessionId?[{id:sessionId,name:'Preview session',state:state||'ready'}]:[]):await rpc('list_sessions');
   $('session-select').replaceChildren(new Option('Choose a session',''));
   sessions.forEach(s=>$('session-select').append(new Option(`${s.name} (${s.state})`,s.id)));
   if(sessions.some(s=>s.id===selectId)) $('session-select').value=selectId;
@@ -243,6 +256,27 @@ document.querySelectorAll('[data-action]').forEach(button=>button.addEventListen
     await loadSessions();
   }catch(error){showError(error);}finally{busy=false;await refresh();}
 }));
+$('delete-session').addEventListener('click',async()=>{
+  if(busy||$('delete-session').disabled||!sessionId)return;
+  const deletingId=sessionId;
+  busy=true;updateState({state,response_count:null});clearError();
+  let deleted=false;
+  try {
+    const details=preview?{name:'Preview session',state,response_count:0}:await rpc('status',{p_session:deletingId});
+    if(details.state==='open')throw new Error('Close voting before deleting this session.');
+    const count=details.response_count;
+    if(!confirm(`Permanently delete "${details.name}" and its ${count} ${count===1?'response':'responses'}?\n\nThis cannot be undone. Its question, voting, and results links will stop working.`))return;
+    if(!preview)await rpc('delete_session',{p_session:deletingId});
+    sessionId='';state=null;deleted=true;
+    const url=new URL(location.href);url.searchParams.delete('session');history.replaceState(null,'',url);
+    updateLinks();await loadSessions();
+  }catch(error){
+    showError(error.code==='PGRST202'?new Error('To enable session deletion, run the updated supabase/poll-01.sql in the Supabase SQL Editor.'):error);
+  }finally{
+    busy=false;updateState({state,response_count:null});await refresh();
+    if(deleted)$('admin-count').textContent=preview?'Preview session removed. Nothing was deleted.':'Session deleted. Choose another session or create a new one.';
+  }
+});
 for(const id of ['question-url','results-url','audience-url']) $(id).addEventListener('click',()=>$(id).select());
 
 async function start() {

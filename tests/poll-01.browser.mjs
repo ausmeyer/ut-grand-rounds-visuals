@@ -91,6 +91,8 @@ try {
   const second='00000000-0000-4000-8000-000000000010';
   const received=[];
   const authRequests=[];
+  const deletedSessions=new Set(),deletionRequests=[];
+  let deletionAvailable=true;
   const authBody=anonymous=>{
     const id=anonymous?'00000000-0000-4000-8000-000000000002':'00000000-0000-4000-8000-000000000001';
     const payload={sub:id,exp:Math.floor(Date.now()/1000)+3600,is_anonymous:anonymous,role:'authenticated'};
@@ -121,7 +123,8 @@ try {
       return send(authBody(url.pathname.endsWith('/signup')));
     }
     const name=url.pathname.split('/').at(-1);
-    if(name==='poll1_status')return send({id:body.p_session,state:body.p_session===second?'ready':sessionState,response_count:body.p_session===second?0:submissions});
+    if(deletedSessions.has(body.p_session)&&['poll1_status','poll1_results'].includes(name))return send({message:'Poll session not found',code:'P0002'},404);
+    if(name==='poll1_status')return send({id:body.p_session,name:body.p_session===second?'New session':'Rehearsal',state:body.p_session===second?'ready':sessionState,response_count:body.p_session===second?0:submissions});
     if(name==='poll1_submit') {
       if(failNext){failNext=false;return route.abort();}
       if(sessionState!=='open')return send({message:'Voting is not open',code:'42501'},403);
@@ -129,9 +132,14 @@ try {
     }
     if(name==='poll1_results')return sessionState==='revealed'?send({bins:WEEKS.map(week=>({week,count:week===1?1:0})),unsure:0}):send({message:'Results have not been revealed'},403);
     if(name==='poll1_is_presenter')return send(true);
-    if(name==='poll1_list_sessions')return send([{id:session,name:'Rehearsal',state:sessionState},{id:second,name:'New session',state:'ready'}]);
+    if(name==='poll1_list_sessions')return send([{id:session,name:'Rehearsal',state:sessionState},{id:second,name:'New session',state:'ready'}].filter(s=>!deletedSessions.has(s.id)));
     if(name==='poll1_create_session')return send(second);
     if(name==='poll1_transition'){sessionState={open:'open',close:'closed',reveal:'revealed'}[body.p_action];return send(sessionState);}
+    if(name==='poll1_delete_session'){
+      if(!deletionAvailable)return send({code:'PGRST202',message:'Function not found'},404);
+      if(body.p_session===session&&sessionState==='open')return send({code:'42501',message:'Close voting before deleting this session'},403);
+      deletionRequests.push(body.p_session);deletedSessions.add(body.p_session);return send(true);
+    }
     throw new Error(`Unexpected request: ${url}`);
   });
   const vote=await live.newPage();observe(vote);await vote.goto(`${base}?mode=vote&session=${session}`);
@@ -188,8 +196,46 @@ try {
   assert.ok((await result.url()).includes(session));
   assert.equal(await admin.locator('#password').inputValue(),'');
   await admin.screenshot({path:join(artifacts,'presenter.png'),fullPage:true});
+  // Cancellation sends no delete request; the named session remains selected.
+  const cancelDialog=admin.waitForEvent('dialog');
+  const cancelClick=admin.locator('#delete-session').click();
+  const cancel=await cancelDialog;
+  assert.match(cancel.message(),/"New session" and its 0 responses/);
+  assert.match(cancel.message(),/cannot be undone/);
+  await cancel.dismiss();await cancelClick;
+  await admin.waitForFunction(()=>!document.querySelector('#delete-session').disabled);
+  assert.deepEqual(deletionRequests,[]);
+  assert.equal(await admin.locator('#session-select').inputValue(),second);
+  // Missing production setup must explain the required SQL, not lose the session.
+  deletionAvailable=false;
+  admin.once('dialog',dialog=>dialog.accept());await admin.locator('#delete-session').click();
+  await admin.waitForFunction(()=>document.querySelector('#connection-message').textContent.includes('updated supabase/poll-01.sql'));
+  assert.equal(await admin.locator('#session-select').inputValue(),second);
+  assert.deepEqual(deletionRequests,[]);deletionAvailable=true;
+  sessionState='open';await admin.locator('#session-select').selectOption(session);
+  await admin.waitForFunction(()=>document.querySelector('#state-badge').textContent==='Voting open');
+  assert.equal(await admin.locator('#delete-session').isDisabled(),true);
+  // Delete a revealed session; clear its selection/links and the old result view.
+  sessionState='revealed';await admin.reload();await admin.waitForSelector('#admin-panel');
+  await admin.waitForFunction(()=>!document.querySelector('#delete-session').disabled);
+  const confirmDialog=admin.waitForEvent('dialog');
+  const confirmClick=admin.locator('#delete-session').click();
+  const confirmation=await confirmDialog;
+  assert.match(confirmation.message(),/"Rehearsal" and its 1 response\?/);
+  await confirmation.accept();await confirmClick;
+  await admin.waitForFunction(()=>document.querySelector('#admin-count').textContent.startsWith('Session deleted.'));
+  assert.deepEqual(deletionRequests,[session]);
+  assert.equal(await admin.locator('#session-select').inputValue(),'');
+  assert.equal(await admin.locator(`#session-select option[value="${session}"]`).count(),0);
+  assert.equal(await admin.locator(`#session-select option[value="${second}"]`).count(),1);
+  assert.equal(await admin.locator('#session-links').isVisible(),false);
+  assert.equal(await admin.locator('#delete-session').isDisabled(),true);
+  assert.equal(new URL(admin.url()).searchParams.has('session'),false);
+  await result.waitForFunction(()=>document.querySelector('#results-wait').textContent==='This poll session is no longer available.');
+  assert.equal(await result.locator('#histogram').isVisible(),false);
+  assert.equal(await result.locator('#results-table tbody tr').count(),0);
   await live.close();
   assert.deepEqual(errors,[]);
-  console.log('PASS: previews, no preview network writes, 1240×540 layout, all 29 ticks without label overlap, slider tap/drag and keyboard rollover, explicit selection, aligned presenter controls, CAPTCHA gating/expiry and auth-token forwarding, submission, retry, closure, hidden/revealed results, presenter login and session-bound links.');
+  console.log('PASS: previews, no preview network writes, 1240×540 layout, all 29 ticks without label overlap, slider tap/drag and keyboard rollover, explicit selection, aligned presenter controls, CAPTCHA gating/expiry and auth-token forwarding, submission, retry, closure, hidden/revealed results, presenter login, session-bound links, deletion confirmation/cancel, open-poll protection, setup errors, and deleted-session cleanup.');
   console.log(`Screenshots: ${artifacts}`);
 }finally{await browser.close();}

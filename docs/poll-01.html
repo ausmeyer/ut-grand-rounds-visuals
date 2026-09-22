@@ -6,10 +6,10 @@
   <meta name="color-scheme" content="light">
   <meta name="referrer" content="no-referrer">
   <title>Flu season peak: audience poll</title>
-  <link rel="stylesheet" href="assets/poll-01/poll.css?v=2">
+  <link rel="stylesheet" href="assets/poll-01/poll.css?v=3">
   <script defer src="assets/poll-01/vendor/supabase.js"></script>
   <script defer src="assets/poll-01/vendor/qrcode.js"></script>
-  <script type="module" src="assets/poll-01/app.js?v=2"></script>
+  <script type="module" src="assets/poll-01/app.js?v=3"></script>
 </head>
 <body>
   <main class="app">
@@ -61,7 +61,7 @@
           <div class="actions"><a id="open-question" target="_blank" rel="noopener">Open question</a><a id="open-results" target="_blank" rel="noopener">Open results</a><a id="open-vote" target="_blank" rel="noopener">Open voting form</a></div>
         </div>
         <p class="muted">A new session starts empty and preserves old responses. Existing slide links remain bound to their original session.</p>
-        <button id="sign-out" class="secondary" type="button">Sign out</button>
+        <div class="actions"><button id="delete-session" class="danger" type="button" disabled>Delete selected session</button><button id="sign-out" class="secondary" type="button">Sign out</button></div>
       </div>
     </section>
     <p id="connection-message" role="status" aria-live="polite"></p>

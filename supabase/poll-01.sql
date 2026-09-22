@@ -1,4 +1,4 @@
--- Run once in this project's Supabase SQL Editor as the project administrator.
+-- Run in this project's Supabase SQL Editor as the project administrator.
 -- Creates only Poll 1 objects. No existing responses or sessions are deleted.
 begin;
 
@@ -136,6 +136,25 @@ begin
 end;
 $$;
 
+create or replace function public.poll1_delete_session(p_session uuid)
+returns boolean language plpgsql security definer set search_path = '' as $$
+declare v_state text;
+begin
+  if not public.poll1_is_presenter() then
+    raise exception 'Presenter access required' using errcode = '42501';
+  end if;
+  -- Share the submission/transition lock so an open poll cannot be deleted.
+  select state into v_state from polling.sessions where id = p_session for update;
+  if not found then return true; end if; -- safe retry after a completed deletion
+  if v_state = 'open' then
+    raise exception 'Close voting before deleting this session' using errcode = '42501';
+  end if;
+  delete from polling.responses where session_id = p_session;
+  delete from polling.sessions where id = p_session;
+  return true;
+end;
+$$;
+
 -- PostgreSQL grants function execution to PUBLIC by default; remove that grant
 -- explicitly for every function, including helpers, before exposing the API.
 revoke all on function public.poll1_is_presenter() from public, anon, authenticated;
@@ -145,9 +164,10 @@ revoke all on function public.poll1_status(uuid) from public, anon, authenticate
 revoke all on function public.poll1_transition(uuid, text) from public, anon, authenticated;
 revoke all on function public.poll1_submit(uuid, integer, boolean) from public, anon, authenticated;
 revoke all on function public.poll1_results(uuid) from public, anon, authenticated;
+revoke all on function public.poll1_delete_session(uuid) from public, anon, authenticated;
 grant execute on function public.poll1_is_presenter(), public.poll1_create_session(text),
   public.poll1_list_sessions(), public.poll1_transition(uuid, text),
-  public.poll1_submit(uuid, integer, boolean) to authenticated;
+  public.poll1_submit(uuid, integer, boolean), public.poll1_delete_session(uuid) to authenticated;
 grant execute on function public.poll1_status(uuid), public.poll1_results(uuid) to anon, authenticated;
 
 notify pgrst, 'reload schema';

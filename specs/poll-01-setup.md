@@ -44,7 +44,7 @@ The implementation uses [poll-01.html](../docs/poll-01.html) in the existing Git
 | Question | `?mode=question&session=UUID`: question and QR code/link to the audience form. |
 | Vote | `?mode=vote&session=UUID`: question, slider, Not sure, Submit, and acknowledged submission status. |
 | Results | `?mode=results&session=UUID`: closed session's histogram, only after reveal. |
-| Presenter | `?mode=admin`: authenticated controls for new session, open, close, reveal, and response count. Open separately, not inside a projected slide. |
+| Presenter | `?mode=admin`: authenticated controls for new session, open, close, reveal, response count, and session deletion. Open separately, not inside a projected slide. |
 
 For an offline visual preview, use `?mode=question&preview=1`, `?mode=vote&preview=1`, or `?mode=results&preview=1` on a local HTTP server. Preview mode does not contact Supabase, and the histogram is labeled as sample responses. These previews do not demonstrate shared collection. For a real session, create it through the presenter controls and copy its generated URLs. Online attendees can use the voting URL in the meeting chat; phone users can scan the QR code. Do not put a localhost URL in the live deck.
 
@@ -53,6 +53,12 @@ All views refer to one explicit poll-session ID. New sessions start empty and do
 Presenter workflow: **New session → Open → Close → Reveal results.** Closing freezes the response set in the backend. Hide answer distributions before reveal, including through the public API, not just with CSS. The presenter may see a total submission count while voting remains open.
 
 Default submission behavior: one response per anonymous browser identity per session; a new submission from the same identity may replace its previous answer while the poll is open. Duplicate network retries must not add votes. Another browser or cleared storage can create another identity, so this is best-effort duplicate prevention, not verified one-person-one-vote.
+
+## Enable and use session deletion
+
+For an existing installation, rerun the complete updated [poll-01.sql](../supabase/poll-01.sql) in this project's **Supabase → SQL Editor**. This installs the presenter-only `poll1_delete_session` function. Running the setup script does not delete sessions or responses, and does not require recreating the presenter account. Production installation of this update is pending.
+
+After installation, select a session in the presenter controls and click **Delete selected session**. The confirmation shows its current name and response count. Open polls must be closed first; unused, closed, and revealed sessions can be deleted. Deletion permanently removes only that session and its responses, leaves user accounts and other sessions intact, and invalidates its question, voting, and results links. There is no undo in the application.
 
 ## Backend and security requirements
 
@@ -73,7 +79,7 @@ Implementation should retain a selection if the network fails, display failure c
 
 ## Verification status
 
-Completed locally: `npm test` passes 11 model/database tests against an in-memory PostgreSQL runtime (PGlite), including the actual migration and grants. The local auth schema in those tests substitutes for Supabase Auth; it does not verify production JWT issuance or project configuration. Browser tests pass against a mocked API in isolated Chrome contexts. Question and result views were visually inspected at 1240 × 540 and the voting form at 390 pixels wide.
+Completed locally: `npm test` passes 15 model/database tests against an in-memory PostgreSQL runtime (PGlite), including the actual migration and grants. The local auth schema in those tests substitutes for Supabase Auth; it does not verify production JWT issuance or project configuration. Browser tests pass against a mocked API in isolated Chrome contexts, including deletion confirmation/cancellation, protection of open polls, the missing-setup error, and cleanup of deleted session links and displayed results. Question and result views were visually inspected at 1240 × 540 and the voting form at 390 pixels wide.
 
 Production read-only checks: anonymous sign-in is enabled and the public `poll1_status` function executes. Not yet verified: all production migration objects and permissions, presenter authorization, production Auth and CAPTCHA, two physical devices sharing a session, simultaneous close/submit behavior across production database connections, 100-person sign-in capacity, and the live Slides.com iframe/network. A shared session-row lock is implemented for close and submission; local tests verify sequential behavior, not a production concurrency load test.
 
@@ -87,6 +93,8 @@ Production read-only checks: anonymous sign-in is enabled and the public `poll1_
 - [x] Non-presenters cannot create/reset/close/reveal sessions or read individual records (local database grants and function tests).
 - [x] Results are unavailable before reveal; after reveal, all 29 bins are present in seasonal order and sum to the numeric-response count (local tests).
 - [x] New-session reset leaves the old session intact and does not redirect late submissions or results slides (local tests).
+- [x] Deletion requires presenter authorization, rejects open polls, removes only the selected session's responses, and is safe to retry (local database tests).
+- [ ] Install the updated deletion function in production. No real sessions were deleted during development.
 - [ ] Shared-network sign-in burst, phone layout, keyboard input, screen-reader week labels, and the 1240 × 540 iframe pass testing.
 - [ ] Rehearsal responses are isolated from the live session, and the backend is active before the event.
 
@@ -99,3 +107,5 @@ Complete the live rehearsal and verify audience capacity before the lecture. Que
 GitHub Pages publishes `main:/docs`. Verify that its build succeeds for the pushed commit and that the presenter page and its assets load on `www.meyerlab.io`. Authentication and real voting remain manual rehearsal checks.
 
 If the published interface fails to load or the rehearsal reveals incorrect counts or access controls, stop using the poll. Revert the polling release commit and push the revert to restore the prior static site; do not delete Supabase sessions or responses. Use a verbal poll until the issue is resolved.
+
+Reverting website code does not restore sessions or responses explicitly deleted through the presenter controls.

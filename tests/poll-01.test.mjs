@@ -135,5 +135,44 @@ test('database permissions, transitions, submission validation, and result isola
       await as('anon');await assert.rejects(call('create_session',['attack']),/permission denied/);
       await assert.rejects(db.query('select * from polling.responses'),/permission denied/);
     });
+    await t.test('session deletion requires an allowlisted non-anonymous presenter',async()=>{
+      await as('anon');
+      await assert.rejects(call('delete_session',[session]),/permission denied/);
+      for(const [uid,anonymous] of [[voter,true],[other,false],[admin,true]]) {
+        await as('authenticated',uid,anonymous);
+        await assert.rejects(call('delete_session',[session]),/Presenter access/);
+      }
+      await as('authenticated',admin,false);
+      assert.equal((await call('status',[session])).response_count,2);
+    });
+    await t.test('even presenters cannot delete an open poll',async()=>{
+      await assert.rejects(call('delete_session',[second]),/Close voting/);
+      assert.equal((await call('status',[second])).state,'open');
+      assert.equal((await call('status',[second])).response_count,1);
+    });
+    await t.test('deleting a revealed session removes only its responses and is retry-safe',async()=>{
+      assert.equal(await call('delete_session',[session]),true);
+      assert.equal(await call('delete_session',[session]),true);
+      assert.deepEqual((await call('list_sessions')).map(s=>s.id),[second]);
+      assert.equal((await call('status',[second])).response_count,1);
+      await as('anon');
+      await assert.rejects(call('status',[session]),/not found/);
+      await assert.rejects(call('results',[session]),/not found/);
+      await as('authenticated',voter);
+      await assert.rejects(call('submit',[session,1,false]),/not found/);
+      await db.exec('reset role');
+      assert.equal((await db.query('select count(*)::int as n from polling.responses where session_id=$1',[session])).rows[0].n,0);
+      assert.equal((await db.query('select count(*)::int as n from auth.users')).rows[0].n,3);
+    });
+    await t.test('ready and closed sessions can also be deleted',async()=>{
+      await as('authenticated',admin,false);
+      const empty=await call('create_session',['Unused rehearsal']);
+      assert.equal(await call('delete_session',[empty]),true);
+      await call('transition',[second,'close']);
+      assert.equal(await call('delete_session',[second]),true);
+      assert.deepEqual(await call('list_sessions'),[]);
+      await db.exec('reset role');
+      assert.equal((await db.query('select count(*)::int as n from polling.responses')).rows[0].n,0);
+    });
   }finally{await db.close();}
 });
