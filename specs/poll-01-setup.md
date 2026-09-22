@@ -1,6 +1,6 @@
 # Poll 1: peak-week audience poll
 
-Status: rehearsal release for GitHub Pages. Public connection settings and the Turnstile site key are configured for project `iehrrxfxoldwzvauhpsm`. Read-only checks on September 22, 2026 confirmed that anonymous sign-in is enabled and `poll1_status` is installed and reachable (it returns the expected "Poll session not found" for a nonexistent session). This does not verify the entire production migration, presenter authorization, or real CAPTCHA and voting. Existing surveillance pages are unchanged.
+Status: Poll 1 has been used on the deployed site. Its interface now uses the shared backend connector for all three questions. The unified SQL migration still requires installation in project `iehrrxfxoldwzvauhpsm` and a live rehearsal. Existing surveillance pages are unchanged.
 
 Audience: approximately 100 people, about half in person and half online. Presenter email: `austin.g.meyer@gmail.com`. Presentation date is still needed for the live-readiness check.
 
@@ -22,18 +22,18 @@ Use a slider with 29 discrete positions in this order:
 
 For implementation, use a fixed ordered array or slider indices 0–28 with `week = ((43 + index) % 52) + 1`. Never numerically sort calendar-week values for the seasonal histogram.
 
-## What Austin needs to do now
+## Shared backend setup
 
-1. Open your [Supabase project](https://supabase.com/dashboard/project/iehrrxfxoldwzvauhpsm). In **SQL Editor**, paste and run the complete [poll-01.sql](../supabase/poll-01.sql) file. It creates the isolated poll tables and permission-checked functions. It does not delete responses when rerun.
-2. In **Authentication → Users → Add user**, create the poll application's presenter user with email `austin.g.meyer@gmail.com`, choose a private password, and confirm the email. Your Supabase dashboard login is not automatically a user of this poll application. Do not send the password to Codex.
-3. In SQL Editor, run [authorize-presenter.sql](../supabase/authorize-presenter.sql). It authorizes only the confirmed, non-anonymous account with that email. If it reports the user was not found, complete step 2 first.
-4. In the Authentication sign-in/provider settings, enable **Anonymous Sign-Ins**. Under **Authentication → Rate Limits**, set anonymous sign-ins to an initial planning limit of **300 per hour per IP**, allowing headroom for roughly 100 attendees and rehearsal. This is a proposed event configuration, not a demonstrated capacity result; verify the setting and simultaneous sign-in behavior before the event. Do not disable all new-user signups, which would also prevent new audience identities.
-5. The supplied public Turnstile site key is now configured in [config.js](../docs/assets/poll-01/config.js). In Cloudflare, verify that the widget permits the public voting hostname (`www.meyerlab.io`) and any actual rehearsal hostname. Enter the matching secret only in Supabase's CAPTCHA settings and save. The configured public key alone does not verify the allowed-hostname or secret-key setup; real CAPTCHA verification still needs a live test on an approved hostname. Supabase recommends CAPTCHA for anonymous sign-ins in its [documentation](https://supabase.com/docs/guides/auth/auth-anonymous).
-6. On the published site, open [presenter controls](https://www.meyerlab.io/ut-grand-rounds-visuals/poll-01.html?mode=admin), sign in, and create a session named Rehearsal. Open the poll and its generated question link. Submit from two different devices or browsers, verify the count reaches two, then close voting and reveal the results. Rehearse the generated question and results URLs through Slides.com. Create a new session and replace the iframe URLs for the actual lecture.
+Use the [unified setup instructions](polls-setup.md). Run the complete
+[polls.sql](../supabase/polls.sql) file in the existing Supabase SQL Editor.
+It covers all three questions and preserves existing sessions, responses,
+presenter authorization, and URLs. Do not rerun the superseded Poll 1 setup.
 
-The supplied Project URL and publishable key are already in the browser configuration. Never add a database password, secret/service-role key, personal access token, or presenter password to source files or this chat. A publishable key permits the configured public API operations, not database administration. See the [API-key guide](https://supabase.com/docs/guides/getting-started/api-keys).
-
-Do not make response tables publicly readable or writable to get a prototype working. Permissions and input checks must be created before accepting real votes. No patient information or attendee names are needed.
+No new credentials or accounts are needed for the existing installation.
+The unified instructions also cover fresh projects, the private recovery
+archive, rehearsal, and rollback. Public configuration remains in
+[config.js](../docs/assets/poll-01/config.js); administrative secrets and
+presenter passwords must never be placed in source files or this chat.
 
 ## Implemented views
 
@@ -56,9 +56,9 @@ Default submission behavior: one response per anonymous browser identity per ses
 
 ## Enable and use session deletion
 
-For an existing installation, rerun the complete updated [poll-01.sql](../supabase/poll-01.sql) in this project's **Supabase → SQL Editor**. This installs the presenter-only `poll1_delete_session` function. Running the setup script does not delete sessions or responses, and does not require recreating the presenter account. Production installation of this update is pending.
+Session deletion is included in [polls.sql](../supabase/polls.sql) through the shared presenter-only `poll_delete_session` function. Running the unified setup does not delete sessions or responses and does not require recreating the presenter account.
 
-After installation, select a session in the presenter controls and click **Delete selected session**. The confirmation shows its current name and response count. Open polls must be closed first; unused, closed, and revealed sessions can be deleted. Deletion permanently removes only that session and its responses, leaves user accounts and other sessions intact, and invalidates its question, voting, and results links. There is no undo in the application.
+After installation, select a session in the presenter controls and click **Delete selected session**. The confirmation shows its current name and response count. Open polls must be closed first; unused, closed, and revealed sessions can be deleted. Deletion removes only that session's live rows, leaves user accounts and other sessions intact, and invalidates its question, voting, and results links. There is no undo in the application. The private pre-migration recovery archive is retained separately.
 
 ## Backend and security requirements
 
@@ -79,9 +79,9 @@ Implementation should retain a selection if the network fails, display failure c
 
 ## Verification status
 
-Completed locally: `npm test` passes 15 model/database tests against an in-memory PostgreSQL runtime (PGlite), including the actual migration and grants. The local auth schema in those tests substitutes for Supabase Auth; it does not verify production JWT issuance or project configuration. Browser tests pass against a mocked API in isolated Chrome contexts, including deletion confirmation/cancellation, protection of open polls, the missing-setup error, and cleanup of deleted session links and displayed results. Question and result views were visually inspected at 1240 × 540 and the voting form at 390 pixels wide.
+Completed locally: `npm test` passes 46 model/database tests against an in-memory PostgreSQL runtime (PGlite), including the unified migration, compatibility adapters, and grants. The local auth schema substitutes for Supabase Auth; it does not verify production JWT issuance or project configuration. Browser checks cover both the unified API and the pre-migration compatibility path, including deletion confirmation/cancellation, protection of open polls, missing-setup errors, and cleanup of deleted session links and results. Question/results layouts remain 1240 × 540 with responsive voting forms.
 
-Production read-only checks: anonymous sign-in is enabled and the public `poll1_status` function executes. Not yet verified: all production migration objects and permissions, presenter authorization, production Auth and CAPTCHA, two physical devices sharing a session, simultaneous close/submit behavior across production database connections, 100-person sign-in capacity, and the live Slides.com iframe/network. A shared session-row lock is implemented for close and submission; local tests verify sequential behavior, not a production concurrency load test.
+Production installation of the unified migration is pending. Recheck real-device voting, CAPTCHA, the Slides.com iframe, and shared-network capacity after installation. A shared session-row lock is implemented for close and submission; local tests verify sequential behavior, not a production concurrency load test.
 
 ### Acceptance checks
 
@@ -94,18 +94,18 @@ Production read-only checks: anonymous sign-in is enabled and the public `poll1_
 - [x] Results are unavailable before reveal; after reveal, all 29 bins are present in seasonal order and sum to the numeric-response count (local tests).
 - [x] New-session reset leaves the old session intact and does not redirect late submissions or results slides (local tests).
 - [x] Deletion requires presenter authorization, rejects open polls, removes only the selected session's responses, and is safe to retry (local database tests).
-- [ ] Install the updated deletion function in production. No real sessions were deleted during development.
+- [ ] Install the unified backend in production. No real sessions were deleted during development.
 - [ ] Shared-network sign-in burst, phone layout, keyboard input, screen-reader week labels, and the 1240 × 540 iframe pass testing.
 - [ ] Rehearsal responses are isolated from the live session, and the backend is active before the event.
 
 ## Remaining work
 
-Complete the live rehearsal and verify audience capacity before the lecture. Questions 2 and 3 remain out of scope for this first implementation. Publishing the static files does not execute SQL or change Supabase configuration.
+Complete the unified migration and rehearse all three polls before the lecture. Publishing the static files does not execute SQL or change Supabase configuration.
 
 ## Deployment and rollback
 
 GitHub Pages publishes `main:/docs`. Verify that its build succeeds for the pushed commit and that the presenter page and its assets load on `www.meyerlab.io`. Authentication and real voting remain manual rehearsal checks.
 
-If the published interface fails to load or the rehearsal reveals incorrect counts or access controls, stop using the poll. Revert the polling release commit and push the revert to restore the prior static site; do not delete Supabase sessions or responses. Use a verbal poll until the issue is resolved.
+If the published interface fails to load or rehearsal reveals incorrect counts or access controls, stop using the poll. The [unified deployment instructions](polls-setup.md) describe frontend rollback while retaining the shared database. Do not run old setup scripts or overwrite newer data from an archive. Use a verbal poll until the issue is resolved.
 
 Reverting website code does not restore sessions or responses explicitly deleted through the presenter controls.

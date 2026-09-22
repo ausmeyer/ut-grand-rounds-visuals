@@ -1,4 +1,5 @@
 import { config } from './config.js';
+import { callPoll } from '../polls/backend.js';
 import { WEEKS, QUESTION, isSession, weekAt, normalizeResults } from './model.js';
 
 const $ = id => document.getElementById(id);
@@ -22,7 +23,7 @@ WEEKS.forEach((week, index) => {
 
 function message(error) {
   const raw = error?.message || String(error);
-  if (error?.code === 'PGRST202') return 'The poll database setup has not been applied yet.';
+  if (error?.code === 'PGRST202') return 'Run supabase/polls.sql in the Supabase SQL Editor to enable this poll.';
   if (/anonymous sign-ins are disabled/i.test(raw)) return 'Audience sign-in is not enabled yet. Please let the presenter know.';
   if (/rate limit/i.test(raw)) return 'Too many sign-ins from this network. Please let the presenter know and try again shortly.';
   if (/fetch|network|timeout|aborted/i.test(raw)) return 'Connection interrupted. Your selection is still here. Please retry.';
@@ -31,8 +32,8 @@ function message(error) {
 function showError(error) { $('connection-message').textContent = message(error); }
 function clearError() { $('connection-message').textContent = ''; }
 async function rpc(name, args = {}) {
-  const { data, error } = await client.rpc(`poll1_${name}`, args).abortSignal(AbortSignal.timeout(15000));
-  if (error) throw error;
+  const data = await callPoll(client,1,name,args);
+  if(name==='results')return {bins:data.bins.map(bin=>({week:bin.value,count:bin.count})),unsure:data.unsure};
   return data;
 }
 function link(view) {
@@ -201,7 +202,7 @@ $('vote-form').addEventListener('submit', async event => {
       const {error}=await client.auth.signInAnonymously({options:{captchaToken:captchaToken || undefined}});
       resetCaptcha(); if(error)throw error; authenticated=true;
     }
-    await rpc('submit',{p_session:sessionId,p_week:$('unsure').checked?null:selectedWeek,p_unsure:$('unsure').checked});
+    await rpc('submit',{p_session:sessionId,p_kind:$('unsure').checked?'not_sure':'week',p_start:$('unsure').checked?null:selectedWeek,p_end:null});
     $('vote-message').textContent='Answer received. Thank you.';
   } catch(error) { $('vote-message').textContent='Your answer was not confirmed. You can retry safely.';showError(error); }
   finally { busy=false;updateVote();await refresh(); }
@@ -271,7 +272,7 @@ $('delete-session').addEventListener('click',async()=>{
     const url=new URL(location.href);url.searchParams.delete('session');history.replaceState(null,'',url);
     updateLinks();await loadSessions();
   }catch(error){
-    showError(error.code==='PGRST202'?new Error('To enable session deletion, run the updated supabase/poll-01.sql in the Supabase SQL Editor.'):error);
+    showError(error.code==='PGRST202'?new Error('To enable session deletion, run supabase/polls.sql in the Supabase SQL Editor.'):error);
   }finally{
     busy=false;updateState({state,response_count:null});await refresh();
     if(deleted)$('admin-count').textContent=preview?'Preview session removed. Nothing was deleted.':'Session deleted. Choose another session or create a new one.';

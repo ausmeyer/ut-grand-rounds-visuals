@@ -1,4 +1,4 @@
--- Run in this project's Supabase SQL Editor as the project administrator.
+-- Test fixture: original Poll 1 setup before the unified backend migration.
 -- Creates only Poll 1 objects. No existing responses or sessions are deleted.
 begin;
 

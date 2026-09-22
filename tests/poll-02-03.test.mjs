@@ -47,7 +47,8 @@ test('Polls 2 and 3 database isolation and lifecycle',async t=>{
     create function auth.uid() returns uuid language sql as $$ select (auth.jwt()->>'sub')::uuid $$;`);
   for(const id of ids)await db.query('insert into auth.users values($1,$2,now(),$3)',[id,id===admin?'austin.g.meyer@gmail.com':null,id!==admin]);
   const sql=async name=>readFile(new URL(`../supabase/${name}`,import.meta.url),'utf8');
-  await db.exec(await sql('poll-01.sql'));await db.exec(await sql('authorize-presenter.sql'));
+  await db.exec(await readFile(new URL('./fixtures/legacy-poll-01.sql',import.meta.url),'utf8'));
+  await db.exec(await sql('authorize-presenter.sql'));
   async function as(role,uid=null,isAnonymous=true) {
     await db.exec('reset role');
     await db.query("select set_config('request.jwt.claims',$1,false)",[JSON.stringify(uid?{sub:uid,is_anonymous:isAnonymous}:{})]);
@@ -61,7 +62,7 @@ test('Polls 2 and 3 database isolation and lifecycle',async t=>{
   const legacy=(await db.query("select public.poll1_create_session('Existing Poll 1') as id")).rows[0].id;
   await db.query("select public.poll1_transition($1,'open')",[legacy]);
   await as('authenticated',voter);await db.query('select public.poll1_submit($1,1,false)',[legacy]);
-  await db.exec('reset role');const migration=await sql('polls-02-03.sql');await db.exec(migration);
+  await db.exec('reset role');const migration=await sql('polls.sql');await db.exec(migration);
   let s2,s3;
   try {
     await t.test('existing presenter authorization is reused and Poll 1 remains intact',async()=>{
@@ -84,7 +85,7 @@ test('Polls 2 and 3 database isolation and lifecycle',async t=>{
           await assert.rejects(call(poll,'transition',[id,'open']),/Presenter access/);
           await assert.rejects(call(poll,'delete_session',[id]),/Presenter access/);
         }
-        for(const table of ['section_sessions','section_responses'])await assert.rejects(db.query(`select * from polling.${table}`),/permission denied/);
+        for(const table of ['sessions','responses'])await assert.rejects(db.query(`select * from polling.${table}`),/permission denied/);
       }
     });
     await t.test('session IDs cannot be reused across poll questions',async()=>{
@@ -161,7 +162,7 @@ test('Polls 2 and 3 database isolation and lifecycle',async t=>{
       await call(3,'delete_session',[s3]);
       assert.equal((await db.query('select public.poll1_status($1) as s',[legacy])).rows[0].s.response_count,1);
       await db.exec('reset role');
-      assert.equal((await db.query('select count(*)::int as n from polling.section_responses')).rows[0].n,0);
+      assert.equal((await db.query('select count(*)::int as n from polling.responses where poll_number in (2,3)')).rows[0].n,0);
       assert.equal((await db.query('select count(*)::int as n from auth.users')).rows[0].n,5);
     });
   }finally{await db.close();}

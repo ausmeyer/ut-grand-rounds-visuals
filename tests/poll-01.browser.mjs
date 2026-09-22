@@ -11,6 +11,7 @@ const {chromium}=await import(process.env.POLL_PLAYWRIGHT?pathToFileURL(process.
 const browser=await chromium.launch({channel:'chrome',headless:true});
 const artifacts=await mkdtemp(join(tmpdir(),'poll-01-browser-'));
 const base='http://127.0.0.1:8765/poll-01.html';
+const legacyBackend=process.env.POLL_LEGACY_BACKEND==='1';
 const errors=[];
 const observe=page=>page.on('pageerror',error=>errors.push(error.message));
 let blockedExternalRequests=0;
@@ -122,7 +123,11 @@ try {
       authRequests.push({path:url.pathname,body});
       return send(authBody(url.pathname.endsWith('/signup')));
     }
-    const name=url.pathname.split('/').at(-1);
+    const endpoint=url.pathname.split('/').at(-1);
+    if(legacyBackend&&endpoint.startsWith('poll_'))return send({code:'PGRST202',message:'Function not found'},404);
+    if(endpoint.startsWith('poll_')&&endpoint!=='poll_is_presenter')assert.equal(body.p_poll,1);
+    if(!legacyBackend&&!endpoint.startsWith('poll_'))assert.equal(endpoint,'poll1_delete_session','Only the deliberately missing delete function should use the fallback');
+    const name=endpoint.replace(/^poll_/,'poll1_');
     if(deletedSessions.has(body.p_session)&&['poll1_status','poll1_results'].includes(name))return send({message:'Poll session not found',code:'P0002'},404);
     if(name==='poll1_status')return send({id:body.p_session,name:body.p_session===second?'New session':'Rehearsal',state:body.p_session===second?'ready':sessionState,response_count:body.p_session===second?0:submissions});
     if(name==='poll1_submit') {
@@ -130,7 +135,9 @@ try {
       if(sessionState!=='open')return send({message:'Voting is not open',code:'42501'},403);
       received.push(body);submissions=1;return send(true);
     }
-    if(name==='poll1_results')return sessionState==='revealed'?send({bins:WEEKS.map(week=>({week,count:week===1?1:0})),unsure:0}):send({message:'Results have not been revealed'},403);
+    if(name==='poll1_results')return sessionState==='revealed'?send({
+      bins:WEEKS.map(week=>({[legacyBackend?'week':'value']:week,count:week===1?1:0})),unsure:0,...(legacyBackend?{}:{numeric_count:1})
+    }):send({message:'Results have not been revealed'},403);
     if(name==='poll1_is_presenter')return send(true);
     if(name==='poll1_list_sessions')return send([{id:session,name:'Rehearsal',state:sessionState},{id:second,name:'New session',state:'ready'}].filter(s=>!deletedSessions.has(s.id)));
     if(name==='poll1_create_session')return send(second);
@@ -155,7 +162,7 @@ try {
   await vote.getByRole('button',{name:'Complete mock security check'}).click();
   await vote.locator('#submit-vote').click();
   await vote.waitForFunction(()=>document.querySelector('#vote-message').textContent==='Answer received. Thank you.');
-  assert.deepEqual(received[0],{p_session:session,p_week:1,p_unsure:false});
+  assert.deepEqual(received[0],legacyBackend?{p_session:session,p_week:1,p_unsure:false}:{p_poll:1,p_session:session,p_kind:'week',p_start:1,p_end:null});
   assert.equal(authRequests.find(r=>r.path.endsWith('/signup')).body.gotrue_meta_security.captcha_token,'synthetic-captcha-token');
   await vote.reload();await vote.waitForFunction(()=>document.querySelector('#state-badge').textContent==='Voting open');
   await vote.locator('#week-slider').click();failNext=true;await vote.locator('#submit-vote').click();
@@ -209,7 +216,7 @@ try {
   // Missing production setup must explain the required SQL, not lose the session.
   deletionAvailable=false;
   admin.once('dialog',dialog=>dialog.accept());await admin.locator('#delete-session').click();
-  await admin.waitForFunction(()=>document.querySelector('#connection-message').textContent.includes('updated supabase/poll-01.sql'));
+  await admin.waitForFunction(()=>document.querySelector('#connection-message').textContent.includes('supabase/polls.sql'));
   assert.equal(await admin.locator('#session-select').inputValue(),second);
   assert.deepEqual(deletionRequests,[]);deletionAvailable=true;
   sessionState='open';await admin.locator('#session-select').selectOption(session);
@@ -237,5 +244,5 @@ try {
   await live.close();
   assert.deepEqual(errors,[]);
   console.log('PASS: previews, no preview network writes, 1240×540 layout, all 29 ticks without label overlap, slider tap/drag and keyboard rollover, explicit selection, aligned presenter controls, CAPTCHA gating/expiry and auth-token forwarding, submission, retry, closure, hidden/revealed results, presenter login, session-bound links, deletion confirmation/cancel, open-poll protection, setup errors, and deleted-session cleanup.');
-  console.log(`Screenshots: ${artifacts}`);
+  console.log(`Backend: ${legacyBackend?'legacy fallback':'unified API'}. Screenshots: ${artifacts}`);
 }finally{await browser.close();}

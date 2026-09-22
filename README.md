@@ -18,10 +18,11 @@ Slides 2, 4, and the surveillance-data section (slides 5–11) are implemented.
 
 Polls 1–3 are implemented in `docs/poll-01.html`, `docs/poll-02.html`, and
 `docs/poll-03.html`, each with question, voting, results, and presenter views.
-Poll 1 has been used live. Polls 2–3 reuse its public configuration and presenter
-authorization but require an additional SQL script before live use. See the
-[Poll 1 setup checklist](specs/poll-01-setup.md) and
-[Polls 2–3 setup instructions](specs/polls-02-03-setup.md).
+All three use one shared backend, with poll-specific validation and separate
+sessions. Run the single [unified setup/migration](specs/polls-setup.md) to
+upgrade the existing Supabase installation without changing session links.
+Question and chart details are in the [Poll 1 specification](specs/poll-01-setup.md)
+and [Polls 2–3 specification](specs/polls-02-03-setup.md).
 The existing surveillance builds do not modify the polls.
 
 Local visual previews, which never submit responses:
@@ -52,6 +53,9 @@ Browser checks are in `tests/poll-01.browser.mjs` and
 and run those scripts with Playwright installed, or set `POLL_PLAYWRIGHT` to the
 absolute path of an installed Playwright `index.mjs`. The tests use isolated
 Chrome contexts and mocked HTTP responses, not the live Supabase database.
+Run both scripts again with `POLL_LEGACY_BACKEND=1` to check the transition
+period before the unified SQL has been installed. Old SQL lives only in
+`tests/fixtures/` for migration tests; `supabase/polls.sql` is the sole setup script.
 
 ## Build
 

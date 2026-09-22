@@ -31,7 +31,7 @@ test('database permissions, transitions, submission validation, and result isola
     create function auth.uid() returns uuid language sql as $$ select (auth.jwt()->>'sub')::uuid $$;
     insert into auth.users values
     ('${admin}','austin.g.meyer@gmail.com',now(),false),('${voter}',null,null,true),('${other}',null,null,true);`);
-  const migration=await readFile(new URL('../supabase/poll-01.sql',import.meta.url),'utf8');
+  const migration=await readFile(new URL('../supabase/polls.sql',import.meta.url),'utf8');
   await db.exec(migration);
   await db.exec(await readFile(new URL('../supabase/authorize-presenter.sql',import.meta.url),'utf8'));
   async function as(role,uid=null,isAnonymous=true){

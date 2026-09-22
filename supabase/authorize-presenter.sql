@@ -1,7 +1,8 @@
 -- First create this user in Supabase Authentication > Users > Add user.
 -- Use a private password and confirm the email. This account is for the poll
 -- application; signing into the Supabase dashboard does not create it.
--- Run after poll-01.sql. No password or administrative secret belongs here.
+-- Run after polls.sql for a new installation only. Existing authorization is preserved.
+-- No password or administrative secret belongs here.
 do $$
 declare v_id uuid;
 begin

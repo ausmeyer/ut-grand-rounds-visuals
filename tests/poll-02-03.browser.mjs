@@ -10,6 +10,7 @@ const browser=await chromium.launch({channel:'chrome',headless:true});
 const artifacts=await mkdtemp(join(tmpdir(),'polls-02-03-browser-'));
 const errors=[];const observe=page=>page.on('pageerror',error=>errors.push(error.message));
 const root='http://127.0.0.1:8765/';
+const legacyBackend=process.env.POLL_LEGACY_BACKEND==='1';
 try {
   for(const poll of Object.values(POLLS)) {
     const base=`${root}poll-0${poll.id}.html`,prefix=`poll-0${poll.id}`;
@@ -103,7 +104,10 @@ try {
         const token=[{alg:'HS256',typ:'JWT'},{sub:uid,exp:Math.floor(Date.now()/1000)+3600,is_anonymous:anonymous,role:'authenticated'}].map(v=>Buffer.from(JSON.stringify(v)).toString('base64url')).join('.')+'.signature';
         return send({access_token:token,refresh_token:'synthetic-refresh',token_type:'bearer',expires_in:3600,user:{id:uid,aud:'authenticated',role:'authenticated',is_anonymous:anonymous}});
       }
-      const name=url.pathname.split('/').at(-1);
+      const endpoint=url.pathname.split('/').at(-1);
+      if(legacyBackend&&endpoint.startsWith('poll_'))return send({code:'PGRST202',message:'Function not found'},404);
+      if(!legacyBackend)assert.ok(endpoint.startsWith('poll_'),'Updated pages must use the shared API');
+      const name=endpoint==='poll_is_presenter'?'poll1_is_presenter':endpoint.replace(/^poll_/,'poll23_');
       if(name==='poll1_is_presenter')return send(true);
       assert.ok(name.startsWith('poll23_'));assert.equal(body.p_poll,poll.id);
       if(name==='poll23_list_sessions')return send([...sessions].map(([key,s])=>({id:key,name:s.name,state:s.state,poll_number:poll.id})));
@@ -173,5 +177,5 @@ try {
   }
   assert.deepEqual(errors,[]);
   console.log('PASS: both question/results frames, Poll 2 exact radios and horizontal bars, Poll 3 two-endpoint selection and all week ticks, mobile layout, no preview writes, CAPTCHA forwarding, failed submission retry, close/reveal, scoped presenter links, new sessions and confirmed deletion.');
-  console.log(`Screenshots: ${artifacts}`);
+  console.log(`Backend: ${legacyBackend?'legacy fallback':'unified API'}. Screenshots: ${artifacts}`);
 }finally{await browser.close();}

@@ -1,4 +1,5 @@
 import { config } from '../poll-01/config.js';
+import { callPoll } from '../polls/backend.js';
 import { POLLS, isSession, validAnswer, normalizeResults, previewResults } from './model.js';
 const poll = POLLS[Number(document.body.dataset.poll)];
 
@@ -24,7 +25,7 @@ if(poll.id===3)for(const id of ['week-ticks','end-week-ticks']) {
 
 function message(error) {
   const raw = error?.message || String(error);
-  if (error?.code === 'PGRST202') return 'Run supabase/polls-02-03.sql in the Supabase SQL Editor to enable this poll.';
+  if (error?.code === 'PGRST202') return 'Run supabase/polls.sql in the Supabase SQL Editor to enable this poll.';
   if (/anonymous sign-ins are disabled/i.test(raw)) return 'Audience sign-in is not enabled yet. Please let the presenter know.';
   if (/rate limit/i.test(raw)) return 'Too many sign-ins from this network. Please let the presenter know and try again shortly.';
   if (/fetch|network|timeout|aborted/i.test(raw)) return 'Connection interrupted. Your selection is still here. Please retry.';
@@ -33,9 +34,7 @@ function message(error) {
 function showError(error) { $('connection-message').textContent = message(error); }
 function clearError() { $('connection-message').textContent = ''; }
 async function rpc(name, args = {}) {
-  const { data, error } = await client.rpc(name==='is_presenter'?'poll1_is_presenter':`poll23_${name}`, name==='is_presenter'?{}:{p_poll:poll.id,...args}).abortSignal(AbortSignal.timeout(15000));
-  if (error) throw error;
-  return data;
+  return callPoll(client,poll.id,name,args);
 }
 function link(view) {
   const url = new URL(`poll-0${poll.id}.html`, location.href);
@@ -296,7 +295,7 @@ $('delete-session').addEventListener('click',async()=>{
     const url=new URL(location.href);url.searchParams.delete('session');history.replaceState(null,'',url);
     updateLinks();await loadSessions();
   }catch(error){
-    showError(error.code==='PGRST202'?new Error('To enable session deletion, run supabase/polls-02-03.sql in the Supabase SQL Editor.'):error);
+    showError(error.code==='PGRST202'?new Error('To enable session deletion, run supabase/polls.sql in the Supabase SQL Editor.'):error);
   }finally{
     busy=false;updateState({state,response_count:null});await refresh();
     if(deleted)$('admin-count').textContent=preview?'Preview session removed. Nothing was deleted.':'Session deleted. Choose another session or create a new one.';

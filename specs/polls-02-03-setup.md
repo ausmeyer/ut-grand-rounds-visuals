@@ -27,22 +27,14 @@ One window can contribute to several bars, so adding bar heights does not give
 the number of participants. These responses describe audience preferences,
 not a clinical recommendation.
 
-## One additional backend setup step
+## Shared backend setup
 
-Poll 1 must already be configured, including its presenter authorization.
-Polls 2–3 reuse its Supabase project, public configuration, Turnstile site key,
-and authorized presenter email. No new keys or accounts are needed.
-
-1. Open the existing project in the Supabase dashboard.
-2. Open **SQL Editor**, then create a **New query**.
-3. Copy the entire contents of [`supabase/polls-02-03.sql`](../supabase/polls-02-03.sql)
-   into that query and click **Run**.
-4. Open each presenter page below and sign in as the existing presenter.
-
-The script adds separate, poll-scoped sessions and responses. It does not
-change or delete Poll 1 sessions, responses, functions, or presenter accounts.
-Rerunning it preserves responses. Publishing the HTML files does not install
-this database script.
+Use the [unified setup instructions](polls-setup.md) and run
+[`supabase/polls.sql`](../supabase/polls.sql) once for all three polls.
+It upgrades either earlier installation, preserves existing sessions and
+responses, and reuses the configured project, presenter, and CAPTCHA.
+Do not run the superseded Poll 1 or Polls 2–3 setup scripts.
+Publishing the HTML files does not install the database script.
 
 ## Presenter links and session workflow
 
@@ -63,8 +55,8 @@ IP-address restriction.
 
 New sessions start empty and leave old sessions unchanged. A session can be
 deleted with confirmation only when it is not open for voting. Deletion
-permanently removes that session's responses; it does not affect other
-questions or sessions.
+removes that session's live responses; it does not affect other questions or
+sessions. The private pre-migration recovery archive is retained separately.
 
 ## Rehearsal and checks
 
@@ -91,6 +83,6 @@ deletion, window aggregation, keyboard selection, phone layouts, and 1240 × 540
 projected layouts. They do not replace a rehearsal with the real CAPTCHA and
 the installed production database functions.
 
-Poll 1's production files are unchanged. If the new interfaces must be rolled
-back, revert only the Polls 2–3 frontend change; leave the new database tables
-in place to preserve any responses collected.
+All three pages use the shared API connector. The
+[unified setup instructions](polls-setup.md) describe migration verification
+and frontend rollback without discarding collected responses.

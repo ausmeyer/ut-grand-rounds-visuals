@@ -1,4 +1,4 @@
--- Run in Supabase SQL Editor after poll-01.sql and presenter authorization.
+-- Test fixture: original Polls 2-3 setup before the unified backend migration.
 -- Adds Polls 2 and 3. Does not alter or delete Poll 1 sessions or responses.
 begin;
 
