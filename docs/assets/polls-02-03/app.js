@@ -104,7 +104,8 @@ function updateState(data) {
   }
 }
 function renderHistogram(data) {
-  const {bins,numericCount,unsure}=normalizeResults(poll,data);
+  const {bins:allBins,numericCount,unsure}=normalizeResults(poll,data);
+  const bins=poll.id===3?poll.sliderValues.map(week=>allBins.find(bin=>bin.value===week)):allBins;
   $('results-wait').hidden=true;$('histogram').hidden=false;
   $('response-summary').textContent=poll.id===2?`${numericCount} ${numericCount===1?'response':'responses'}`:`${numericCount} windows · ${unsure} not sure`;
   $('empty-results').hidden=numericCount>0;

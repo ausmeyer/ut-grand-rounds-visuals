@@ -24,8 +24,9 @@ the next calendar year; equal endpoints represent one week.
 Results show the **number of response windows including each week**, with the
 number of submitted windows and “Not sure” responses displayed separately.
 One window can contribute to several bars, so adding bar heights does not give
-the number of participants. The full-year results bins are retained so older
-responses remain represented; changing the slider range requires no SQL update.
+the number of participants. The results plot uses the same seasonal range and
+order as the sliders: 32–52, then 1–12. Stored responses remain unchanged; weeks
+outside that range are not plotted. No SQL update is required for this display.
 These responses describe audience preferences,
 not a clinical recommendation.
 

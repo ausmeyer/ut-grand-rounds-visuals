@@ -4,7 +4,7 @@ import {mkdtemp} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {pathToFileURL} from 'node:url';
-import {POLLS,includesWeek} from '../docs/assets/polls-02-03/model.js';
+import {POLLS,includesWeek,previewResults} from '../docs/assets/polls-02-03/model.js';
 const {chromium}=await import(process.env.POLL_PLAYWRIGHT?pathToFileURL(process.env.POLL_PLAYWRIGHT).href:'playwright');
 const browser=await chromium.launch({channel:'chrome',headless:true});
 const artifacts=await mkdtemp(join(tmpdir(),'polls-02-03-browser-'));
@@ -35,11 +35,17 @@ try {
         assert.ok(bottom<=540,`Poll ${poll.id} question clipped at ${bottom}`);
       } else {
         const bars=await page.locator('#histogram rect').evaluateAll(nodes=>nodes.map(el=>({x:+el.getAttribute('x'),y:+el.getAttribute('y'),width:+el.getAttribute('width'),height:+el.getAttribute('height')})));
-        assert.equal(bars.length,poll.values.length);
+        assert.equal(bars.length,(poll.sliderValues||poll.values).length);
         if(poll.id===2) {
           assert.equal(new Set(bars.map(b=>b.x)).size,1,'Horizontal bars share a left edge');
           assert.equal(new Set(bars.map(b=>b.y)).size,5,'Each option has its own row');
           assert.equal(new Set(bars.map(b=>b.height)).size,1);
+        } else {
+          assert.deepEqual(await page.locator('#histogram text[y="345"]').allTextContents(),poll.sliderValues.map(String));
+          const sample=previewResults(poll);
+          assert.deepEqual(await page.locator('#histogram rect title').allTextContents(),poll.sliderValues.map(week=>
+            `Week ${week}: ${sample.bins.find(bin=>bin.value===week).count} windows`));
+          assert.deepEqual(await page.locator('#results-table tbody tr td:first-child').allTextContents(),[...poll.sliderValues.map(String),'Not sure']);
         }
       }
       await page.screenshot({path:join(artifacts,`${prefix}-${mode}.png`)});await page.close();
@@ -171,7 +177,8 @@ try {
     assert.equal(await results.locator('#histogram').isVisible(),false);
     admin.once('dialog',dialog=>dialog.accept());await admin.locator('[data-action=reveal]').click();
     await results.waitForSelector('#histogram svg');
-    assert.equal(await results.locator('#histogram rect').count(),poll.values.length);
+    assert.equal(await results.locator('#histogram rect').count(),(poll.sliderValues||poll.values).length);
+    if(poll.id===3)assert.deepEqual(await results.locator('#histogram text[y="345"]').allTextContents(),poll.sliderValues.map(String));
     assert.equal(await admin.locator('#audience-url').inputValue(),`${base}?mode=vote&session=${id}`);
     await admin.locator('#session-name').fill(`New poll ${poll.id}`);await admin.locator('#new-session-form button').click();
     await admin.waitForFunction(()=>document.querySelector('#admin-count').textContent==='0 responses');
