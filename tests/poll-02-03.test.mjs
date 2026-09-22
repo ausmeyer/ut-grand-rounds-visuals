@@ -15,8 +15,11 @@ test('Poll 2 has exactly five choices and no default or alternative answer',()=>
 });
 test('Poll 3 validates both endpoints and includes year-crossing windows',()=>{
   const poll=POLLS[3];assert.deepEqual(poll.values,Array.from({length:52},(_,i)=>i+1));
-  for(const [start,end] of [[1,52],[50,3],[10,10]])assert.equal(validAnswer(poll,{kind:'window',start,end}),true);
-  for(const [start,end] of [[null,1],[1,null],[0,2],[2,53],[1.5,2]])assert.equal(validAnswer(poll,{kind:'window',start,end}),false);
+  assert.deepEqual(poll.sliderValues,[...Array.from({length:21},(_,i)=>32+i),...Array.from({length:12},(_,i)=>i+1)]);
+  assert.deepEqual([0,20,21,32].map(index=>poll.sliderValues[index]),[32,52,1,12]);
+  assert.equal(new Set(poll.sliderValues).size,33);
+  for(const [start,end] of [[32,12],[1,52],[50,3],[10,10]])assert.equal(validAnswer(poll,{kind:'window',start,end}),true);
+  for(const [start,end] of [[null,1],[1,null],[0,2],[2,53],[1.5,2],[13,32],[32,31]])assert.equal(validAnswer(poll,{kind:'window',start,end}),false);
   assert.equal(validAnswer(poll,{kind:'not_sure',start:null,end:null}),true);
   assert.equal(validAnswer(poll,{kind:'not_sure',start:1,end:2}),false);
   assert.deepEqual(poll.values.filter(w=>includesWeek(50,3,w)),[1,2,3,50,51,52]);

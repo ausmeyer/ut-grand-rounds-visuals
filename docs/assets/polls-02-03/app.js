@@ -1,6 +1,6 @@
 import { config } from '../poll-01/config.js';
 import { callPoll } from '../polls/backend.js';
-import { POLLS, isSession, validAnswer, normalizeResults, previewResults } from './model.js';
+import { POLLS, isSession, validAnswer, normalizeResults, previewResults } from './model.js?v=2';
 const poll = POLLS[Number(document.body.dataset.poll)];
 
 const $ = id => document.getElementById(id);
@@ -17,9 +17,9 @@ $('preview-banner').hidden = !preview;
 document.querySelectorAll('.question-text').forEach(el => { el.textContent = poll.question; });
 document.querySelector('.lead').textContent = poll.instruction;
 if(poll.id===3)for(const id of ['week-ticks','end-week-ticks']) {
-  poll.values.forEach((week,index)=>{
+  poll.sliderValues.forEach((week,index)=>{
     const tick=document.createElement('span');tick.textContent=week;
-    tick.style.left=`${index/(poll.values.length-1)*100}%`;$(id).append(tick);
+    tick.style.left=`${index/(poll.sliderValues.length-1)*100}%`;$(id).append(tick);
   });
 }
 
@@ -206,7 +206,7 @@ async function setupCaptcha() {
   });
 }
 if(poll.id===3)for(const id of ['week-slider','end-week-slider']) {
-  const select=()=>{if(id==='week-slider')selectedStart=Number($(id).value);else selectedEnd=Number($(id).value);updateVote();};
+  const select=()=>{const week=poll.sliderValues[Number($(id).value)];if(id==='week-slider')selectedStart=week;else selectedEnd=week;updateVote();};
   $(id).addEventListener('input',select);$(id).addEventListener('click',select);
 }
 document.querySelectorAll('#vote-form input[type=radio]').forEach(el=>el.addEventListener('change',updateVote));

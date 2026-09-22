@@ -6,7 +6,7 @@ Poll 2:
 
 > How far in advance can we accurately predict the inflection at the peak with quantitative forecasts?
 
-Five radio choices: **0, 1, 2, 3, or 4 weeks**. Nothing is selected initially.
+Five unboxed radio choices: **0, 1, 2, 3, or 4 weeks**. Nothing is selected initially.
 Results are horizontal bars showing the number of responses for each choice.
 This preserves the presenter's question about quantitative forecasts; it does
 not substitute a question about predicting a peak date within a chosen tolerance.
@@ -16,7 +16,7 @@ Poll 3:
 
 > What time window would you recommend for a typical adult patient to get their annual flu vaccine?
 
-Two sliders select the first and last week, each covering weeks 1–52. Both
+Two sliders select the first and last week, each ordered 32–52, then 1–12. Both
 endpoints must be selected explicitly, or the attendee can choose “Not sure.”
 The endpoints are inclusive. An end week before the start week crosses into
 the next calendar year; equal endpoints represent one week.
@@ -24,7 +24,9 @@ the next calendar year; equal endpoints represent one week.
 Results show the **number of response windows including each week**, with the
 number of submitted windows and “Not sure” responses displayed separately.
 One window can contribute to several bars, so adding bar heights does not give
-the number of participants. These responses describe audience preferences,
+the number of participants. The full-year results bins are retained so older
+responses remain represented; changing the slider range requires no SQL update.
+These responses describe audience preferences,
 not a clinical recommendation.
 
 ## Shared backend setup

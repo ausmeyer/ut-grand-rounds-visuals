@@ -10,6 +10,7 @@ export const POLLS = Object.freeze({
   }),
   3: Object.freeze({
     id:3, kind:'window', values:Object.freeze(Array.from({length:52},(_,i)=>i+1)),
+    sliderValues:Object.freeze(Array.from({length:33},(_,i)=>((31+i)%52)+1)),
     question:'What time window would you recommend for a typical adult patient to get their annual flu vaccine?',
     instruction:'Choose the first and last week of your preferred window, then submit.',
     title:'Recommended vaccination windows',
@@ -22,8 +23,9 @@ export function includesWeek(start,end,week) {
 }
 export function validAnswer(poll,{kind,start,end}) {
   if(poll.id===3&&kind==='not_sure')return start===null&&end===null;
-  if(kind!==poll.kind||!Number.isInteger(start)||!poll.values.includes(start))return false;
-  return poll.id===2 ? end===null : Number.isInteger(end)&&poll.values.includes(end);
+  const choices=poll.sliderValues||poll.values;
+  if(kind!==poll.kind||!Number.isInteger(start)||!choices.includes(start))return false;
+  return poll.id===2 ? end===null : Number.isInteger(end)&&choices.includes(end);
 }
 export function normalizeResults(poll,data) {
   const validCount=value=>Number.isSafeInteger(value)&&value>=0;

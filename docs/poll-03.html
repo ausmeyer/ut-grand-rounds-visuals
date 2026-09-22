@@ -7,10 +7,10 @@
   <meta name="referrer" content="no-referrer">
   <title>Audience poll 3</title>
   <link rel="stylesheet" href="assets/poll-01/poll.css?v=3">
-  <link rel="stylesheet" href="assets/polls-02-03/poll.css?v=1">
+  <link rel="stylesheet" href="assets/polls-02-03/poll.css?v=2">
   <script defer src="assets/poll-01/vendor/supabase.js"></script>
   <script defer src="assets/poll-01/vendor/qrcode.js"></script>
-  <script type="module" src="assets/polls-02-03/app.js?v=2"></script>
+  <script type="module" src="assets/polls-02-03/app.js?v=3"></script>
 </head>
 <body data-poll="3">
   <main class="app">
@@ -18,7 +18,7 @@
     <header><span class="eyebrow">Audience poll 3</span><span id="state-badge" class="badge">Connecting</span></header>
     <section id="question-view" hidden>
       <div><h1 class="question-text"></h1><p class="lead">Choose the first and last week of your preferred window, then submit.</p>
-        <div class="season-key"><span>1</span><span>52</span></div>
+        <div class="season-key"><span>32</span><span>12</span></div>
         <p class="muted">Use your phone or open the voting link.</p>
       </div>
       <aside class="join"><div id="qr"></div><strong>Scan to vote</strong><a id="vote-link" target="_blank" rel="noopener"></a></aside>
@@ -27,10 +27,10 @@
       <h1 class="question-text"></h1>
       <form id="vote-form">
         <div class="bound-heading"><label for="week-slider">First week</label><output id="start-output" for="week-slider">Choose a week</output></div>
-        <input id="week-slider" class="section-slider" type="range" min="1" max="52" step="1" value="26" aria-label="First week of vaccination window" aria-valuetext="No week selected">
+        <input id="week-slider" class="section-slider" type="range" min="0" max="32" step="1" value="16" aria-label="First week of vaccination window, from week 32 through week 12" aria-valuetext="No week selected">
         <div id="week-ticks" class="slider-ticks dense-ticks" aria-hidden="true"></div>
         <div class="bound-heading"><label for="end-week-slider">Last week</label><output id="end-output" for="end-week-slider">Choose a week</output></div>
-        <input id="end-week-slider" class="section-slider" type="range" min="1" max="52" step="1" value="26" aria-label="Last week of vaccination window" aria-valuetext="No week selected">
+        <input id="end-week-slider" class="section-slider" type="range" min="0" max="32" step="1" value="16" aria-label="Last week of vaccination window, from week 32 through week 12" aria-valuetext="No week selected">
         <div id="end-week-ticks" class="slider-ticks dense-ticks" aria-hidden="true"></div>
         <p id="window-note" class="muted" hidden>Window continues into the next calendar year.</p>
         <fieldset class="answer-options"><legend class="sr-only">Response type</legend>

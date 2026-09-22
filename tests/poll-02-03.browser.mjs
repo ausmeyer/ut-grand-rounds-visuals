@@ -56,11 +56,15 @@ try {
       assert.equal(await phone.locator('#submit-vote').isDisabled(),false);
       await phone.getByRole('radio',{name:'4 weeks',exact:true}).check();
       assert.equal(await phone.locator('[name=lead-weeks]:checked').count(),1);
+      const labels=await phone.locator('.forecast-options label').evaluateAll(nodes=>nodes.map(el=>{
+        const css=getComputedStyle(el);return {border:css.borderTopWidth,background:css.backgroundColor};
+      }));
+      for(const label of labels)assert.deepEqual(label,{border:'0px',background:'rgba(0, 0, 0, 0)'});
     } else {
       for(const width of [320,390,600,800,1000]) {
         await phone.setViewportSize({width,height:844});
         for(const id of ['week-ticks','end-week-ticks']) {
-          assert.deepEqual(await phone.locator(`#${id} span`).allTextContents(),poll.values.map(String));
+          assert.deepEqual(await phone.locator(`#${id} span`).allTextContents(),poll.sliderValues.map(String));
           const boxes=await phone.locator(`#${id} span`).evaluateAll(nodes=>nodes.map(el=>{
             const range=document.createRange();range.selectNodeContents(el);const r=range.getBoundingClientRect();
             return {left:r.left,right:r.right,top:r.top,bottom:r.bottom};
@@ -72,13 +76,20 @@ try {
         assert.equal(await phone.evaluate(()=>document.documentElement.scrollWidth),width);
       }
       await phone.setViewportSize({width:390,height:844});
-      await phone.locator('#week-slider').focus();await phone.keyboard.press('End');
-      assert.equal(await phone.locator('#start-output').textContent(),'Week 52');
+      await phone.locator('#week-slider').focus();await phone.keyboard.press('Home');
+      assert.equal(await phone.locator('#start-output').textContent(),'Week 32');
       assert.equal(await phone.locator('#submit-vote').isDisabled(),true,'Both endpoints need explicit selection');
-      await phone.locator('#end-week-slider').focus();await phone.keyboard.press('Home');
-      assert.equal(await phone.locator('#end-output').textContent(),'Week 1');
+      await phone.locator('#end-week-slider').focus();await phone.keyboard.press('End');
+      assert.equal(await phone.locator('#end-output').textContent(),'Week 12');
       assert.equal(await phone.locator('#window-note').isVisible(),true);
       assert.equal(await phone.locator('#submit-vote').isDisabled(),false);
+      await phone.keyboard.press('Home');
+      for(let i=0;i<20;i++)await phone.keyboard.press('ArrowRight');
+      assert.equal(await phone.locator('#end-output').textContent(),'Week 52');
+      await phone.keyboard.press('ArrowRight');
+      assert.equal(await phone.locator('#end-output').textContent(),'Week 1');
+      assert.equal(await phone.locator('#end-week-slider').getAttribute('aria-valuetext'),'Week 1');
+      await phone.keyboard.press('End');
       await phone.getByRole('radio',{name:'Not sure',exact:true}).check();
       assert.equal(await phone.locator('#week-slider').isDisabled(),true);
       await phone.getByRole('radio',{name:'Use my window',exact:true}).check();
@@ -133,8 +144,8 @@ try {
     await vote.waitForFunction(()=>document.querySelector('#state-badge').textContent==='Voting open');
     if(poll.id===2)await vote.getByRole('radio',{name:'0 weeks',exact:true}).check();
     else {
-      await vote.locator('#week-slider').focus();await vote.keyboard.press('End');
-      await vote.locator('#end-week-slider').focus();await vote.keyboard.press('Home');
+      await vote.locator('#week-slider').focus();await vote.keyboard.press('Home');
+      await vote.locator('#end-week-slider').focus();await vote.keyboard.press('End');
     }
     assert.equal(await vote.locator('#submit-vote').isDisabled(),true,'Selection cannot bypass CAPTCHA');
     await vote.getByRole('button',{name:'Complete mock security check'}).click();
@@ -142,7 +153,7 @@ try {
     await vote.waitForFunction(()=>document.querySelector('#vote-message').textContent.includes('not confirmed'));
     await vote.locator('#submit-vote').click();
     await vote.waitForFunction(()=>document.querySelector('#vote-message').textContent==='Answer received. Thank you.');
-    assert.deepEqual(submitted.at(-1),{p_poll:poll.id,p_session:id,p_kind:poll.kind,p_start:poll.id===2?0:52,p_end:poll.id===2?null:1});
+    assert.deepEqual(submitted.at(-1),{p_poll:poll.id,p_session:id,p_kind:poll.kind,p_start:poll.id===2?0:32,p_end:poll.id===2?null:12});
     assert.equal(authRequests[0].gotrue_meta_security.captcha_token,'synthetic-captcha-token');
     const results=await live.newPage();observe(results);await results.setViewportSize({width:1240,height:540});
     await results.goto(`${base}?mode=results&session=${id}`);
