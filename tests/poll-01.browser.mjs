@@ -28,6 +28,7 @@ try {
     await page.goto(`${base}?mode=${mode}&preview=1`);
     await page.waitForFunction(()=>document.querySelector('#state-badge').textContent!=='Connecting');
     assert.equal(await page.locator('#connection-message').textContent(),'');
+    assert.doesNotMatch(await page.locator('body').innerText(),/52\s*(→|->)\s*1/);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),1240);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollHeight),540);
     if(mode==='question')assert.equal(await page.locator('#qr svg').count(),1);
@@ -39,6 +40,34 @@ try {
   await phone.goto(`${base}?mode=vote&preview=1`);
   await phone.waitForFunction(()=>document.querySelector('#state-badge').textContent==='Voting open');
   assert.equal(await phone.locator('#submit-vote').isDisabled(),true);
+  assert.doesNotMatch(await phone.locator('body').innerText(),/52\s*(→|->)\s*1/);
+  assert.equal(await phone.locator('#choose-week').count(),0);
+  assert.deepEqual(await phone.locator('#week-ticks span').allTextContents(),WEEKS.map(String));
+  for(const width of [320,390,1000]) {
+    await phone.setViewportSize({width,height:844});
+    const tickLayout=await phone.locator('#week-ticks span').evaluateAll(ticks=>ticks.map(tick=>{
+      const range=document.createRange();range.selectNodeContents(tick);
+      const box=range.getBoundingClientRect();
+      return {left:box.left,right:box.right,top:box.top,bottom:box.bottom,tickHeight:parseFloat(getComputedStyle(tick,'::before').height)};
+    }));
+    for(let i=0;i<tickLayout.length;i++) {
+      const a=tickLayout[i];
+      assert.ok(a.left>=0&&a.right<=width&&a.tickHeight>0,`Visible tick and number at width ${width}`);
+      for(const b of tickLayout.slice(i+1))
+        assert.ok(a.right<=b.left||b.right<=a.left||a.bottom<=b.top||b.bottom<=a.top,`Week labels overlap at width ${width}`);
+    }
+  }
+  await phone.setViewportSize({width:390,height:844});
+  // Tapping the initial thumb explicitly selects week 6 without another button.
+  await phone.locator('#week-slider').click();
+  assert.equal(await phone.locator('#week-output').textContent(),'Week 6');
+  assert.equal(await phone.locator('#submit-vote').isDisabled(),false);
+  const sliderBox=await phone.locator('#week-slider').boundingBox();
+  await phone.mouse.move(sliderBox.x+sliderBox.width/2,sliderBox.y+sliderBox.height/2);
+  await phone.mouse.down();
+  await phone.mouse.move(sliderBox.x+sliderBox.width-12,sliderBox.y+sliderBox.height/2,{steps:12});
+  await phone.mouse.up();
+  assert.equal(await phone.locator('#week-output').textContent(),'Week 20');
   await phone.locator('#week-slider').focus();await phone.keyboard.press('Home');
   assert.equal(await phone.locator('#week-output').textContent(),'Week 44');
   await phone.locator('#week-slider').evaluate(el=>{el.value='8';el.dispatchEvent(new Event('input',{bubbles:true}));});
@@ -47,11 +76,11 @@ try {
   assert.equal(await phone.locator('#week-slider').getAttribute('aria-valuetext'),'Week 1');
   await phone.locator('#submit-vote').click();
   await phone.waitForFunction(()=>document.querySelector('#vote-message').textContent.includes('Nothing was sent'));
+  await phone.screenshot({path:join(artifacts,'phone.png'),fullPage:true});
   await phone.locator('#unsure').check();
   assert.equal(await phone.locator('#week-slider').isDisabled(),true);
   assert.equal(await phone.locator('#week-output').textContent(),'Not sure');
   assert.equal(await phone.evaluate(()=>document.documentElement.scrollWidth),390);
-  await phone.screenshot({path:join(artifacts,'phone.png'),fullPage:true});
   await previews.close();
   assert.equal(blockedExternalRequests,0,'Preview unexpectedly attempted an external request');
 
@@ -121,7 +150,7 @@ try {
   assert.deepEqual(received[0],{p_session:session,p_week:1,p_unsure:false});
   assert.equal(authRequests.find(r=>r.path.endsWith('/signup')).body.gotrue_meta_security.captcha_token,'synthetic-captcha-token');
   await vote.reload();await vote.waitForFunction(()=>document.querySelector('#state-badge').textContent==='Voting open');
-  await vote.locator('#choose-week').click();failNext=true;await vote.locator('#submit-vote').click();
+  await vote.locator('#week-slider').click();failNext=true;await vote.locator('#submit-vote').click();
   await vote.waitForFunction(()=>document.querySelector('#vote-message').textContent.includes('not confirmed'));
   assert.equal(await vote.locator('#week-output').textContent(),'Week 6');
   await vote.locator('#submit-vote').click();
@@ -146,6 +175,10 @@ try {
   assert.equal(authRequests.length,beforeLogin,'No password request before CAPTCHA');
   await admin.getByRole('button',{name:'Complete mock security check'}).click();
   await admin.locator('#login-form button[type=submit]').click();await admin.waitForSelector('#admin-panel');
+  const inputBox=await admin.locator('#session-name').boundingBox();
+  const buttonBox=await admin.locator('#new-session-form button').boundingBox();
+  assert.ok(Math.abs(inputBox.y-buttonBox.y)<1,'New-session input and button tops align');
+  assert.ok(Math.abs(inputBox.y+inputBox.height-buttonBox.y-buttonBox.height)<1,'New-session input and button bottoms align');
   assert.equal(authRequests.find(r=>r.path.endsWith('/token')).body.gotrue_meta_security.captcha_token,'synthetic-captcha-token');
   assert.equal(await admin.locator('#question-url').inputValue(),`${base}?mode=question&session=${session}`);
   await admin.locator('#session-name').fill('Another rehearsal');await admin.locator('#new-session-form button').click();
@@ -157,6 +190,6 @@ try {
   await admin.screenshot({path:join(artifacts,'presenter.png'),fullPage:true});
   await live.close();
   assert.deepEqual(errors,[]);
-  console.log('PASS: previews, no preview network writes, 1240×540 layout, phone layout, keyboard rollover, explicit selection, CAPTCHA gating/expiry and auth-token forwarding, submission, retry, closure, hidden/revealed results, presenter login and session-bound links.');
+  console.log('PASS: previews, no preview network writes, 1240×540 layout, all 29 ticks without label overlap, slider tap/drag and keyboard rollover, explicit selection, aligned presenter controls, CAPTCHA gating/expiry and auth-token forwarding, submission, retry, closure, hidden/revealed results, presenter login and session-bound links.');
   console.log(`Screenshots: ${artifacts}`);
 }finally{await browser.close();}

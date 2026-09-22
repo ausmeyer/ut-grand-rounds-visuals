@@ -16,7 +16,7 @@ Use a slider with 29 discrete positions in this order:
 
 - Whole weeks only, with an explicit Submit button and a separate “Not sure” option retained from the outline.
 - The initial slider position is not an answer. Require explicit selection or confirmation before enabling submission.
-- Display the selected week prominently and support touch, mouse, and keyboard input. Label the rollover as 52 → 1. Screen readers should announce the calendar week, not the internal slider index.
+- Display the selected week prominently and support touch, mouse, and keyboard input. Show a tick and number for every week, without an extra year-rollover annotation. Screen readers should announce the calendar week, not the internal slider index.
 - Store the selected calendar week, not a fictional week 53–72. This poll intentionally uses the requested 52-week convention.
 - Histogram bins follow exactly the same seasonal order and include zero-count weeks. Show “Not sure” separately, not as week zero. Label the vertical axis as number of responses.
 

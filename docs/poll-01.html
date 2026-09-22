@@ -6,10 +6,10 @@
   <meta name="color-scheme" content="light">
   <meta name="referrer" content="no-referrer">
   <title>Flu season peak: audience poll</title>
-  <link rel="stylesheet" href="assets/poll-01/poll.css">
+  <link rel="stylesheet" href="assets/poll-01/poll.css?v=2">
   <script defer src="assets/poll-01/vendor/supabase.js"></script>
   <script defer src="assets/poll-01/vendor/qrcode.js"></script>
-  <script type="module" src="assets/poll-01/app.js"></script>
+  <script type="module" src="assets/poll-01/app.js?v=2"></script>
 </head>
 <body>
   <main class="app">
@@ -17,7 +17,7 @@
     <header><span class="eyebrow">Audience poll 1</span><span id="state-badge" class="badge">Connecting</span></header>
     <section id="question-view" hidden>
       <div><h1 class="question-text"></h1><p class="lead">Choose one week, then submit your answer.</p>
-        <div class="season-key"><span>Week 44</span><span>52 → 1</span><span>Week 20</span></div>
+        <div class="season-key"><span>44</span><span>20</span></div>
         <p class="muted">Use your phone or open the voting link.</p>
       </div>
       <aside class="join"><div id="qr"></div><strong>Scan to vote</strong><a id="vote-link" target="_blank" rel="noopener"></a></aside>
@@ -28,8 +28,7 @@
         <label class="slider-label" for="week-slider">Your estimate</label>
         <output id="week-output" for="week-slider">Choose a week</output>
         <input id="week-slider" type="range" min="0" max="28" step="1" value="14" aria-label="Peak week, from week 44 through week 20" aria-valuetext="No week selected">
-        <div class="slider-ticks" aria-hidden="true"><span>44</span><span class="rollover">52 → 1</span><span>20</span></div>
-        <button id="choose-week" class="secondary" type="button">Select week 6</button>
+        <div id="week-ticks" class="slider-ticks" aria-hidden="true"></div>
         <label class="unsure"><input id="unsure" type="checkbox"> Not sure</label>
         <div id="vote-captcha"></div>
         <button id="submit-vote" type="submit" disabled>Submit answer</button>

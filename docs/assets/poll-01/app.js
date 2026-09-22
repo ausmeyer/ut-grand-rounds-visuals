@@ -13,6 +13,12 @@ document.body.dataset.mode = mode;
 $(`${mode}-view`).hidden = false;
 $('preview-banner').hidden = !preview;
 document.querySelectorAll('.question-text').forEach(el => { el.textContent = QUESTION; });
+WEEKS.forEach((week, index) => {
+  const tick = document.createElement('span');
+  tick.textContent = week;
+  tick.style.left = `${index / (WEEKS.length - 1) * 100}%`;
+  $('week-ticks').append(tick);
+});
 
 function message(error) {
   const raw = error?.message || String(error);
@@ -56,14 +62,11 @@ function updateLinks() {
 }
 function updateVote() {
   const unsure = $('unsure').checked;
-  const currentWeek = weekAt(Number($('week-slider').value));
   $('week-output').textContent = unsure ? 'Not sure' : selectedWeek === null ? 'Choose a week' : `Week ${selectedWeek}`;
   $('week-slider').setAttribute('aria-valuetext', unsure ? 'Not sure selected' : selectedWeek === null ? 'No week selected' : `Week ${selectedWeek}`);
-  $('choose-week').textContent = `Select week ${currentWeek}`;
   const allowed = state === 'open' && !busy;
   $('week-slider').disabled = !allowed || unsure;
   $('unsure').disabled = !allowed;
-  $('choose-week').disabled = !allowed || unsure;
   const captchaReady = !config.turnstileSiteKey || authenticated || captchaToken || preview;
   $('submit-vote').disabled = !allowed || (!unsure && selectedWeek === null) || !captchaReady;
 }
@@ -119,8 +122,6 @@ function renderHistogram(data) {
     for (const value of [bin.week,bin.count]) { const td=document.createElement('td');td.textContent=value;tr.append(td); }
     tbody.append(tr);
   });
-  add('line',{x1:left+9*step,y1:top,x2:left+9*step,y2:bottom,stroke:'#8b9699','stroke-dasharray':'4 4'});
-  add('text',{x:left+9*step,y:18,'text-anchor':'middle',fill:'#647278','font-size':14},'52 → 1');
   add('text',{x:left+width/2,y:375,'text-anchor':'middle',fill:'#14242b','font-size':18},'Week of the year');
   const unsureRow=document.createElement('tr');
   for (const value of ['Not sure',unsure]) { const td=document.createElement('td');td.textContent=value;unsureRow.append(td); }
@@ -169,8 +170,9 @@ async function setupCaptcha() {
     'expired-callback':()=>{captchaToken='';if(mode==='vote')updateVote();},
   });
 }
-$('week-slider').addEventListener('input', () => { selectedWeek=weekAt(Number($('week-slider').value)); updateVote(); });
-$('choose-week').addEventListener('click', () => { selectedWeek=weekAt(Number($('week-slider').value));updateVote(); });
+function selectWeek() { selectedWeek=weekAt(Number($('week-slider').value));updateVote(); }
+$('week-slider').addEventListener('input', selectWeek);
+$('week-slider').addEventListener('click', selectWeek);
 $('unsure').addEventListener('change', updateVote);
 $('vote-form').addEventListener('submit', async event => {
   event.preventDefault();
