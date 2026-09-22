@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="referrer" content="no-referrer">
+  <title>Flu season peak: audience poll</title>
+  <link rel="stylesheet" href="assets/poll-01/poll.css">
+  <script defer src="assets/poll-01/vendor/supabase.js"></script>
+  <script defer src="assets/poll-01/vendor/qrcode.js"></script>
+  <script type="module" src="assets/poll-01/app.js"></script>
+</head>
+<body>
+  <main class="app">
+    <div id="preview-banner" class="preview" hidden>Preview only · Sample responses · Nothing is submitted</div>
+    <header><span class="eyebrow">Audience poll 1</span><span id="state-badge" class="badge">Connecting</span></header>
+    <section id="question-view" hidden>
+      <div><h1 class="question-text"></h1><p class="lead">Choose one week, then submit your answer.</p>
+        <div class="season-key"><span>Week 44</span><span>52 → 1</span><span>Week 20</span></div>
+        <p class="muted">Use your phone or open the voting link.</p>
+      </div>
+      <aside class="join"><div id="qr"></div><strong>Scan to vote</strong><a id="vote-link" target="_blank" rel="noopener"></a></aside>
+    </section>
+    <section id="vote-view" hidden>
+      <h1 class="question-text"></h1>
+      <form id="vote-form">
+        <label class="slider-label" for="week-slider">Your estimate</label>
+        <output id="week-output" for="week-slider">Choose a week</output>
+        <input id="week-slider" type="range" min="0" max="28" step="1" value="14" aria-label="Peak week, from week 44 through week 20" aria-valuetext="No week selected">
+        <div class="slider-ticks" aria-hidden="true"><span>44</span><span class="rollover">52 → 1</span><span>20</span></div>
+        <button id="choose-week" class="secondary" type="button">Select week 6</button>
+        <label class="unsure"><input id="unsure" type="checkbox"> Not sure</label>
+        <div id="vote-captcha"></div>
+        <button id="submit-vote" type="submit" disabled>Submit answer</button>
+      </form>
+      <p id="vote-message" role="status" aria-live="polite"></p>
+      <p class="muted privacy">No name or email required. You can update your answer while voting is open.</p>
+    </section>
+    <section id="results-view" hidden>
+      <div class="results-heading"><h1>When do we think flu season peaks?</h1><span id="response-summary"></span></div>
+      <p id="results-wait" class="waiting">Results will appear after voting closes and the presenter reveals them.</p>
+      <div id="histogram" hidden></div><p id="empty-results" hidden>No week estimates were submitted.</p>
+      <div class="sr-only"><table id="results-table"><caption>Peak-week response counts</caption><thead><tr><th>Week</th><th>Responses</th></tr></thead><tbody></tbody></table></div>
+    </section>
+    <section id="admin-view" hidden>
+      <h1>Poll 1 presenter controls</h1>
+      <form id="login-form">
+        <label>Email<input id="email" type="email" autocomplete="username" required></label>
+        <label>Password<input id="password" type="password" autocomplete="current-password" required></label>
+        <div id="admin-captcha"></div><button type="submit">Sign in</button>
+      </form>
+      <div id="admin-panel" hidden>
+        <form id="new-session-form"><label>New session name<input id="session-name" maxlength="80" placeholder="Rehearsal or presentation date" required></label><button type="submit">New empty session</button></form>
+        <label>Selected session<select id="session-select"><option value="">Choose a session</option></select></label>
+        <p id="admin-count" role="status"></p>
+        <div class="actions"><button type="button" data-action="open" disabled>Open poll</button><button type="button" data-action="close" disabled>Close poll</button><button type="button" data-action="reveal" disabled>Reveal results</button></div>
+        <div id="session-links" hidden>
+          <label>Question iframe URL<input id="question-url" readonly></label>
+          <label>Results iframe URL<input id="results-url" readonly></label>
+          <label>Audience voting URL<input id="audience-url" readonly></label>
+          <div class="actions"><a id="open-question" target="_blank" rel="noopener">Open question</a><a id="open-results" target="_blank" rel="noopener">Open results</a><a id="open-vote" target="_blank" rel="noopener">Open voting form</a></div>
+        </div>
+        <p class="muted">A new session starts empty and preserves old responses. Existing slide links remain bound to their original session.</p>
+        <button id="sign-out" class="secondary" type="button">Sign out</button>
+      </div>
+    </section>
+    <p id="connection-message" role="status" aria-live="polite"></p>
+    <noscript>This poll requires JavaScript.</noscript>
+  </main>
+</body>
+</html>

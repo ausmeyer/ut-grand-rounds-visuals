@@ -1,0 +1,162 @@
+// Serve docs/ on localhost:8765 first. Point POLL_PLAYWRIGHT to an installed
+// Playwright package if it is not resolvable from this repository.
+import assert from 'node:assert/strict';
+import { mkdtemp } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { WEEKS } from '../docs/assets/poll-01/model.js';
+import { config } from '../docs/assets/poll-01/config.js';
+const {chromium}=await import(process.env.POLL_PLAYWRIGHT?pathToFileURL(process.env.POLL_PLAYWRIGHT).href:'playwright');
+const browser=await chromium.launch({channel:'chrome',headless:true});
+const artifacts=await mkdtemp(join(tmpdir(),'poll-01-browser-'));
+const base='http://127.0.0.1:8765/poll-01.html';
+const errors=[];
+const observe=page=>page.on('pageerror',error=>errors.push(error.message));
+let blockedExternalRequests=0;
+try {
+  // Previews must not contact Supabase or create real anonymous users.
+  const previews=await browser.newContext({viewport:{width:1240,height:540}});
+  await previews.route('**/*',async route=>{
+    if(!route.request().url().startsWith('http://127.0.0.1:8765/')){
+      blockedExternalRequests++;return route.abort();
+    }
+    return route.continue();
+  });
+  for(const mode of ['question','results']) {
+    const page=await previews.newPage();observe(page);
+    await page.goto(`${base}?mode=${mode}&preview=1`);
+    await page.waitForFunction(()=>document.querySelector('#state-badge').textContent!=='Connecting');
+    assert.equal(await page.locator('#connection-message').textContent(),'');
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),1240);
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollHeight),540);
+    if(mode==='question')assert.equal(await page.locator('#qr svg').count(),1);
+    else assert.equal(await page.locator('#histogram rect').count(),29);
+    await page.screenshot({path:join(artifacts,`${mode}.png`)});
+    await page.close();
+  }
+  const phone=await previews.newPage();observe(phone);await phone.setViewportSize({width:390,height:844});
+  await phone.goto(`${base}?mode=vote&preview=1`);
+  await phone.waitForFunction(()=>document.querySelector('#state-badge').textContent==='Voting open');
+  assert.equal(await phone.locator('#submit-vote').isDisabled(),true);
+  await phone.locator('#week-slider').focus();await phone.keyboard.press('Home');
+  assert.equal(await phone.locator('#week-output').textContent(),'Week 44');
+  await phone.locator('#week-slider').evaluate(el=>{el.value='8';el.dispatchEvent(new Event('input',{bubbles:true}));});
+  await phone.keyboard.press('ArrowRight');
+  assert.equal(await phone.locator('#week-output').textContent(),'Week 1');
+  assert.equal(await phone.locator('#week-slider').getAttribute('aria-valuetext'),'Week 1');
+  await phone.locator('#submit-vote').click();
+  await phone.waitForFunction(()=>document.querySelector('#vote-message').textContent.includes('Nothing was sent'));
+  await phone.locator('#unsure').check();
+  assert.equal(await phone.locator('#week-slider').isDisabled(),true);
+  assert.equal(await phone.locator('#week-output').textContent(),'Not sure');
+  assert.equal(await phone.evaluate(()=>document.documentElement.scrollWidth),390);
+  await phone.screenshot({path:join(artifacts,'phone.png'),fullPage:true});
+  await previews.close();
+  assert.equal(blockedExternalRequests,0,'Preview unexpectedly attempted an external request');
+
+  // Exercise the live frontend against a deterministic mocked API. SQL security
+  // is tested separately against PostgreSQL; these are not production requests.
+  let sessionState='open',submissions=0,failNext=false;
+  const session='00000000-0000-4000-8000-000000000009';
+  const second='00000000-0000-4000-8000-000000000010';
+  const received=[];
+  const authRequests=[];
+  const authBody=anonymous=>{
+    const id=anonymous?'00000000-0000-4000-8000-000000000002':'00000000-0000-4000-8000-000000000001';
+    const payload={sub:id,exp:Math.floor(Date.now()/1000)+3600,is_anonymous:anonymous,role:'authenticated'};
+    const access=[{alg:'HS256',typ:'JWT'},payload].map(v=>Buffer.from(JSON.stringify(v)).toString('base64url')).join('.')+'.signature';
+    return {access_token:access,refresh_token:'test-refresh',token_type:'bearer',expires_in:3600,user:{id,aud:'authenticated',role:'authenticated',is_anonymous:anonymous,email:anonymous?'':'presenter@example.test'}};
+  };
+  const live=await browser.newContext({viewport:{width:390,height:844}});
+  // Test the integration with a mock widget, never an automated CAPTCHA solve.
+  await live.route('https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit',route=>route.fulfill({
+    contentType:'application/javascript',body:`
+      window.turnstile={
+        render(container,options){
+          window.testCaptchaOptions=options;
+          const button=document.createElement('button');
+          button.type='button';button.textContent='Complete mock security check';
+          button.onclick=()=>options.callback('synthetic-captcha-token');
+          container.append(button);return 'test-widget';
+        },
+        reset(){}
+      };`,
+  }));
+  await live.route('https://iehrrxfxoldwzvauhpsm.supabase.co/**',async route=>{
+    const url=new URL(route.request().url());
+    const body=route.request().postDataJSON()||{};
+    const send=(data,status=200)=>route.fulfill({status,contentType:'application/json',body:JSON.stringify(data)});
+    if(url.pathname.startsWith('/auth/v1/')){
+      authRequests.push({path:url.pathname,body});
+      return send(authBody(url.pathname.endsWith('/signup')));
+    }
+    const name=url.pathname.split('/').at(-1);
+    if(name==='poll1_status')return send({id:body.p_session,state:body.p_session===second?'ready':sessionState,response_count:body.p_session===second?0:submissions});
+    if(name==='poll1_submit') {
+      if(failNext){failNext=false;return route.abort();}
+      if(sessionState!=='open')return send({message:'Voting is not open',code:'42501'},403);
+      received.push(body);submissions=1;return send(true);
+    }
+    if(name==='poll1_results')return sessionState==='revealed'?send({bins:WEEKS.map(week=>({week,count:week===1?1:0})),unsure:0}):send({message:'Results have not been revealed'},403);
+    if(name==='poll1_is_presenter')return send(true);
+    if(name==='poll1_list_sessions')return send([{id:session,name:'Rehearsal',state:sessionState},{id:second,name:'New session',state:'ready'}]);
+    if(name==='poll1_create_session')return send(second);
+    if(name==='poll1_transition'){sessionState={open:'open',close:'closed',reveal:'revealed'}[body.p_action];return send(sessionState);}
+    throw new Error(`Unexpected request: ${url}`);
+  });
+  const vote=await live.newPage();observe(vote);await vote.goto(`${base}?mode=vote&session=${session}`);
+  await vote.waitForFunction(()=>document.querySelector('#state-badge').textContent==='Voting open');
+  assert.equal(await vote.locator('#submit-vote').isDisabled(),true);
+  await vote.locator('#week-slider').evaluate(el=>{el.value='9';el.dispatchEvent(new Event('input',{bubbles:true}));});
+  assert.equal(await vote.locator('#submit-vote').isDisabled(),true,'A week alone cannot bypass CAPTCHA');
+  assert.equal(await vote.evaluate(()=>window.testCaptchaOptions.sitekey),config.turnstileSiteKey);
+  await vote.getByRole('button',{name:'Complete mock security check'}).click();
+  assert.equal(await vote.locator('#submit-vote').isDisabled(),false);
+  await vote.evaluate(()=>window.testCaptchaOptions['expired-callback']());
+  assert.equal(await vote.locator('#submit-vote').isDisabled(),true,'Expired CAPTCHA must disable submission');
+  await vote.getByRole('button',{name:'Complete mock security check'}).click();
+  await vote.locator('#submit-vote').click();
+  await vote.waitForFunction(()=>document.querySelector('#vote-message').textContent==='Answer received. Thank you.');
+  assert.deepEqual(received[0],{p_session:session,p_week:1,p_unsure:false});
+  assert.equal(authRequests.find(r=>r.path.endsWith('/signup')).body.gotrue_meta_security.captcha_token,'synthetic-captcha-token');
+  await vote.reload();await vote.waitForFunction(()=>document.querySelector('#state-badge').textContent==='Voting open');
+  await vote.locator('#choose-week').click();failNext=true;await vote.locator('#submit-vote').click();
+  await vote.waitForFunction(()=>document.querySelector('#vote-message').textContent.includes('not confirmed'));
+  assert.equal(await vote.locator('#week-output').textContent(),'Week 6');
+  await vote.locator('#submit-vote').click();
+  await vote.waitForFunction(()=>document.querySelector('#vote-message').textContent==='Answer received. Thank you.');
+  assert.equal(submissions,1);
+  const result=await live.newPage();observe(result);await result.setViewportSize({width:1240,height:540});
+  await result.goto(`${base}?mode=results&session=${session}`);
+  await result.waitForFunction(()=>document.querySelector('#state-badge').textContent==='Voting open');
+  assert.equal(await result.locator('#histogram').isVisible(),false);
+  sessionState='closed';
+  await vote.waitForFunction(()=>document.querySelector('#state-badge').textContent==='Voting closed');
+  assert.equal(await vote.locator('#submit-vote').isDisabled(),true);
+  assert.equal(await result.locator('#histogram').isVisible(),false);
+  sessionState='revealed';await result.waitForSelector('#histogram svg');
+  assert.equal(await result.locator('#histogram rect').count(),29);
+  const admin=await live.newPage();observe(admin);await admin.setViewportSize({width:1000,height:900});
+  await admin.goto(`${base}?mode=admin&session=${session}`);
+  await admin.locator('#email').fill('presenter@example.test');await admin.locator('#password').fill('synthetic-test-only');
+  const beforeLogin=authRequests.length;
+  await admin.locator('#login-form button[type=submit]').click();
+  assert.match(await admin.locator('#connection-message').textContent(),/Complete the security check/);
+  assert.equal(authRequests.length,beforeLogin,'No password request before CAPTCHA');
+  await admin.getByRole('button',{name:'Complete mock security check'}).click();
+  await admin.locator('#login-form button[type=submit]').click();await admin.waitForSelector('#admin-panel');
+  assert.equal(authRequests.find(r=>r.path.endsWith('/token')).body.gotrue_meta_security.captcha_token,'synthetic-captcha-token');
+  assert.equal(await admin.locator('#question-url').inputValue(),`${base}?mode=question&session=${session}`);
+  await admin.locator('#session-name').fill('Another rehearsal');await admin.locator('#new-session-form button').click();
+  await admin.waitForFunction(id=>document.querySelector('#audience-url').value.includes(id),second);
+  await admin.waitForFunction(()=>!document.querySelector('[data-action=open]').disabled);
+  assert.equal(await admin.locator('#admin-count').textContent(),'0 responses');
+  assert.ok((await result.url()).includes(session));
+  assert.equal(await admin.locator('#password').inputValue(),'');
+  await admin.screenshot({path:join(artifacts,'presenter.png'),fullPage:true});
+  await live.close();
+  assert.deepEqual(errors,[]);
+  console.log('PASS: previews, no preview network writes, 1240×540 layout, phone layout, keyboard rollover, explicit selection, CAPTCHA gating/expiry and auth-token forwarding, submission, retry, closure, hidden/revealed results, presenter login and session-bound links.');
+  console.log(`Screenshots: ${artifacts}`);
+}finally{await browser.close();}
