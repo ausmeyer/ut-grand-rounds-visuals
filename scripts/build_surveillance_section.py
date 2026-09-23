@@ -321,6 +321,9 @@ def normalized_overlay(cache: dict[str, list[dict]]) -> dict:
         normalized = []
         normalized_aggregates = []
         for season, season_curves in curves_by_season.items():
+            # Slide 11 only: exclude July 1, 2022 through June 30, 2023.
+            if season == "2022/23":
+                continue
             aggregate = aggregate_by_season.get(season)
             if aggregate is None:
                 continue
