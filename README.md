@@ -133,3 +133,39 @@ NSSP, NREVSS, NHSN, and FluSurv-NET. Within each surveillance system-season,
 all included locations share one min-max scale; calendar weeks are never shifted.
 Thick lines are week-specific medians across the matching scaled national or
 network aggregate seasons, rather than summaries that weight locations equally.
+
+
+## Slide 4 claymation
+
+The finished animation and editable Blender project are in
+`docs/slide-04-claymation/`. The video is 2 minutes 12 seconds at 1920 × 1080
+and 24 fps. The standalone player preserves the eight chapter shortcuts,
+video and Blender downloads, and expandable system descriptions and sources.
+
+- [Standalone player](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-04-claymation/)
+- [Compact iframe player](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-04-claymation/embed.html)
+
+Use the compact player URL in a Slides.com Iframe block, sized to 16:9, or
+embed it in a webpage:
+
+```html
+<iframe
+  src="https://www.meyerlab.io/ut-grand-rounds-visuals/slide-04-claymation/embed.html"
+  title="Following influenza through U.S. surveillance"
+  style="display:block;width:100%;aspect-ratio:16/9;border:0"
+  allow="fullscreen"
+  allowfullscreen>
+</iframe>
+```
+
+Playback starts when the viewer presses Play. Both players use the same MP4;
+GitHub Pages serves the video directly without running Blender on the server.
+The `.blend` download opens in Blender for editing. The original interactive
+`slide-04.html` remains available at its existing address.
+
+The published assets are the approved render from the local
+`../animations/slide-04-claymation-2026-09-23-v2/` project: `watch.html` is
+copied to `index.html`, alongside `surveillance_claymation.mp4`,
+`surveillance_claymation.blend`, and `poster.png`. Update those four files
+together after rendering a revision. Intermediate frames and older render
+versions are not included in this repository.

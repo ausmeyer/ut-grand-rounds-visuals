@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A clay patient journey · U.S. influenza surveillance</title>
+<style>
+:root{color-scheme:light;--ink:#203a3f;--teal:#246d70;--paper:#f6f1e7}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:1320px;margin:auto;padding:36px 32px 70px}.eyebrow{color:var(--teal);font-size:12px;font-weight:750;letter-spacing:.14em}
+h1{font-size:clamp(25px,3.5vw,42px);line-height:1.18;letter-spacing:-.025em;margin:10px 0 14px}p{margin:10px 0}
+video{display:block;width:100%;aspect-ratio:16/9;background:#ded5c6;border-radius:16px;box-shadow:0 12px 42px #2939371c}
+.transport{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 0}.transport button,.transport a{border:1px solid #aabbb4;border-radius:100px;padding:9px 17px;background:transparent;font:inherit;color:var(--teal);text-decoration:none;cursor:pointer}
+.transport button:hover,.transport a:hover{background:#e4ebe2}.chapters{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:23px 0 30px}
+.chapters button{display:flex;align-items:center;gap:10px;background:#fffcf5;color:var(--ink);border:1px solid #d7ddd4;border-radius:11px;padding:14px;cursor:pointer;font-family:inherit;font-size:15px;font-weight:600;line-height:1.2;text-align:left}
+.chapters button span{font-size:11px;color:#69847c}.chapters button small{margin-left:auto;color:#6f7d79}.chapters button:hover,.chapters button.active{border-color:var(--teal);background:#e3eee6}
+details{margin-top:30px}summary{cursor:pointer;font-size:20px;font-weight:650}.transcript{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}article{background:#fffcf6;padding:24px;border-radius:14px}.article-heading{display:flex;gap:12px;align-items:center}.article-heading span{font-size:12px;color:var(--teal)}h3{font-size:23px;margin:0}.fullname{font-size:14px;color:#687977}article a{color:var(--teal)}
+@media(max-width:760px){main{padding:24px 16px}.chapters,.transcript{grid-template-columns:1fr 1fr}.chapters button{padding:12px;font-size:13px}}@media(max-width:480px){.transcript{grid-template-columns:1fr}}
+</style></head><body><main>
+<div class="eyebrow">UT GRAND ROUNDS</div>
+<h1>Following influenza through U.S. surveillance</h1>
+<video id="film" controls playsinline preload="metadata" poster="poster.png"><source src="surveillance_claymation.mp4" type="video/mp4">Open surveillance_claymation.mp4 in your video player.</video>
+<div class="transport"><button id="restart" type="button">Replay from the beginning</button><a href="surveillance_claymation.mp4" download>Save video</a><a href="surveillance_claymation.blend" download>Blender project</a></div>
+<nav class="chapters" aria-label="Jump to a surveillance system"><button type="button" data-start="14"><span>01</span>ILINet<small>0:14</small></button><button type="button" data-start="30"><span>02</span>NSSP<small>0:30</small></button><button type="button" data-start="50"><span>03</span>FluSurv-NET<small>0:50</small></button><button type="button" data-start="58"><span>04</span>NHSN<small>0:58</small></button><button type="button" data-start="74"><span>05</span>ICLS<small>1:14</small></button><button type="button" data-start="82"><span>06</span>NREVSS<small>1:22</small></button><button type="button" data-start="104"><span>07</span>NCHS<small>1:44</small></button><button type="button" data-start="112"><span>08</span>Pediatric deaths<small>1:52</small></button></nav>
+<details><summary>System descriptions and sources</summary><div class="transcript"><article id="ilinet"><div class="article-heading"><span>0:14</span><h3>ILINet</h3></div>
+<p class="fullname">U.S. Outpatient Influenza-like Illness Surveillance Network</p><p><strong>Reports:</strong> The weekly percentage of outpatient visits meeting the influenza-like illness definition, reported by age group.</p>
+<p><strong>How to read it:</strong> Use it to follow how much outpatient care is for flu-like illness. Other respiratory viruses can cause the same symptoms, so this is not a count of confirmed influenza.</p>
+<a href="https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-outpatient" target="_blank" rel="noopener">CDC source ↗</a></article><article id="nssp"><div class="article-heading"><span>0:30</span><h3>NSSP</h3></div>
+<p class="fullname">National Syndromic Surveillance Program</p><p><strong>Reports:</strong> The percentage of emergency-department visits with an influenza discharge diagnosis, overall and by age group.</p>
+<p><strong>How to read it:</strong> Use it to follow how much emergency care involves a flu diagnosis. Testing and coding practices affect the signal; a diagnosis does not always mean a positive test.</p>
+<a href="https://www.cdc.gov/nssp/php/onboarding-resources/companion-guide-ed-data-respiratory-illness.html" target="_blank" rel="noopener">CDC source ↗</a></article><article id="flusurv-net"><div class="article-heading"><span>0:50</span><h3>FluSurv-NET</h3></div>
+<p class="fullname">Influenza Hospitalization Surveillance Network</p><p><strong>Reports:</strong> Population-based weekly rates and detailed characteristics of laboratory-confirmed influenza hospitalizations in selected catchment areas.</p>
+<p><strong>How to read it:</strong> Use it to compare hospitalization rates across ages and seasons and identify who is most affected. Rates describe monitored communities, not every U.S. hospital.</p>
+<a href="https://www.cdc.gov/fluview/overview/influenza-hospitalization-surveillance.html" target="_blank" rel="noopener">CDC source ↗</a></article><article id="nhsn"><div class="article-heading"><span>0:58</span><h3>NHSN</h3></div>
+<p class="fullname">National Healthcare Safety Network Hospital Respiratory Data Module</p><p><strong>Reports:</strong> Weekly facility-level counts of new laboratory-confirmed influenza admissions, current hospitalizations, ICU occupancy, and bed capacity.</p>
+<p><strong>How to read it:</strong> Use it to track admissions and pressure on hospital and ICU capacity. These are hospital totals, not detailed records of individual patients.</p>
+<a href="https://www.cdc.gov/nhsn/psc/hospital-respiratory-reporting.html" target="_blank" rel="noopener">CDC source ↗</a></article><article id="icls"><div class="article-heading"><span>1:14</span><h3>ICLS</h3></div>
+<p class="fullname">U.S. Influenza Collaborating Laboratories System</p><p><strong>Reports:</strong> Weekly influenza tests and positive results. Public-health laboratory reports include virus types, subtypes or lineages, and patient ages when available.</p>
+<p><strong>How to read it:</strong> Use clinical-lab positivity to follow flu activity and public-health results to identify circulating viruses. Public-health samples often arrive already positive, so their positivity is not a community infection rate.</p>
+<a href="https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-virologic" target="_blank" rel="noopener">CDC source ↗</a></article><article id="nrevss"><div class="article-heading"><span>1:22</span><h3>NREVSS</h3></div>
+<p class="fullname">National Respiratory and Enteric Virus Surveillance System</p><p><strong>Reports:</strong> Weekly test totals and positive results for influenza and other respiratory and enteric viruses, from hospital, commercial, and public-health laboratories.</p>
+<p><strong>How to read it:</strong> Use clinical-lab positivity to follow when and where flu is circulating. It describes tested specimens, not the percentage of all people infected.</p>
+<a href="https://www.cdc.gov/nrevss/php/dashboard/index.html" target="_blank" rel="noopener">CDC source ↗</a></article><article id="nchs"><div class="article-heading"><span>1:44</span><h3>NCHS</h3></div>
+<p class="fullname">National Center for Health Statistics Mortality Surveillance</p><p><strong>Reports:</strong> Weekly death-certificate measures for deaths coded with influenza, pneumonia, and/or COVID-19.</p>
+<p><strong>How to read it:</strong> Use influenza-coded deaths to follow flu&#x27;s fatal impact over the season. Recent weeks are incomplete, and death certificates miss some deaths caused by flu.</p>
+<a href="https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-mortality" target="_blank" rel="noopener">CDC source ↗</a></article><article id="pediatric-mortality"><div class="article-heading"><span>1:52</span><h3>Pediatric deaths</h3></div>
+<p class="fullname">Influenza-Associated Pediatric Mortality Surveillance System</p><p><strong>Reports:</strong> Individual laboratory-confirmed influenza-associated deaths among people younger than 18 years, with demographic and clinical details.</p>
+<p><strong>How to read it:</strong> Use it to track reported flu deaths in children and identify their clinical patterns. Recent counts can increase as additional reports arrive.</p>
+<a href="https://www.cdc.gov/fluview/overview/index.html#cdc_surveillance_methods-mortality" target="_blank" rel="noopener">CDC source ↗</a></article></div></details>
+</main><script>
+const video=document.querySelector('#film');
+const buttons=[...document.querySelectorAll('[data-start]')];
+buttons.forEach(button=>button.addEventListener('click',()=>{video.currentTime=Number(button.dataset.start);video.play().catch(()=>{});}));
+document.querySelector('#restart').addEventListener('click',()=>{video.currentTime=0;video.play().catch(()=>{});});
+video.addEventListener('timeupdate',()=>buttons.forEach(button=>{const start=Number(button.dataset.start);const active=video.currentTime>=start&&video.currentTime<start+8;button.classList.toggle('active',active);button.setAttribute('aria-current',active?'true':'false');}));
+</script></body></html>
