@@ -36,6 +36,10 @@ try {
         assert.equal(await page.locator('.participation').isVisible(),state>=2);
         assert.equal(await page.locator('.targets').isVisible(),state===3);
         assert.deepEqual(await page.locator('.bar').evaluateAll(bars=>bars.map(b=>Number(b.dataset.count))),[23,21,34,43,49]);
+        if(state===3) {
+          assert.equal(await page.locator('.primary .target-name').innerText(),'Weekly hospital admissions');
+          assert.deepEqual(await page.locator('.other-target').allInnerTexts(),['Influenza share of\nemergency visits','Categorical\nadmission changes\nIncrease / decrease','Peak timing','Peak admissions']);
+        }
       }
       await page.screenshot({path:join(artifacts,`slide-${number}-state-${state}.png`)});
     }

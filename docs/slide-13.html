@@ -41,6 +41,7 @@
     .horizon { color: #536a72; font-size: 15px; margin-top: 7px; }
     .other-targets { margin-top: 23px; display: grid; grid-template-columns: 1.3fr 1fr; column-gap: 20px; row-gap: 18px; }
     .other-target { padding-top: 9px; border-top: 1px solid #d6e0dc; color: #425961; font-size: 15px; line-height: 1.35; font-weight: 690; }
+    .target-detail { display: block; margin-top: 5px; color: var(--muted); font-size: 13px; font-weight: 550; }
     [data-step][hidden] { visibility: hidden; display: block; }
     svg [data-step][hidden] { display: none; }
   </style>
@@ -71,7 +72,7 @@
         <section class="targets" data-step="3" aria-label="FluSight 2026–27 targets">
           <h2 class="panel-heading">2026–27 forecast targets</h2>
           <div class="primary"><div class="tag">Primary target</div><div class="target-name">Weekly hospital admissions</div><div class="horizon">Current week + 3 weeks ahead</div></div>
-          <div class="other-targets"><div class="other-target">Influenza share of<br>emergency visits</div><div class="other-target">Admission-rate changes</div><div class="other-target">Peak week</div><div class="other-target">Peak admissions</div></div>
+          <div class="other-targets"><div class="other-target">Influenza share of<br>emergency visits</div><div class="other-target">Categorical<br>admission changes<span class="target-detail">Increase / decrease</span></div><div class="other-target">Peak timing</div><div class="other-target">Peak admissions</div></div>
         </section>
       </div>
     </section>
