@@ -1,0 +1,12 @@
+[
+  {
+    "name": "baseline",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/FluSight-baseline/2024-12-14-FluSight-baseline.csv",
+    "sha256": "5190a3d2f704c0e72b7074da9c0972ee21a4b3de950b18ba96ab080c355ce068"
+  },
+  {
+    "name": "later-truth",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/adc3e7d4cd98a53f9233c188fd9024b81fd90f0a/target-data/target-hospital-admissions.csv",
+    "sha256": "b79860f077ea484e45f18a8096442723b02d1a62ceb42b13d7d9de7f84ea4e37"
+  }
+]

@@ -194,7 +194,7 @@ def main() -> None:
     args = parser.parse_args()
     if args.refresh:
         refresh()
-    for number, data in ((12, forecast_example()), (13, participation())):
+    for number, data in ((12, forecast_example()), (13, {"target_season": "2026–27"})):
         write_json(DATA / f"slide-{number}.json", data)
         template = ROOT / "src" / f"slide-{number}.template.html"
         source = template.read_text()
@@ -202,7 +202,7 @@ def main() -> None:
             raise ValueError(f"Missing or repeated data marker: {template}")
         rendered = source.replace("/*__SLIDE_DATA__*/", json.dumps(data, ensure_ascii=False, separators=(",", ":")))
         (ROOT / "docs" / f"slide-{number}.html").write_text(rendered)
-        print(f"Slide {number}: " + (f"{len(data['models'])} individual models" if number == 12 else str(data["seasons"])))
+        print(f"Slide {number}: " + (f"{len(data['models'])} individual models" if number == 12 else data["target_season"] + " targets"))
 
 
 if __name__ == "__main__":

@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>FluSight history, participation, and forecast targets</title>
+  <title>FluSight forecast targets</title>
   <style>
     :root { --ink: #14242b; --muted: #647278; --teal: #0a6670; --paper: #fbfaf6; --line: #d5dad6; }
     * { box-sizing: border-box; }
     html, body { width: 1240px; height: 540px; margin: 0; overflow: hidden; }
-    body { background: var(--paper); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-variant-numeric: tabular-nums; }
+    body { background: var(--paper); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
     .app { width: 1240px; height: 540px; display: grid; grid-template-rows: 38px 1fr; gap: 8px; padding: 10px 16px 8px; }
     .topbar, .controls { display: flex; align-items: center; }
     .topbar { justify-content: space-between; gap: 16px; }
@@ -22,90 +22,55 @@
     button:hover { border-color: var(--teal); color: var(--teal); }
     button:disabled { opacity: .35; cursor: default; }
     :focus-visible { outline: 3px solid #82bcc1; outline-offset: 2px; }
-    .frame { padding: 17px 24px 15px; border: 1px solid var(--line); border-radius: 14px; background: white; box-shadow: 0 8px 24px rgb(28 49 50 / 7%); }
-    .timeline { display: block; width: 1158px; height: 139px; }
-    .year { font-size: 21px; font-weight: 800; fill: var(--teal); }
-    .event { font-size: 16px; font-weight: 720; fill: #344b54; }
-    .event-detail { font-size: 13px; fill: var(--muted); }
-    .lower { display: grid; grid-template-columns: 608px 1fr; gap: 35px; height: 299px; }
-    .participation { padding-right: 20px; border-right: 1px solid #e0e5e2; }
-    .panel-heading { font-size: 18px; font-weight: 780; margin: 0; }
-    .panel-subtitle { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
-    #participation-chart { display: block; width: 588px; height: 253px; }
-    .axis { font-size: 12px; font-weight: 650; fill: var(--muted); }
-    .count { font-size: 21px; font-weight: 800; fill: var(--teal); }
-    .targets { padding-top: 0; }
-    .primary { margin-top: 18px; padding-left: 14px; border-left: 4px solid var(--teal); }
-    .tag { color: var(--teal); font-size: 10px; font-weight: 840; letter-spacing: .11em; text-transform: uppercase; }
-    .target-name { margin-top: 5px; font-size: 23px; line-height: 1.3; font-weight: 790; }
-    .horizon { color: #536a72; font-size: 15px; margin-top: 7px; }
-    .other-targets { margin-top: 23px; display: grid; grid-template-columns: 1.3fr 1fr; column-gap: 20px; row-gap: 18px; }
-    .other-target { padding-top: 9px; border-top: 1px solid #d6e0dc; color: #425961; font-size: 15px; line-height: 1.35; font-weight: 690; }
-    .target-detail { display: block; margin-top: 5px; color: var(--muted); font-size: 13px; font-weight: 550; }
-    [data-step][hidden] { visibility: hidden; display: block; }
-    svg [data-step][hidden] { display: none; }
+    .frame { position: relative; border: 1px solid var(--line); border-radius: 14px; background: white; box-shadow: 0 8px 24px rgb(28 49 50 / 7%); }
+    .history { position: absolute; top: 25px; left: 150px; right: 150px; height: 87px; display: grid; grid-template-columns: 1fr 100px 1fr; align-items: center; text-align: center; }
+    .year { font-size: 15px; font-weight: 700; color: var(--muted); margin-bottom: 8px; }
+    .event { font-size: 23px; font-weight: 720; }
+    .arrow { color: #8caaa9; font-size: 42px; }
+    .primary { position: absolute; top: 161px; left: 80px; right: 80px; text-align: center; }
+    .tag { color: var(--teal); font-size: 14px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+    .target-name { margin: 12px 0 9px; font-size: 42px; line-height: 1.2; font-weight: 780; color: var(--teal); }
+    .horizon { color: #536a72; font-size: 21px; }
+    .other-targets { position: absolute; top: 352px; left: 54px; right: 54px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 25px; text-align: center; }
+    .other-target { color: #425961; font-size: 20px; line-height: 1.35; font-weight: 680; }
+    .target-detail { display: block; margin-top: 8px; color: var(--muted); font-size: 16px; font-weight: 500; }
+    .frame[data-state="1"] .history { top: 170px; }
+    .frame[data-state="1"] .event { font-size: 30px; }
+    .frame[data-state="1"] .year { font-size: 20px; }
+    [hidden] { display: none !important; }
   </style>
 </head>
 <body>
   <main class="app">
     <header class="topbar">
       <div class="subtitle">From outpatient illness to hospital burden</div>
-      <div class="controls"><label for="state-select">View</label><button id="back-button" aria-label="Previous view">←</button><select id="state-select" aria-label="History and targets view"><option value="1">1 · Changing targets</option><option value="2">2 · Model participation</option><option value="3">3 · Current targets</option></select><button id="next-button" aria-label="Next view">→</button></div>
+      <div class="controls"><label for="state-select">View</label><button id="back-button" aria-label="Previous view">←</button><select id="state-select" aria-label="Forecast targets view"><option value="1">1 · Changing targets</option><option value="2">2 · Weekly admissions</option><option value="3">3 · Other targets</option></select><button id="next-button" aria-label="Next view">→</button></div>
     </header>
-    <section class="frame">
-      <svg class="timeline" viewBox="0 0 1158 139" role="img" aria-labelledby="timeline-title timeline-desc">
-        <title id="timeline-title">The evolution of FluSight</title>
-        <desc id="timeline-desc">FluSight began in the 2013–14 season with outpatient influenza-like illness forecasts. Hospital admissions became the focus in 2021–22. Additional targets are offered for 2026–27.</desc>
-        <line x1="118" x2="1038" y1="52" y2="52" stroke="#c7d6d4" stroke-width="3"/>
-        <circle cx="118" cy="52" r="7" fill="#4e7c88"/>
-        <circle cx="574" cy="52" r="7" fill="#0a6670"/>
-        <g text-anchor="middle"><text x="118" y="28" class="year">2013–14</text><text x="118" y="83" class="event">FluSight begins</text><text x="118" y="105" class="event-detail">Outpatient influenza-like illness</text></g>
-        <g text-anchor="middle"><text x="574" y="28" class="year">2021–22</text><text x="574" y="83" class="event">Hospitalization focus</text><text x="574" y="105" class="event-detail">Laboratory-confirmed admissions</text></g>
-        <g data-step="3" text-anchor="middle"><circle cx="1038" cy="52" r="7" fill="#0a6670"/><text x="1038" y="28" class="year">2026–27</text><text x="1038" y="83" class="event">Current target set</text><text x="1038" y="105" class="event-detail">Burden, trends, and peaks</text></g>
-      </svg>
-      <div class="lower">
-        <section class="participation" data-step="2" aria-label="Model participation by season">
-          <h2 class="panel-heading">Models contributing regularly</h2>
-          <p class="panel-subtitle">Submitted in at least half of the season’s weeks</p>
-          <svg id="participation-chart" viewBox="0 0 588 253" role="img" aria-labelledby="bars-title bars-desc"></svg>
-        </section>
-        <section class="targets" data-step="3" aria-label="FluSight 2026–27 targets">
-          <h2 class="panel-heading">2026–27 forecast targets</h2>
-          <div class="primary"><div class="tag">Primary target</div><div class="target-name">Weekly hospital admissions</div><div class="horizon">Current week + 3 weeks ahead</div></div>
-          <div class="other-targets"><div class="other-target">Influenza share of<br>emergency visits</div><div class="other-target">Categorical<br>admission changes<span class="target-detail">Increase / decrease</span></div><div class="other-target">Peak timing</div><div class="other-target">Peak admissions</div></div>
-        </section>
-      </div>
+    <section class="frame" data-state="1" aria-label="FluSight history and targets">
+      <div class="history"><div><div class="year">2013–14</div><div class="event">Outpatient illness</div></div><div class="arrow" aria-label="to">→</div><div><div class="year">2021–22 onward</div><div class="event">Hospital admissions</div></div></div>
+      <section class="primary" data-step="2" hidden aria-label="Primary forecast target">
+        <div class="tag"><span id="target-season"></span> · Primary target</div>
+        <div class="target-name">Weekly hospital admissions</div>
+        <div class="horizon">Current week + 3 weeks ahead</div>
+      </section>
+      <section class="other-targets" data-step="3" hidden aria-label="Other forecast targets">
+        <div class="other-target">Influenza share of<br>emergency visits</div>
+        <div class="other-target">Categorical<br>admission changes<span class="target-detail">Increase / decrease</span></div>
+        <div class="other-target">Peak timing</div>
+        <div class="other-target">Peak admissions</div>
+      </section>
     </section>
   </main>
   <script>
     "use strict";
     const data = /*__SLIDE_DATA__*/;
-    const chart = document.getElementById("participation-chart"), select = document.getElementById("state-select");
-    const back = document.getElementById("back-button"), next = document.getElementById("next-button");
-    function add(tag, attrs, text) {
-      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
-      for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, value);
-      if (text !== undefined) el.textContent = text;
-      chart.appendChild(el); return el;
-    }
-    add("title", { id: "bars-title" }, "Regularly submitting FluSight models by season");
-    add("desc", { id: "bars-desc" }, data.seasons.map(d => `${d.season}: ${d.models} models`).join(". ") + ". Each model submitted in at least half the scheduled weeks. Hub reference models are excluded.");
-    const plotBottom = 216, plotTop = 27, max = Math.ceil(Math.max(...data.seasons.map(d => d.models)) / 10) * 10;
-    const y = value => plotBottom - value / max * (plotBottom - plotTop);
-    for (let value = 0; value <= max; value += 10) {
-      add("line", { x1: 34, x2: 582, y1: y(value), y2: y(value), stroke: "#e2e7e4" });
-      add("text", { x: 25, y: y(value) + 4, "text-anchor": "end", class: "axis" }, value);
-    }
-    data.seasons.forEach((season, index) => {
-      const center = 91 + index * 108;
-      add("rect", { x: center - 27, y: y(season.models), width: 54, height: plotBottom - y(season.models), rx: 4, fill: "#4e9298", class: "bar", "data-count": season.models });
-      add("text", { x: center, y: y(season.models) - 10, "text-anchor": "middle", class: "count" }, season.models);
-      add("text", { x: center, y: plotBottom + 25, "text-anchor": "middle", class: "axis" }, season.season);
-    });
+    document.getElementById("target-season").textContent = data.target_season;
+    const select = document.getElementById("state-select"), back = document.getElementById("back-button"), next = document.getElementById("next-button");
     function fromHash() { const value = Number(new URLSearchParams(location.hash.slice(1)).get("state")); return [1, 2, 3].includes(value) ? value : 1; }
     function render() {
       const step = fromHash(); select.value = String(step); back.disabled = step === 1; next.disabled = step === 3;
-      document.querySelectorAll("[data-step]").forEach(el => { const hidden = Number(el.dataset.step) > step; el.toggleAttribute("hidden", hidden); el.setAttribute("aria-hidden", String(hidden)); });
+      document.querySelector(".frame").dataset.state = step;
+      document.querySelectorAll("[data-step]").forEach(el => { el.hidden = Number(el.dataset.step) > step; });
     }
     function go(value) { location.hash = `state=${Math.max(1, Math.min(3, value))}`; }
     select.addEventListener("change", () => go(Number(select.value)));

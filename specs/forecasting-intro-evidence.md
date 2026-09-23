@@ -25,13 +25,17 @@ The horizontal and vertical scales remain unchanged. All 35 participant models w
 
 Speaker note: models submitted forecasts to the hub, but not every submitted model was designated for ensemble inclusion. The official ensemble shown is the archived hub product. Its band is nominal forecast uncertainty, not a guarantee of 95% empirical coverage. Forecasts from this date were archived, not necessarily publicly communicated on the CDC forecasting webpage at that time.
 
-## Slide 13: history, participation, and current targets
+## Slide 13: history and current targets
 
 Suggested Slides.com title: **The forecasting target changed after COVID-19**.
 
-1. A compact timeline establishes the early outpatient illness focus and the 2021–22 hospitalization focus.
-2. Add the number of models contributing in at least half the scheduled weeks in each season.
-3. Add the 2026–27 target set.
+1. A simple transition establishes the 2013–14 outpatient illness focus and the 2021–22 shift to hospital admissions.
+2. Emphasize weekly hospital admissions and the current-week through three-week-ahead horizons.
+3. Add four other 2026–27 targets as plain labels below the primary target.
+
+The participation plot was removed at the user's request. There is no backup view. The pre-existing count calculation and its evidence below remain research provenance, not projected slide content. Slide 12 is unchanged.
+
+Presenter wording: the early signal was outpatient influenza-like illness, not laboratory-confirmed influenza. The current primary outcome is laboratory-confirmed admissions. Categorical changes describe direction and magnitude, with stable, increase/decrease, and large increase/decrease categories. The short on-slide label is not a complete list of categories. Peak timing is the week with the largest count; peak admissions is that largest weekly count. Additional targets were not necessarily first introduced in 2026–27.
 
 ### Historical and target claims
 
@@ -84,6 +88,6 @@ SLIDE_PLAYWRIGHT=/absolute/path/to/playwright/index.mjs node tests/forecasting-i
 
 The normal build is offline and uses only the pinned cached inputs. To re-download those same pinned inputs, `uv run --with pyarrow python scripts/build_forecasting_intro.py --refresh`. PyArrow is needed only to convert the single Parquet source during refresh, not for a normal build.
 
-The browser test checks all six states at 1240 × 540, hash/direct links, controls, keyboard navigation, plot counts, finite paths, bounds, local cartoon loading, and no external runtime requests. Screenshot inspection checks label spacing and visual hierarchy separately. Eight Python checks across the repository and 46 existing poll checks pass locally. These changes have no backend or schema dependency and do not alter other numbered slide pages.
+The shared browser test now also covers Slides 14–15: 13 total states at 1240 × 540, direct hashes, controls, keyboard navigation, finite paths, frame bounds, fixed admissions-axis geometry, text collisions, and no external runtime requests. Screenshot inspection checks spacing and visual hierarchy separately. These changes have no backend or schema dependency.
 
-Release checklist: rebuild from cached inputs, run tests, inspect all six screenshots, compare the staged diff, publish through the existing Pages workflow, and verify both served HTML files match the generated files. If either page is broken after publishing, revert the dedicated introduction commit and republish; no data migration or poll rollback is required.
+Release checklist: rebuild from cached inputs, run tests, inspect screenshots, compare the scoped diff, publish through the existing Pages workflow, and verify served HTML matches the generated files. Existing Git history provides recovery if a requested page fails to render; no backup pages, database migrations, or poll changes are needed. Slides 14–15 have separate [evidence and presenter notes](forecast-scores-evidence.md).

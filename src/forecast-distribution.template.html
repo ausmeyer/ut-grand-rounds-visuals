@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>One influenza forecast</title>
+  <style>
+    :root { --ink: #14242b; --muted: #647278; --teal: #0a6670; --paper: #fbfaf6; --line: #d5dad6; }
+    * { box-sizing: border-box; }
+    html, body { width: 1240px; height: 540px; margin: 0; overflow: hidden; }
+    body { background: var(--paper); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-variant-numeric: tabular-nums; }
+    .app { width: 1240px; height: 540px; display: grid; grid-template-rows: 38px 1fr; gap: 8px; padding: 10px 16px 8px; }
+    .topbar, .controls { display: flex; align-items: center; }
+    .topbar { justify-content: space-between; gap: 16px; }
+    .subtitle { color: #42535a; font-size: 14px; font-weight: 670; }
+    .controls { gap: 7px; }
+    .controls label { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; margin-right: 3px; }
+    button, select { height: 32px; border: 1px solid #b9c3c0; border-radius: 8px; background: white; color: var(--ink); font: inherit; font-weight: 740; }
+    select { width: 272px; padding: 0 32px 0 10px; font-size: 13px; }
+    button { width: 34px; padding: 0; font-size: 17px; cursor: pointer; }
+    button:hover { border-color: var(--teal); color: var(--teal); }
+    button:disabled { opacity: .35; cursor: default; }
+    :focus-visible { outline: 3px solid #82bcc1; outline-offset: 2px; }
+    .frame { padding: 17px 24px; border: 1px solid var(--line); border-radius: 14px; background: white; box-shadow: 0 8px 24px rgb(28 49 50 / 7%); }
+    #chart { display: block; width: 1158px; height: 438px; overflow: visible; }
+    svg text { fill: var(--ink); font-size: 19px; }
+    .muted { fill: var(--muted); }
+    .teal { fill: var(--teal); }
+    .number { font-size: 33px; font-weight: 780; }
+    .label { font-size: 18px; font-weight: 650; }
+    .tick { font-size: 16px; fill: var(--muted); }
+    .interval-label { font-size: 18px; fill: var(--teal); }
+    .note { font-size: 20px; }
+    .score { font-size: 20px; font-weight: 750; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="subtitle">Texas · Week ending Dec 21, 2024 · Forecast due Dec 11</div>
+      <div class="controls"><label for="state-select">View</label><button id="back-button" aria-label="Previous view">←</button><select id="state-select" aria-label="Forecast example view"></select><button id="next-button" aria-label="Next view">→</button></div>
+    </header>
+    <section class="frame"><svg id="chart" viewBox="0 0 1158 438" role="img" aria-labelledby="chart-title chart-desc"></svg></section>
+  </main>
+  <script>
+    "use strict";
+    const data = /*__SLIDE_DATA__*/;
+    const scoring = data.slide === 15;
+    document.title = scoring ? "Evaluating one influenza forecast" : "A forecast is a distribution";
+    const views = scoring ? ["What happened", "Point error", "Weighted interval score", "Compare with the baseline"] : ["The median", "50% prediction interval", "95% prediction interval"];
+    const chart = document.getElementById("chart"), select = document.getElementById("state-select"), back = document.getElementById("back-button"), next = document.getElementById("next-button");
+    views.forEach((label, index) => select.add(new Option(`${index + 1} · ${label}`, String(index + 1))));
+    const x = value => 120 + value / data.axis_max * 960;
+    const rowY = 192, axisY = 354, color = "#0a6670", orange = "#b96628", neutral = "#75818a";
+    const fmt = value => value.toLocaleString("en-US", { maximumFractionDigits: 0 });
+    function add(tag, attrs, content) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, value);
+      if (content !== undefined) el.textContent = content;
+      chart.appendChild(el); return el;
+    }
+    function text(atX, atY, content, className = "", anchor = "middle") { return add("text", { x: atX, y: atY, class: className, "text-anchor": anchor }, content); }
+    function line(x1, x2, y1, y2, stroke, width = 2, extra = {}) { return add("line", { x1, x2, y1, y2, stroke, "stroke-width": width, ...extra }); }
+    function bracket(a, b, y, label, stroke, className) {
+      line(x(a), x(b), y, y, stroke, 2, { class: className });
+      for (const v of [a, b]) line(x(v), x(v), y - 5, y + 5, stroke);
+      text((x(a) + x(b)) / 2, y + 26, label, "label").style.fill = stroke;
+    }
+    function interval(q, y, stroke, level, id) {
+      if (level >= 3) {
+        line(x(q["0.025"]), x(q["0.975"]), y, y, stroke, 4, { class: `${id} interval-95` });
+        for (const v of [q["0.025"], q["0.975"]]) line(x(v), x(v), y - 9, y + 9, stroke, 3);
+      }
+      if (level >= 2) line(x(q["0.25"]), x(q["0.75"]), y, y, stroke, 16, { "stroke-linecap": "round", class: `${id} interval-50` });
+      add("circle", { cx: x(q["0.5"]), cy: y, r: 10, fill: stroke, stroke: "white", "stroke-width": 3, class: `${id} median` });
+    }
+    function fromHash() { const value = Number(new URLSearchParams(location.hash.slice(1)).get("state")); return Number.isInteger(value) && value >= 1 && value <= views.length ? value : 1; }
+    function render() {
+      const step = fromHash(), q = data.ensemble, compare = scoring && step === 4;
+      select.value = String(step); back.disabled = step === 1; next.disabled = step === views.length;
+      chart.replaceChildren();
+      add("title", { id: "chart-title" }, `Texas influenza hospital admissions: ${views[step - 1]}`);
+      let description = `Forecast due December 11 for the week ending December 21, 2024. FluSight ensemble median: ${q["0.5"]}.`;
+      if (scoring || step >= 2) description += ` Central 50% prediction interval: ${q["0.25"]} to ${q["0.75"]}.`;
+      if (scoring || step >= 3) description += ` Central 95% prediction interval: ${q["0.025"]} to ${q["0.975"]}.`;
+      if (scoring) description += ` Observed admissions: ${data.observed}.`;
+      if (scoring && step === 2) description += ` Absolute error: ${data.scores.absolute_error}. MAE and RMSE summarize errors across forecasts.`;
+      if (scoring && step >= 3) description += ` Count-scale WIS from all 23 quantiles: ${data.scores.ensemble_wis.toFixed(1)}.`;
+      if (compare) description += ` Baseline WIS: ${data.scores.baseline_wis.toFixed(1)}. Single-forecast relative WIS: ${data.scores.relative_wis.toFixed(2)}.`;
+      add("desc", { id: "chart-desc" }, description);
+      line(x(0), x(data.axis_max), axisY, axisY, "#aab7b7");
+      for (let v = 0; v <= data.axis_max; v += 200) {
+        line(x(v), x(v), axisY, axisY + 7, "#aab7b7");
+        text(x(v), axisY + 29, fmt(v), "tick");
+      }
+      text((x(0) + x(data.axis_max)) / 2, axisY + 57, "Weekly influenza hospital admissions", "label muted");
+      text(x(q["0.5"]), 43, "Forecast median", "label teal");
+      text(x(q["0.5"]), 82, fmt(q["0.5"]), "number teal");
+      line(x(q["0.5"]), x(q["0.5"]), compare ? 149 : 99, rowY - 18, "#bad0ce", 2);
+      text(40, rowY - 26, "FluSight ensemble", "label teal", "start");
+      interval(q, rowY, color, scoring ? 3 : step, "ensemble");
+      if (!scoring || step === 1) {
+        if (scoring || step >= 2) text((x(q["0.25"]) + x(q["0.75"])) / 2, 239, `50% interval: ${fmt(q["0.25"])}–${fmt(q["0.75"])}`, "interval-label");
+        if (scoring || step >= 3) text((x(q["0.025"]) + x(q["0.975"])) / 2, 279, `95% interval: ${fmt(q["0.025"])}–${fmt(q["0.975"])}`, "interval-label");
+      }
+      if (scoring) {
+        line(x(data.observed), x(data.observed), compare ? 149 : 99, compare ? 323 : rowY + 18, "#26373e", 2, { "stroke-dasharray": "4 5", class: "observed-guide" });
+        add("circle", { cx: x(data.observed), cy: rowY, r: 8, fill: "#14242b", class: "observed" });
+        text(x(data.observed), 43, "Observed", "label");
+        text(x(data.observed), 82, fmt(data.observed), "number");
+        if (step === 2) {
+          bracket(q["0.5"], data.observed, 235, `Absolute error: ${fmt(data.scores.absolute_error)}`, orange, "error-gap");
+          text(579, 309, "MAE averages absolute misses; RMSE gives larger misses more weight.", "note");
+        }
+        if (step === 3) {
+          bracket(q["0.025"], q["0.975"], 234, "Interval width", color, "width-bracket");
+          line(x(q["0.975"]), x(data.observed), rowY, rowY, orange, 6, { class: "interval-miss" });
+          text(x(data.observed) + 12, 237, "Outside interval", "label", "start").style.fill = orange;
+          text(579, 313, `WIS ${data.scores.ensemble_wis.toFixed(1)} · Balances width and misses across intervals`, "note");
+        }
+        if (compare) {
+          text(40, 283, "FluSight baseline", "label muted", "start");
+          interval(data.baseline, 305, neutral, 3, "baseline");
+          text(x(data.baseline["0.5"]), 273, fmt(data.baseline["0.5"]), "label muted");
+          text(1115, rowY + 6, `WIS ${data.scores.ensemble_wis.toFixed(1)}`, "score teal", "end");
+          text(1115, 311, `WIS ${data.scores.baseline_wis.toFixed(1)}`, "score muted", "end");
+          text(579, 128, `Relative WIS (this forecast): ${data.scores.relative_wis.toFixed(2)} · Baseline = 1`, "note");
+        }
+      }
+    }
+    function go(value) { location.hash = `state=${Math.max(1, Math.min(views.length, value))}`; }
+    select.addEventListener("change", () => go(Number(select.value)));
+    back.addEventListener("click", () => go(fromHash() - 1)); next.addEventListener("click", () => go(fromHash() + 1));
+    addEventListener("hashchange", render);
+    addEventListener("keydown", event => { if (["SELECT", "INPUT", "BUTTON"].includes(document.activeElement.tagName)) return; if (event.key === "ArrowRight" || event.key === "ArrowLeft") { event.preventDefault(); go(fromHash() + (event.key === "ArrowRight" ? 1 : -1)); } });
+    render();
+  </script>
+</body>
+</html>

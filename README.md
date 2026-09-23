@@ -65,6 +65,7 @@ python3 scripts/build_slide_02.py
 python3 scripts/build_slide_04.py
 python3 scripts/build_surveillance_section.py
 python3 scripts/build_forecasting_intro.py
+python3 scripts/build_forecast_scores.py
 ```
 
 `build_surveillance_section.py` reads the already-downloaded CSV files from
@@ -140,12 +141,23 @@ Slides 12 and 13 each support `#state=1` through `#state=3`:
 
 - Slide 12: observed Texas admissions, individual forecasts, then the official
   ensemble and hospital planning.
-- Slide 13: historical targets, model participation, then the 2026–27 targets.
+- Slide 13: the historical shift to hospital admissions, the primary weekly
+  target, then the four other 2026–27 targets. No participation chart.
+
+Slide 14 supports `#state=1` through `#state=3`: one forecast median, its 50%
+prediction interval, then its 95% prediction interval. Slide 15 uses the same
+admissions axis with `#state=1` through `#state=4`: the observed count, point
+error, weighted interval score, then the archived baseline comparison.
 
 The forecasting introduction builds offline from pinned CDC archive snapshots
 in `data/forecasting-intro/`. The [evidence notes](specs/forecasting-intro-evidence.md)
 record the forecast vintage, model-week counting rule, source attribution,
 rebuild instructions, and tests. No source-fetching or forecasting runs in the iframe.
+
+The [Slides 14–15 evidence and presenter notes](specs/forecast-scores-evidence.md)
+document the single-week example, later observation vintage, all-quantile WIS
+calculation, and distinction from CDC's season-level evaluation. Those slides
+build offline from `data/forecast-scores/` and the existing ensemble source.
 
 
 ## Slide 4 claymation
