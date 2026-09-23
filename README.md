@@ -164,7 +164,11 @@ build offline from `data/forecast-scores/` and the existing ensemble source.
 
 The finished animation and editable Blender project are in
 `docs/slide-04-claymation/`. The video is 2 minutes 12 seconds at 1920 × 1080
-and 24 fps. The standalone player preserves the eight chapter shortcuts,
+and 24 fps. Only the opening title (first six seconds) and surveillance information
+cards appear over the animation; there are no bottom or later top banners.
+Clay signs use consistent black lettering, and the NSSP sign is raised above
+the ED entrance to remain visible behind the ambulance.
+The standalone player preserves the eight chapter shortcuts,
 video and Blender downloads, and expandable system descriptions and sources.
 
 - [Standalone player](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-04-claymation/)
