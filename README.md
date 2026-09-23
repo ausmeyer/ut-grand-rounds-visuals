@@ -14,7 +14,8 @@ src/        HTML source templates
 scripts/    Reproducible build scripts
 ```
 
-Slides 2, 4, and the surveillance-data section (slides 5–11) are implemented.
+Slides 2, 4, the surveillance-data section (slides 5–11), and the forecasting
+introduction (slides 12–13) are implemented.
 
 Polls 1–3 are implemented in `docs/poll-01.html`, `docs/poll-02.html`, and
 `docs/poll-03.html`, each with question, voting, results, and presenter views.
@@ -63,6 +64,7 @@ period before the unified SQL has been installed. Old SQL lives only in
 python3 scripts/build_slide_02.py
 python3 scripts/build_slide_04.py
 python3 scripts/build_surveillance_section.py
+python3 scripts/build_forecasting_intro.py
 ```
 
 `build_surveillance_section.py` reads the already-downloaded CSV files from
@@ -133,6 +135,17 @@ NSSP, NREVSS, NHSN, and FluSurv-NET. Within each surveillance system-season,
 all included locations share one min-max scale; calendar weeks are never shifted.
 Thick lines are week-specific medians across the matching scaled national or
 network aggregate seasons, rather than summaries that weight locations equally.
+
+Slides 12 and 13 each support `#state=1` through `#state=3`:
+
+- Slide 12: observed Texas admissions, individual forecasts, then the official
+  ensemble and hospital planning.
+- Slide 13: historical targets, model participation, then the 2026–27 targets.
+
+The forecasting introduction builds offline from pinned CDC archive snapshots
+in `data/forecasting-intro/`. The [evidence notes](specs/forecasting-intro-evidence.md)
+record the forecast vintage, model-week counting rule, source attribution,
+rebuild instructions, and tests. No source-fetching or forecasting runs in the iframe.
 
 
 ## Slide 4 claymation

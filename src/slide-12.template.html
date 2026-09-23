@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>FluSight: from observations to hospital planning</title>
+  <style>
+    :root { --ink: #14242b; --muted: #647278; --teal: #0a6670; --paper: #fbfaf6; --line: #d5dad6; }
+    * { box-sizing: border-box; }
+    html, body { width: 1240px; height: 540px; margin: 0; overflow: hidden; }
+    body { background: var(--paper); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-variant-numeric: tabular-nums; }
+    .app { width: 1240px; height: 540px; display: grid; grid-template-rows: 38px 1fr; gap: 8px; padding: 10px 16px 8px; }
+    .topbar, .controls { display: flex; align-items: center; }
+    .topbar { justify-content: space-between; gap: 16px; }
+    .subtitle { color: #42535a; font-size: 14px; font-weight: 670; }
+    .controls { gap: 7px; }
+    .controls label { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; margin-right: 3px; }
+    button, select { height: 32px; border: 1px solid #b9c3c0; border-radius: 8px; background: white; color: var(--ink); font: inherit; font-weight: 740; }
+    select { width: 252px; padding: 0 32px 0 10px; font-size: 13px; }
+    button { width: 34px; padding: 0; font-size: 17px; cursor: pointer; }
+    button:hover { border-color: var(--teal); color: var(--teal); }
+    button:disabled { opacity: .35; cursor: default; }
+    :focus-visible { outline: 3px solid #82bcc1; outline-offset: 2px; }
+    .frame { display: grid; grid-template-columns: 862px 1fr; gap: 14px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: white; box-shadow: 0 8px 24px rgb(28 49 50 / 7%); overflow: hidden; }
+    svg { display: block; width: 862px; height: 448px; }
+    .axis { fill: var(--muted); font-size: 13px; font-weight: 650; }
+    .grid { stroke: #e0e5e2; stroke-width: 1; }
+    .curve { fill: none; stroke-linejoin: round; stroke-linecap: round; }
+    .models { stroke: #839ba5; stroke-width: 1.6; opacity: .55; }
+    .models.faded { opacity: .13; }
+    .observed { stroke: #263a43; stroke-width: 3.5; }
+    .ensemble { stroke: var(--teal); stroke-width: 4; }
+    .legend { font-size: 12px; font-weight: 730; fill: #42535a; }
+    .flow { position: relative; height: 448px; border-left: 1px solid #e2e7e4; text-align: center; }
+    .question { position: absolute; top: 150px; left: 24px; right: 4px; margin: 0; text-align: left; font-size: 27px; line-height: 1.4; font-weight: 730; color: var(--teal); }
+    .flow-node { position: absolute; left: 23px; right: 1px; }
+    .teams { top: 21px; }
+    .team-icons { display: flex; justify-content: center; gap: 10px; margin-bottom: 11px; }
+    .team-icons span { display: block; position: relative; margin-top: 12px; width: 28px; height: 17px; border-radius: 9px 9px 4px 4px; background: #d7e6e7; border-bottom: 3px solid #6b969c; }
+    .team-icons span::before { content: ""; position: absolute; width: 11px; height: 11px; left: 8px; top: -13px; border-radius: 50%; background: #6b969c; }
+    .flow-heading { font-size: 19px; font-weight: 780; }
+    .team-count { font-size: 12px; color: var(--muted); margin-top: 6px; white-space: nowrap; }
+    .hub { top: 152px; padding: 14px 4px; border: 1px solid #bcced0; border-radius: 10px; background: #f4f9f8; }
+    .ensemble-node { top: 254px; font-size: 20px; font-weight: 780; color: var(--teal); }
+    .hospital { top: 328px; }
+    .hospital img { display: block; width: 125px; height: 100px; object-fit: contain; margin: 0 auto 5px; }
+    .decisions { font-size: 15px; font-weight: 750; color: #42535a; white-space: nowrap; }
+    .arrow { position: absolute; left: 146px; width: 2px; background: #91afb3; }
+    .arrow::after { content: ""; position: absolute; bottom: -1px; left: -4px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid #91afb3; }
+    .a1 { top: 117px; height: 25px; }
+    .a2 { top: 217px; height: 26px; }
+    .a3 { top: 291px; height: 24px; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="subtitle">Texas · weekly influenza hospital admissions · December 11, 2024</div>
+      <div class="controls">
+        <label for="state-select">View</label>
+        <button id="back-button" aria-label="Previous view">←</button>
+        <select id="state-select" aria-label="Forecast view"><option value="1">1 · Observed admissions</option><option value="2">2 · Individual forecasts</option><option value="3">3 · Ensemble and planning</option></select>
+        <button id="next-button" aria-label="Next view">→</button>
+      </div>
+    </header>
+    <section class="frame">
+      <svg id="chart" viewBox="0 0 862 448" role="img" aria-labelledby="chart-title chart-desc"></svg>
+      <aside class="flow" aria-label="From forecasting teams to hospital planning">
+        <p class="question" id="question">How many admissions should hospitals expect?</p>
+        <div class="flow-node teams" data-step="2">
+          <div class="team-icons" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="flow-heading">Forecasting teams</div>
+          <div class="team-count">2024–25: 33 teams, 46 models</div>
+        </div>
+        <div class="arrow a1" data-step="2" aria-hidden="true"></div>
+        <div class="flow-node hub flow-heading" data-step="2">FluSight hub</div>
+        <div class="arrow a2" data-step="3" aria-hidden="true"></div>
+        <div class="flow-node ensemble-node" data-step="3">Ensemble forecast</div>
+        <div class="arrow a3" data-step="3" aria-hidden="true"></div>
+        <div class="flow-node hospital" data-step="3"><img src="assets/slide-04-hospital.webp" alt="Hospital"><div class="decisions">Staffing · Beds · Supplies</div></div>
+      </aside>
+    </section>
+  </main>
+  <script>
+    "use strict";
+    const data = /*__SLIDE_DATA__*/;
+    const chart = document.getElementById("chart");
+    const select = document.getElementById("state-select");
+    const back = document.getElementById("back-button");
+    const next = document.getElementById("next-button");
+    const bounds = { left: 68, right: 820, top: 64, bottom: 399 };
+    const time = (day) => Date.parse(`${day}T00:00:00Z`);
+    const first = time(data.observed[0].date), last = time(data.ensemble.at(-1).date);
+    const x = (day) => bounds.left + (time(day) - first) / (last - first) * (bounds.right - bounds.left);
+    const maximum = Math.max(...data.models.flatMap(m => m.points.map(p => p.median)), ...data.ensemble.map(p => p.upper), ...data.observed.map(p => p.value));
+    const yMax = Math.ceil(maximum / 1000) * 1000;
+    const y = (value) => bounds.bottom - value / yMax * (bounds.bottom - bounds.top);
+    function node(tag, attrs = {}, text) {
+      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [name, value] of Object.entries(attrs)) el.setAttribute(name, value);
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+    const add = (tag, attrs, text) => chart.appendChild(node(tag, attrs, text));
+    const line = (points, key) => points.map((p, i) => `${i ? "L" : "M"}${x(p.date).toFixed(2)},${y(p[key]).toFixed(2)}`).join(" ");
+    function legend(px, label, color, opacity = 1, fill = false) {
+      add(fill ? "rect" : "line", fill ? { x: px, y: 13, width: 22, height: 11, fill: color, opacity } : { x1: px, x2: px + 22, y1: 19, y2: 19, stroke: color, "stroke-width": 3, opacity });
+      add("text", { x: px + 29, y: 23, class: "legend" }, label);
+    }
+    function render(step) {
+      select.value = String(step); back.disabled = step === 1; next.disabled = step === 3;
+      document.querySelectorAll("[data-step]").forEach(el => { el.hidden = Number(el.dataset.step) > step; });
+      document.getElementById("question").hidden = step !== 1;
+      chart.replaceChildren(node("title", { id: "chart-title" }, "Texas influenza hospital admissions and FluSight forecasts"), node("desc", { id: "chart-desc" }, `View ${step} of 3. Observations available December 11, 2024, followed by ${data.models.length} submitted model medians and the official ensemble median with a 95% prediction interval. Future observations are not shown. The vertical scale is fixed across views.`));
+      legend(68, "Observed", "#263a43");
+      if (step >= 2) legend(208, "Individual models", "#839ba5", step === 3 ? .3 : .7);
+      if (step >= 3) { legend(406, "Ensemble median", "#0a6670"); legend(604, "95% prediction interval", "#b5d7d9", 1, true); }
+      add("rect", { x: x(data.issue_date), y: bounds.top, width: bounds.right - x(data.issue_date), height: bounds.bottom - bounds.top, fill: "#f6f9f8" });
+      for (let tick = 0; tick <= yMax; tick += 1000) {
+        add("line", { x1: bounds.left, x2: bounds.right, y1: y(tick), y2: y(tick), class: "grid" });
+        add("text", { x: bounds.left - 10, y: y(tick) + 4, "text-anchor": "end", class: "axis" }, tick.toLocaleString("en-US"));
+      }
+      add("text", { x: bounds.left, y: 48, class: "axis" }, "Admissions per week");
+      for (const [day, label] of [["2024-10-05", "Oct 5"], ["2024-10-19", "Oct 19"], ["2024-11-02", "Nov 2"], ["2024-11-16", "Nov 16"], ["2024-11-30", "Nov 30"], ["2024-12-14", "Dec 14"], ["2024-12-28", "Dec 28"], ["2025-01-04", "Jan 4"]]) {
+        add("line", { x1: x(day), x2: x(day), y1: bounds.bottom, y2: bounds.bottom + 5, stroke: "#88969a" });
+        add("text", { x: x(day), y: bounds.bottom + 24, "text-anchor": "middle", class: "axis" }, label);
+      }
+      add("line", { x1: bounds.left, x2: bounds.right, y1: bounds.bottom, y2: bounds.bottom, stroke: "#88969a" });
+      if (step >= 2) for (const model of data.models) {
+        const curve = add("path", { d: line(model.points, "median"), class: `curve models${step === 3 ? " faded" : ""}` });
+        curve.appendChild(node("title", {}, model.id));
+      }
+      if (step >= 3) {
+        const upper = line(data.ensemble, "upper");
+        const lower = line([...data.ensemble].reverse(), "lower").replace(/^M/, "L");
+        add("path", { d: `${upper} ${lower} Z`, fill: "#b5d7d9", "fill-opacity": .6, class: "interval" });
+        add("path", { d: line(data.ensemble, "median"), class: "curve ensemble" });
+        for (const point of data.ensemble) add("circle", { cx: x(point.date), cy: y(point.median), r: 3.5, fill: "#0a6670" });
+      }
+      add("path", { d: line(data.observed, "value"), class: "curve observed" });
+      for (const point of data.observed) add("circle", { cx: x(point.date), cy: y(point.value), r: 3.3, fill: "#263a43" });
+      add("line", { x1: x(data.issue_date), x2: x(data.issue_date), y1: bounds.top, y2: bounds.bottom, stroke: "#6e858b", "stroke-width": 1.5, "stroke-dasharray": "5 5" });
+      add("text", { x: x(data.issue_date), y: 48, "text-anchor": "middle", class: "axis" }, "Forecast issued");
+    }
+    function fromHash() { const value = Number(new URLSearchParams(location.hash.slice(1)).get("state")); return [1, 2, 3].includes(value) ? value : 1; }
+    function go(value) { location.hash = `state=${Math.max(1, Math.min(3, value))}`; }
+    select.addEventListener("change", () => go(Number(select.value)));
+    back.addEventListener("click", () => go(fromHash() - 1)); next.addEventListener("click", () => go(fromHash() + 1));
+    addEventListener("hashchange", () => render(fromHash()));
+    addEventListener("keydown", event => { if (["SELECT", "INPUT", "BUTTON"].includes(document.activeElement.tagName)) return; if (event.key === "ArrowRight" || event.key === "ArrowLeft") { event.preventDefault(); go(fromHash() + (event.key === "ArrowRight" ? 1 : -1)); } });
+    render(fromHash());
+  </script>
+</body>
+</html>

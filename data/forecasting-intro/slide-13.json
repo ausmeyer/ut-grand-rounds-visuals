@@ -1,0 +1,35 @@
+{
+  "seasons": [
+    {
+      "season": "2021–22",
+      "models": 23,
+      "scheduled_weeks": 24,
+      "minimum_weeks": 12
+    },
+    {
+      "season": "2022–23",
+      "models": 21,
+      "scheduled_weeks": 31,
+      "minimum_weeks": 16
+    },
+    {
+      "season": "2023–24",
+      "models": 34,
+      "scheduled_weeks": 31,
+      "minimum_weeks": 16
+    },
+    {
+      "season": "2024–25",
+      "models": 43,
+      "scheduled_weeks": 28,
+      "minimum_weeks": 14
+    },
+    {
+      "season": "2025–26",
+      "models": 49,
+      "scheduled_weeks": 28,
+      "minimum_weeks": 14
+    }
+  ],
+  "target_season": "2026–27"
+}

@@ -1,0 +1,232 @@
+[
+  {
+    "name": "legacy-tree",
+    "url": "https://api.github.com/repos/cdcepi/FluSight-forecast-data/git/trees/c42804d2507ac590b4d900c28143db289f7d5645?recursive=1",
+    "sha256": "79fdc982dfad62a6e6a346379c69f9347625a6b2c06a1922896817e0dbec865d"
+  },
+  {
+    "name": "hub-tree",
+    "url": "https://api.github.com/repos/cdcepi/FluSight-forecast-hub/git/trees/b758798766336111d3ae0151a3bf4aea383d5d6c?recursive=1",
+    "sha256": "145d77c6671bcf6b0169007fe57675a765c3c942dc6f2d0f1ebbd883d802eb2d"
+  },
+  {
+    "name": "tasks",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/hub-config/tasks.json",
+    "sha256": "1d24e40548e1b4ab09743f9e205dd665060abd011f6ad6544acc757cf5321fa3"
+  },
+  {
+    "name": "hub-readme",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/README.md",
+    "sha256": "047d626f4533fab571353f7700a860738499aa8149e4970e14386bbf7039e2bb"
+  },
+  {
+    "name": "forecast-summary",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/weekly-summaries/2024-12-14/2024-12-14_flu_forecasts_data.csv",
+    "sha256": "198fd53d5b7bcdcfc2f4d64f3c499069c7ec230736398d60bca46317174da9f3"
+  },
+  {
+    "name": "ensemble",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/FluSight-ensemble/2024-12-14-FluSight-ensemble.csv",
+    "sha256": "8bd843fd80f396637abd7427b5fb362bd2611da105a61f919368194b85e62782"
+  },
+  {
+    "name": "truth-vintage",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/47f76990a0cfba1cf226c7bc0087200777e77766/target-data/target-hospital-admissions.csv",
+    "sha256": "db5621aa21bd603cd09dc80590662aa5c2ebc61cf0b56614d4dbf3f67767fe4d"
+  },
+  {
+    "name": "model-CADPH-FluCAT_Ensemble",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/CADPH-FluCAT_Ensemble/2024-12-14-CADPH-FluCAT_Ensemble.csv",
+    "sha256": "7c127e3de7b9fbaf02f6afe3a7a48209f56e69c6aab5b7ebcf439c2473c600fe"
+  },
+  {
+    "name": "model-CEPH-Rtrend_fluH",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/CEPH-Rtrend_fluH/2024-12-14-CEPH-Rtrend_fluH.csv",
+    "sha256": "680a05f9e14d88c8c77ede680ce7ba5e6fb99b5edff512bf8c9a0f7311584ddb"
+  },
+  {
+    "name": "model-CMU-TimeSeries",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/CMU-TimeSeries/2024-12-14-CMU-TimeSeries.csv",
+    "sha256": "195f9c11c41b0bbbb3d9a3fff932ef49faa33c5f6db80314b930601e13afde3c"
+  },
+  {
+    "name": "model-CMU-climate_baseline",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/CMU-climate_baseline/2024-12-14-CMU-climate_baseline.csv",
+    "sha256": "26d7d42069b22961066adca3da2f98d0cd57edd58889c678d591d966e74bcac6"
+  },
+  {
+    "name": "model-CU-ensemble",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/CU-ensemble/2024-12-14-CU-ensemble.csv",
+    "sha256": "b917d5612bb95952f8e922f97a3df9666d141f6f3cd8cb21513088f822ac533d"
+  },
+  {
+    "name": "model-Gatech-ensemble_point",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/Gatech-ensemble_point/2024-12-14-Gatech-ensemble_point.csv",
+    "sha256": "8d8c0b0334989c5bac7f4c68ddd73f32adcec63cef8b8dc7e5a49a4b2bb91461"
+  },
+  {
+    "name": "model-Gatech-ensemble_prob",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/Gatech-ensemble_prob/2024-12-14-Gatech-ensemble_prob.csv",
+    "sha256": "0648e67a48e15930e6f839bbcf2462df972c404beda8164b2ac31d7e6031658c"
+  },
+  {
+    "name": "model-ISU_NiemiLab-GPE",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/ISU_NiemiLab-GPE/2024-12-14-ISU_NiemiLab-GPE.csv",
+    "sha256": "c93b1557cc866873f9f9631a675087dcc1230a5e6391c8913d9a3315b38bdb7d"
+  },
+  {
+    "name": "model-JHUAPL-DMD",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/JHUAPL-DMD/2024-12-14-JHUAPL-DMD.csv",
+    "sha256": "5e40146723ee69da8f160cf76916cdef1e35f57a0d3c719afee5a0bcd466ca70"
+  },
+  {
+    "name": "model-JHU_CSSE-CSSE_Ensemble",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/JHU_CSSE-CSSE_Ensemble/2024-12-14-JHU_CSSE-CSSE_Ensemble.csv",
+    "sha256": "fc6b0331d98eda2a2eefd2742ec15f8363f1d2401255a5b8b104113b80560f55"
+  },
+  {
+    "name": "model-LUcompUncertLab-chimera",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/LUcompUncertLab-chimera/2024-12-14-LUcompUncertLab-chimera.csv",
+    "sha256": "c692fc98ecef8eb28908762705d08c42ca87a29b83132d2147a16e5b20e304e5"
+  },
+  {
+    "name": "model-LosAlamos_NAU-CModel_Flu",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/LosAlamos_NAU-CModel_Flu/2024-12-14-LosAlamos_NAU-CModel_Flu.csv",
+    "sha256": "7f7ca136094eb5edc22c5abfafc89df0d5cac516f52f860feaad788c6b565c3d"
+  },
+  {
+    "name": "model-MDPredict-SIRS",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/MDPredict-SIRS/2024-12-14-MDPredict-SIRS.csv",
+    "sha256": "f30fc37c1561fb7c3ac258fefab572d01f6740530ec89b0091dc627b6219281c"
+  },
+  {
+    "name": "model-MIGHTE-Joint",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/MIGHTE-Joint/2024-12-14-MIGHTE-Joint.csv",
+    "sha256": "30db71c57a1b6e8c3d12c8979e2329319424c60b245a5d171bf160c46699e8e9"
+  },
+  {
+    "name": "model-MIGHTE-Nsemble",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/MIGHTE-Nsemble/2024-12-14-MIGHTE-Nsemble.csv",
+    "sha256": "beb2becbf0df36f1643801b52791d493893240c2843cafe0a13635dd61639f1f"
+  },
+  {
+    "name": "model-MOBS-GLEAM_FLUH",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/MOBS-GLEAM_FLUH/2024-12-14-MOBS-GLEAM_FLUH.csv",
+    "sha256": "0139c25ff49b7a23ae705b876d14b43affa3d4a09a0ae380544030554e75bbb3"
+  },
+  {
+    "name": "model-Metaculus-cp",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/Metaculus-cp/2024-12-14-Metaculus-cp.csv",
+    "sha256": "6ae8567e26d11168afcb40d5a5566d5c59c2dc8e3f32728e50c16dfc718f46f9"
+  },
+  {
+    "name": "model-NEU_ISI-AdaptiveEnsemble",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/NEU_ISI-AdaptiveEnsemble/2024-12-14-NEU_ISI-AdaptiveEnsemble.csv",
+    "sha256": "3750df7947eec36c1c00aeb829512ecc935ec1f6990ce2d25b862ae39d3667db"
+  },
+  {
+    "name": "model-NEU_ISI-FluBcast",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/NEU_ISI-FluBcast/2024-12-14-NEU_ISI-FluBcast.csv",
+    "sha256": "820b5468fce37bc90d7d1f474103e6b7f068091e5e730e9b3bdec7953aba04db"
+  },
+  {
+    "name": "model-NIH-Flu_ARIMA",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/NIH-Flu_ARIMA/2024-12-14-NIH-Flu_ARIMA.csv",
+    "sha256": "e8dcc118d6fc9f622b8d3910ccba27546bbd2dfb72a730160719d9cf270ef57e"
+  },
+  {
+    "name": "model-OHT_JHU-nbxd",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/OHT_JHU-nbxd/2024-12-14-OHT_JHU-nbxd.csv",
+    "sha256": "53d8ceee60e9a46e35dce6e25df2db4ee4b792faf83caff2a31d6ebfd17d09bd"
+  },
+  {
+    "name": "model-PSI-PROF",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/PSI-PROF/2024-12-14-PSI-PROF.csv",
+    "sha256": "a969df6f00a6c73110c1f4d99f542503df56cfeb7d67910f6ea1cda2c6b05b10"
+  },
+  {
+    "name": "model-PSI-PROF_beta",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/PSI-PROF_beta/2024-12-14-PSI-PROF_beta.csv",
+    "sha256": "82f19af601250b451bd2ab371d6d6c05d55cea33a50d651262606822eb9c79d0"
+  },
+  {
+    "name": "model-SigSci-BECAM",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/SigSci-BECAM/2024-12-14-SigSci-BECAM.csv",
+    "sha256": "31b554d5c95138aafaa9284217746004c5f408a76f9c30e20a909a5e1473cb97"
+  },
+  {
+    "name": "model-SigSci-TSENS",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/SigSci-TSENS/2024-12-14-SigSci-TSENS.csv",
+    "sha256": "dc6ffd2d896b24a34f695ed022e09c2818e17ea6a8f8514ca61553216d5e3050"
+  },
+  {
+    "name": "model-Stevens-ILIForecast",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/Stevens-ILIForecast/2024-12-14-Stevens-ILIForecast.csv",
+    "sha256": "3ca800de90146f86b9f8a8e43f1eceadcc8b7cafe99f380a2eb9fefdc79092c8"
+  },
+  {
+    "name": "model-UGA_CEID-Walk",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/UGA_CEID-Walk/2024-12-14-UGA_CEID-Walk.csv",
+    "sha256": "89f76da84787f15ddc106ece249b983693e5c3b4715e31e1087bd0da3a1b6ff7"
+  },
+  {
+    "name": "model-UGA_flucast-Copycat",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/UGA_flucast-Copycat/2024-12-14-UGA_flucast-Copycat.csv",
+    "sha256": "7dce4f6fe1e92c7b7dcb379279048a8fc2f5725a58cefe78c6a9de70feca1aec"
+  },
+  {
+    "name": "model-UGA_flucast-INFLAenza",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/UGA_flucast-INFLAenza/2024-12-14-UGA_flucast-INFLAenza.csv",
+    "sha256": "c86d827274db1ea91931a7643ad01e99be8e9d5b7830959e60e421037f9b55d5"
+  },
+  {
+    "name": "model-UGA_flucast-Scenariocast",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/UGA_flucast-Scenariocast/2024-12-14-UGA_flucast-Scenariocast.csv",
+    "sha256": "f3674a7a9bcd1880d74f0b2c671f43a9344114792390efa3ec2781d69df074d5"
+  },
+  {
+    "name": "model-UI_CompEpi-EpiGen",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/UI_CompEpi-EpiGen/2024-12-14-UI_CompEpi-EpiGen.csv",
+    "sha256": "764fbca2b57d10a52664d7580fe6dba5e98eff13a730305bdf06b0ba3b55a2fd"
+  },
+  {
+    "name": "model-UM-DeepOutbreak",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/UM-DeepOutbreak/2024-12-14-UM-DeepOutbreak.csv",
+    "sha256": "bc4c4ebd117d8634982a8e426da5f7761331e8d64c68007220ee17b69d174e46"
+  },
+  {
+    "name": "model-UMass-AR2",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/UMass-AR2/2024-12-14-UMass-AR2.csv",
+    "sha256": "fc28d432d0e9f5313dd92432f506a085c50129bbf9c395cb314adb0274a8ce52"
+  },
+  {
+    "name": "model-UMass-flusion",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/UMass-flusion/2024-12-14-UMass-flusion.csv",
+    "sha256": "c20a1b73291f532884de23851a65840ed1932471db7fde64f348de9b169966e3"
+  },
+  {
+    "name": "model-UMass-trends_ensemble",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/UMass-trends_ensemble/2024-12-14-UMass-trends_ensemble.parquet",
+    "sha256": "4cdab226b73df0bad216b24e02cba02676a8b87b2ad4b06aced9df9ef4ada0d3"
+  },
+  {
+    "name": "model-UNC_IDD-InfluPaint",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/UNC_IDD-InfluPaint/2024-12-14-UNC_IDD-InfluPaint.csv",
+    "sha256": "abbdd43f3117d1714c92925221e29fdf71a83d855d1dc26e4698c11b902cf882"
+  },
+  {
+    "name": "model-UVAFluX-Ensemble",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/UVAFluX-Ensemble/2024-12-14-UVAFluX-Ensemble.csv",
+    "sha256": "2607b13a848ccbacbae1fd9722380bdcb580ad81de02415600ffc98b2c58d37f"
+  },
+  {
+    "name": "model-VTSanghani-PRIME",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/VTSanghani-PRIME/2024-12-14-VTSanghani-PRIME.csv",
+    "sha256": "a49909f067ff10f56871f1c24116d56630da82bedf007524ba13f09c6f5a8c95"
+  },
+  {
+    "name": "model-fjordhest-ensemble",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/fjordhest-ensemble/2024-12-14-fjordhest-ensemble.csv",
+    "sha256": "13725832efaf66cdc1fd89c48277bef854c5d81e0363fa2200bdb5ccc9187c1e"
+  }
+]
