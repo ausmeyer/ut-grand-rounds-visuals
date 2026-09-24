@@ -2,10 +2,10 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>A clay patient journey · U.S. influenza surveillance</title>
 <style>
-:root{color-scheme:light;--ink:#203a3f;--teal:#246d70;--paper:#f6f1e7}
+:root{color-scheme:light;--ink:#203a3f;--teal:#246d70;--paper:#fbfaf6}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{max-width:1320px;margin:auto;padding:36px 32px 70px}.eyebrow{color:var(--teal);font-size:12px;font-weight:750;letter-spacing:.14em}
-h1{font-size:clamp(25px,3.5vw,42px);line-height:1.18;letter-spacing:-.025em;margin:10px 0 14px}p{margin:10px 0}
+main{max-width:1320px;margin:auto;padding:36px 32px 70px}
+p{margin:10px 0}
 video{display:block;width:100%;aspect-ratio:16/9;background:#ded5c6;border-radius:16px;box-shadow:0 12px 42px #2939371c}
 .transport{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:18px 0}.transport button,.transport a{border:1px solid #aabbb4;border-radius:100px;padding:9px 17px;background:transparent;font:inherit;color:var(--teal);text-decoration:none;cursor:pointer}
 .transport button:hover,.transport a:hover{background:#e4ebe2}.chapters{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:23px 0 30px}
@@ -14,9 +14,7 @@ video{display:block;width:100%;aspect-ratio:16/9;background:#ded5c6;border-radiu
 details{margin-top:30px}summary{cursor:pointer;font-size:20px;font-weight:650}.transcript{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px}article{background:#fffcf6;padding:24px;border-radius:14px}.article-heading{display:flex;gap:12px;align-items:center}.article-heading span{font-size:12px;color:var(--teal)}h3{font-size:23px;margin:0}.fullname{font-size:14px;color:#687977}article a{color:var(--teal)}
 @media(max-width:760px){main{padding:24px 16px}.chapters,.transcript{grid-template-columns:1fr 1fr}.chapters button{padding:12px;font-size:13px}}@media(max-width:480px){.transcript{grid-template-columns:1fr}}
 </style></head><body><main>
-<div class="eyebrow">UT GRAND ROUNDS</div>
-<h1>Following influenza through U.S. surveillance</h1>
-<video id="film" controls playsinline preload="metadata" poster="poster.png?v=2b57690518cb"><source src="surveillance_claymation.mp4?v=2b57690518cb" type="video/mp4">Open surveillance_claymation.mp4 in your video player.</video>
+<video id="film" aria-label="Following influenza through U.S. surveillance" controls playsinline preload="metadata" poster="poster.png?v=2b57690518cb"><source src="surveillance_claymation.mp4?v=2b57690518cb" type="video/mp4">Open surveillance_claymation.mp4 in your video player.</video>
 <div class="transport"><button id="restart" type="button">Replay from the beginning</button><a href="surveillance_claymation.mp4?v=2b57690518cb" download>Save video</a><a href="surveillance_claymation.blend?v=2b57690518cb" download>Blender project</a></div>
 <nav class="chapters" aria-label="Jump to a surveillance system"><button type="button" data-start="14"><span>01</span>ILINet<small>0:14</small></button><button type="button" data-start="30"><span>02</span>NSSP<small>0:30</small></button><button type="button" data-start="50"><span>03</span>FluSurv-NET<small>0:50</small></button><button type="button" data-start="58"><span>04</span>NHSN<small>0:58</small></button><button type="button" data-start="74"><span>05</span>ICLS<small>1:14</small></button><button type="button" data-start="82"><span>06</span>NREVSS<small>1:22</small></button><button type="button" data-start="104"><span>07</span>NCHS<small>1:44</small></button><button type="button" data-start="112"><span>08</span>Pediatric deaths<small>1:52</small></button></nav>
 <details><summary>System descriptions and sources</summary><div class="transcript"><article id="ilinet"><div class="article-heading"><span>0:14</span><h3>ILINet</h3></div>
