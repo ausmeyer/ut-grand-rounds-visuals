@@ -145,19 +145,22 @@ Slides 12 and 13 each support `#state=1` through `#state=3`:
   target, then the four other 2026–27 targets. No participation chart.
 
 Slide 14 supports `#state=1` through `#state=3`: one forecast median, its 50%
-prediction interval, then its 95% prediction interval. Slide 15 uses the same
-admissions axis with `#state=1` through `#state=4`: the observed count, point
-error, weighted interval score, then the archived baseline comparison.
+prediction interval, then its 95% prediction interval. Slide 15 supports two
+views: `#state=1` shows a synthetic current-week through three-week-ahead
+forecast with 23 quantiles; `#state=2` adds WIS and a relative-WIS reference
+at 1. The plot stays fixed. Use the dropdown or arrows to move between views,
+or use the hash URLs on successive Slides.com slides. Both views fit 1240 × 540;
+keep the slide title in Slides.com, outside the iframe.
 
 The forecasting introduction builds offline from pinned CDC archive snapshots
 in `data/forecasting-intro/`. The [evidence notes](specs/forecasting-intro-evidence.md)
 record the forecast vintage, model-week counting rule, source attribution,
 rebuild instructions, and tests. No source-fetching or forecasting runs in the iframe.
 
-The [Slides 14–15 evidence and presenter notes](specs/forecast-scores-evidence.md)
-document the single-week example, later observation vintage, all-quantile WIS
-calculation, and distinction from CDC's season-level evaluation. Those slides
-build offline from `data/forecast-scores/` and the existing ensemble source.
+The [Slides 14–15 evidence notes](specs/forecast-scores-evidence.md) distinguish
+Slide 14's real archived example from Slide 15's synthetic illustration.
+Both build offline with `python3 scripts/build_forecast_scores.py`. The new
+Slide 15 displays no measured model score or performance claim.
 
 
 ## Slide 4 claymation

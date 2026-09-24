@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build Slides 14–15 from one archived forecast; --refresh fetches pinned inputs."""
+"""Build the archived Slide 14 example and the synthetic Slide 15 teaching graphic."""
 
 import argparse
 import csv
@@ -10,6 +10,7 @@ import json
 import math
 from pathlib import Path
 import subprocess
+from statistics import NormalDist
 
 from build_forecasting_intro import HUB_SHA, RAW, read_source, write_json
 
@@ -85,7 +86,24 @@ def example():
                        "relative_wis": ensemble_wis / baseline_wis}}
 
 
+def target_example():
+    """Illustrative marginal distributions, not fitted or submitted forecasts."""
+    normal = NormalDist()
+    forecasts = []
+    for horizon, (median, spread) in enumerate(zip([470, 520, 550, 570], [.13, .19, .24, .28])):
+        quantiles = {str(q): round(median * math.exp(spread * normal.inv_cdf(q)), 3)
+                     for q in QUANTILES}
+        forecasts.append({"horizon": horizon, "quantiles": quantiles})
+    return {"slide": 15, "synthetic": True, "axis_max": 1000,
+            "history": [{"week": week, "value": value}
+                        for week, value in zip(range(-5, 0), [110, 155, 230, 305, 390])],
+            "forecasts": forecasts, "quantile_count": len(QUANTILES),
+            "distribution": "Illustrative lognormal marginals; specified medians and log-scale spreads."}
+
+
 def slide_data(number, full):
+    if number == 15:
+        return target_example()
     data = dict(full)
     if number == 14:
         for key in ("baseline", "observed", "truth_vintage", "score_scale", "scores"):
@@ -95,7 +113,8 @@ def slide_data(number, full):
 
 
 def render(data):
-    source = (ROOT / "src" / "forecast-distribution.template.html").read_text()
+    template = "slide-15.template.html" if data["slide"] == 15 else "forecast-distribution.template.html"
+    source = (ROOT / "src" / template).read_text()
     if source.count("/*__SLIDE_DATA__*/") != 1:
         raise ValueError("Expected one data marker")
     return source.replace("/*__SLIDE_DATA__*/", json.dumps(data, ensure_ascii=False, separators=(",", ":")))
@@ -112,7 +131,7 @@ def main():
         data = slide_data(number, full)
         write_json(DATA / f"slide-{number}.json", data)
         (ROOT / "docs" / f"slide-{number}.html").write_text(render(data))
-    print(json.dumps(full["scores"], indent=2))
+    print("Built Slide 14 (archived forecast) and Slide 15 (synthetic targets and scoring example).")
 
 
 if __name__ == "__main__":

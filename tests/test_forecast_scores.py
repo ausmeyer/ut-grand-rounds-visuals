@@ -57,6 +57,36 @@ class ForecastScoreTests(unittest.TestCase):
         self.assertNotIn("observed", BUILD.slide_data(14, full))
         self.assertNotIn("scores", BUILD.slide_data(14, full))
 
+    def test_synthetic_target_example(self):
+        data = BUILD.target_example()
+        self.assertTrue(data["synthetic"])
+        self.assertEqual(data["quantile_count"], 23)
+        self.assertEqual([point["week"] for point in data["history"]], list(range(-5, 0)))
+        self.assertEqual([point["horizon"] for point in data["forecasts"]], [0, 1, 2, 3])
+        previous_width = {"0.025": 0, "0.25": 0}
+        for point, median in zip(data["forecasts"], [470, 520, 550, 570]):
+            quantiles = point["quantiles"]
+            self.assertEqual([float(q) for q in quantiles], BUILD.QUANTILES)
+            values = list(quantiles.values())
+            self.assertEqual(values, sorted(values))
+            self.assertTrue(all(BUILD.math.isfinite(v) and v > 0 for v in values))
+            self.assertEqual(quantiles["0.5"], median)
+            self.assertLess(quantiles["0.975"], data["axis_max"])
+            for lower, upper in [("0.025", "0.975"), ("0.25", "0.75")]:
+                width = quantiles[upper] - quantiles[lower]
+                self.assertGreater(width, previous_width[lower])
+                previous_width[lower] = width
+        self.assertNotIn("scores", data)
+        self.assertNotIn("observed", data)
+        html = BUILD.render(data)
+        self.assertIn("Synthetic example", html)
+        self.assertIn("prefers-reduced-motion", html)
+        self.assertNotIn("MAE", html)
+
+    def test_slide14_is_unchanged(self):
+        self.assertEqual(hashlib.sha256((ROOT / "docs/slide-14.html").read_bytes()).hexdigest(),
+                         "da999f6844d04a0b0c51f924cdcbc78e362b0ba8b37d200d607f9445a15463bb")
+
     def test_slide12_is_unchanged(self):
         self.assertEqual(hashlib.sha256((ROOT / "docs/slide-12.html").read_bytes()).hexdigest(),
                          "4740785f0d8809ac29ca897b7e5e2b7331a4374f9fe1f07e85912663ffc696cd")

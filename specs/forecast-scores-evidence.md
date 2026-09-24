@@ -1,80 +1,88 @@
-# Slides 14–15: one forecast, then its evaluation
+# Slides 14–15: forecast distributions, targets, and scoring
 
-## Teaching purpose
+Slide 15 revised September 24, 2026. Slide 14 is unchanged.
+Both pages are self-contained 1240 × 540 iframes with their titles in Slides.com.
 
-For the grand rounds audience, use about 1.25 minutes for Slide 14 and 1.75 minutes for Slide 15. By the end, learners should identify a median and two central prediction intervals, distinguish one absolute error from MAE/RMSE, and interpret a relative WIS below 1 for the displayed comparison. Keep equations and methodological detail here, not on the projected slides.
+## Slide 14: unchanged archived example
 
-This is a real public aggregate example, not synthetic patient data. Population: all-age Texas weekly influenza hospital admissions. It neither estimates an individual's risk nor supports age-specific conclusions or clinical advice.
+All-age Texas influenza hospital admissions for the week ending December 21,
+2024, from the forecast due December 11. This is a real public aggregate example.
 
-## Visual sequence and presenter script
+- `#state=1`: ensemble median, 692 admissions.
+- `#state=2`: central 50% prediction interval, 512–855.
+- `#state=3`: central 95% prediction interval, 300–1,095.
 
-Suggested native Slides.com titles: **A forecast is a distribution, not just a line** and **Accuracy includes both the center and the uncertainty**. The iframes do not duplicate them.
+The source is the [original FluSight ensemble submission](https://github.com/cdcepi/FluSight-forecast-hub/blob/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/FluSight-ensemble/2024-12-14-FluSight-ensemble.csv),
+cached in `data/forecasting-intro/sources/ensemble.gz`. Selection: location 48,
+reference date 2024-12-14, target `wk inc flu hosp`, horizon 1,
+target end date 2024-12-21, output type `quantile`.
+The [weekly summary](https://github.com/cdcepi/FluSight-forecast-hub/blob/b758798766336111d3ae0151a3bf4aea383d5d6c/weekly-summaries/2024-12-14/2024-12-14_flu_forecasts_data.csv)
+establishes the due date. No eventual observation or score appears in Slide 14.
 
-Slide 14:
+## Slide 15: synthetic targets and scoring illustration
 
-1. `#state=1`: “For this one week in Texas, the ensemble median was 692 admissions.”
-2. `#state=2`: “The central 50% prediction interval ran from 512 to 855.”
-3. `#state=3`: “The wider 95% interval ran from 300 to 1,095. The dot alone does not tell us the uncertainty.”
+Suggested Slides.com title: **What do we predict, and what counts as better?**
+About 1.25 minutes. The intended audience should recognize the four primary
+weekly horizons, distinguish quantiles from a point prediction, and interpret
+relative WIS below 1 as better than the matched persistence baseline.
 
-Slide 15 keeps precisely the same admissions axis and ensemble position:
+1. `#state=1`: synthetic hospital-admission history and a current-week through
+   three-week-ahead forecast. Show the median and central 50%/95% intervals,
+   with the label “23 quantiles per location and target week.”
+2. `#state=2`: keep the entire plot fixed and reveal the WIS explanation and
+   relative-WIS reference at 1. There is no plotted model score or outcome.
 
-1. `#state=1`: reveal 1,169 observed admissions. “This outcome fell outside both intervals.” Briefly explain that coverage is the fraction of many realized outcomes contained in their corresponding intervals. One miss does not establish poor calibration.
-2. `#state=2`: “The median missed by 477 admissions. MAE averages absolute misses across forecasts. RMSE squares errors before averaging and taking a square root, so larger misses matter more.” The plotted quantity is absolute error, not an aggregate MAE or RMSE.
-3. `#state=3`: “Weighted interval score evaluates the uncertainty too. Narrow intervals reduce width, but missing the observation incurs a penalty.” The width bracket and highlighted 95% miss illustrate two ingredients, not the entire numerical computation. All 23 quantiles enter the score, including the median and intervals not drawn.
-4. `#state=4`: add the actual archived baseline. “For this forecast the ensemble's score was 319.3 versus 508.8 for the baseline, giving relative WIS 0.63. Lower is better; 1 means equal scores.” This is one case, not a season-wide ranking. The baseline median is 493, the last observed count in the forecast-time vintage, with its own archived uncertainty.
+Controls: dropdown, previous/next buttons, and left/right keys when a form
+control is not focused. Direct hash links work without visiting the first view.
+The scoring text fades between views; reduced-motion preferences disable the
+transition. There is no autoplay and no assumed cross-origin control of the
+Slides.com parent. Use separate hash URLs in successive slides if desired.
 
-## Pinned data and claim ledger
+### Synthetic data construction
 
-| Quantity or claim | Source and exact selection |
+The hypothetical history is 110, 155, 230, 305, and 390 admissions for weeks
+-5 through -1. The four forecast medians are 470, 520, 550, and 570; specified
+log-scale standard deviations are 0.13, 0.19, 0.24, and 0.28.
+
+`build_forecast_scores.target_example()` generates all 23 quantiles from each
+specified lognormal marginal using the standard-normal inverse CDF:
+`Q(p) = median * exp(log_scale_sd * normal_inverse_cdf(p))`.
+Values are retained to three decimals because this is a continuous teaching
+illustration, not a submission file. The plot displays only the 0.025, 0.25,
+0.5, 0.75, and 0.975 quantiles. The other tails are not drawn. All displayed
+bounds fit the axis, remain positive, are nested, and widen with horizon.
+Lines join discrete weekly marginals; the bands are not simultaneous
+trajectory intervals. No parameters were fitted and no empirical forecast
+performance or actual patient data are represented. “Synthetic example” is
+visible in both views.
+
+### Claim ledger
+
+| Displayed claim | Evidence |
 | --- | --- |
-| Ensemble's 23 quantiles | [Original FluSight-ensemble submission](https://github.com/cdcepi/FluSight-forecast-hub/blob/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/FluSight-ensemble/2024-12-14-FluSight-ensemble.csv), already cached in `data/forecasting-intro/sources/ensemble.gz`. Select reference date 2024-12-14, location 48, horizon 1, target `wk inc flu hosp`, target end date 2024-12-21, output type `quantile`. |
-| Matching baseline quantiles | [Original FluSight-baseline submission](https://github.com/cdcepi/FluSight-forecast-hub/blob/b758798766336111d3ae0151a3bf4aea383d5d6c/model-output/FluSight-baseline/2024-12-14-FluSight-baseline.csv), same filters. Sample rows are excluded. |
-| Forecast due date | [CDC weekly summary](https://github.com/cdcepi/FluSight-forecast-hub/blob/b758798766336111d3ae0151a3bf4aea383d5d6c/weekly-summaries/2024-12-14/2024-12-14_flu_forecasts_data.csv): forecast_due_date 2024-12-11. A due date is not a reconstructed submission timestamp. |
-| Later observed count 1,169 | [Target data, June 18, 2025 repository snapshot](https://github.com/cdcepi/FluSight-forecast-hub/blob/adc3e7d4cd98a53f9233c188fd9024b81fd90f0a/target-data/target-hospital-admissions.csv), date 2024-12-21, location 48. This is not the June 25 final evaluation vintage cited by CDC. No later observations are included in Slide 14's embedded data. |
-| MAE and RMSE | [Hyndman and Athanasopoulos, Forecasting: Principles and Practice, §5.8](https://otexts.com/fpp3/accuracy.html), scale-dependent errors. MAE targets the median; squared error targets the mean. Finite quantiles do not identify an exact forecast mean. |
-| WIS | [Bracher et al., PLOS Computational Biology 2021, §2.2, equations 1–4](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1008618). Also checked the [2022 correction](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1010592), which corrects example values and figures, not these definitions. |
-| Published CDC evaluation differs from this example | [CDC 2024–25 evaluation, Scoring](https://www.cdc.gov/flu-forecasting/evaluation/2024-2025-report.html): log-transformed counts and geometric-mean comparisons across matched forecasts. Here, arithmetic remains on the admissions-count scale to match the visual, and the ratio applies to one forecast only. Do not cite 0.63 as CDC's published ensemble relative WIS. |
+| Weekly laboratory-confirmed influenza admissions; horizons 0–3 | [Pinned 2026/27 hub README, primary target](https://github.com/cdcepi/FluSight-forecast-hub/blob/b758798766336111d3ae0151a3bf4aea383d5d6c/README.md), inspected from `data/forecasting-intro/sources/hub-readme.gz`. Optional preceding-week hindcasts are outside this core illustration. |
+| 23 quantiles per location/target week | [Pinned hub tasks configuration](https://github.com/cdcepi/FluSight-forecast-hub/blob/b758798766336111d3ae0151a3bf4aea383d5d6c/hub-config/tasks.json), cached with the forecasting introduction; matches `QUANTILES` in the builder. |
+| WIS evaluates interval width and missed observations; lower is better | [Bracher et al., PLOS Computational Biology 2021, equations 1–4](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1008618). The display is a plain-language summary, not a full formula; WIS also includes median absolute error. |
+| Relative WIS below 1 is better than the matched persistence baseline | [CDC 2024/25 evaluation, Scoring](https://www.cdc.gov/flu-forecasting/evaluation/2024-2025-report.html), rechecked September 24, 2026. Comparisons require consistent scoring scale and matched cases; the page shows no calculated score. |
+| Persistence carries forward the latest observed count, with uncertainty | Same CDC report, FluSight Operations: baseline median is the latest observation and uncertainty is based on observation noise. |
 
-Source CSVs are immutable-commit downloads; their decompressed SHA-256 checksums are in the corresponding `sources.json` manifests. The plotted and scored quantiles are in `data/forecast-scores/slide-14.json` and `slide-15.json`. The case continues Slide 12's dated Texas forecast; it is a teaching selection, not a representative performance sample.
+The scale at 1 is a conceptual comparison, not a performance finding. Interval
+width alone and coverage alone do not establish accuracy. No hospital-use,
+clinical-benefit, calibration, or age-specific claim is made.
 
-## Worked calculations
-
-For this outcome, `y = 1169`, median `m = 692`, so absolute error is `|1169 - 692| = 477 admissions`.
-
-Across N forecasts, `MAE = sum(|y_i - f_i|) / N` and `RMSE = sqrt(sum((y_i - f_i)^2) / N)`. No separate numeric MAE and RMSE are shown for this single case: with N = 1 both would equal the absolute error and obscure their different behavior across cases.
-
-For each of K = 11 central intervals `[l_k, u_k]` with noncoverage probability `alpha_k`:
-
-```text
-IS_k = (u_k - l_k)
-       + (2 / alpha_k) * max(l_k - y, 0)
-       + (2 / alpha_k) * max(y - u_k, 0)
-
-WIS = [0.5 * |y - m| + sum((alpha_k / 2) * IS_k)] / (K + 0.5)
-```
-
-Intervals use quantile pairs from 0.01/0.99 through 0.45/0.55, including 0.025/0.975. The 95% interval alone has width `1095 - 300 = 795` and an upper-tail miss of `1169 - 1095 = 74`, hence interval score `795 + (2 / 0.05) * 74 = 3755`. That is not WIS. Combining all intervals and the median gives ensemble WIS **319.2778260869565**, baseline WIS **508.77217391304356**, and ratio **0.6275457708925836**. WIS has admission-count units here; its ratio is dimensionless.
-
-An independent test recomputes WIS as the average of twice the pinball loss over all 23 quantiles. The build rejects missing/duplicated/crossing quantiles and missing truth. No density curve or missing quantiles are invented.
-
-## Common misconceptions and quick checks
-
-- A prediction interval describes uncertainty about the future observed count, not a confidence interval for an estimated mean. A nominal 95% interval is not a guarantee.
-- A median is not necessarily a mean. This example labels it explicitly.
-- Wider intervals are not automatically better: WIS trades width against misses. Coverage alone does not assess sharpness.
-- One relative score below 1 does not establish superior seasonal performance, nor does one uncovered observation establish miscalibration.
-
-Optional oral check: “If all intervals were made extremely wide, would WIS necessarily improve?” Answer: no; covering the outcome avoids miss penalties but adds width cost.
-
-Optional oral check: “What would relative WIS of 1.2 mean?” Answer: for the same scored cases and scoring convention, the model's summarized score is 1.2 times the baseline's and is worse. It is not a probability or a 20% increase in admissions.
-
-## Rebuild and verify
+## Build and verify
 
 ```sh
-python3 scripts/build_forecasting_intro.py
 python3 scripts/build_forecast_scores.py
 python3 -m unittest discover -s tests -p 'test_*.py'
 SLIDE_PLAYWRIGHT=/absolute/path/to/playwright/index.mjs node tests/forecasting-intro.browser.mjs
 ```
 
-Normal builds are offline. `python3 scripts/build_forecast_scores.py --refresh` re-fetches only the two additional pinned inputs. Tests verify source hashes, exact forecast values, score equivalence, generated HTML, unchanged Slide 12, fixed geometry, reveals, navigation, text bounds/collisions, and no external runtime requests. Inspect the rendered states as well as test results before publishing. The iframes need no backend or database changes.
+Normal builds are offline. Source manifests retain decompressed SHA-256 hashes.
+The existing archived-baseline and later-truth fixtures remain used by the
+builder's numerical WIS regression tests, but do not supply the new Slide 15.
+The tests independently recompute those archived scores as quantile losses.
+Additional tests verify the synthetic distributions, generated HTML, unchanged
+Slide 14, all 11 states across Slides 12–15, navigation, reduced motion, fixed
+plot geometry, label bounds/collisions, and no external runtime requests.
+Inspect rendered screenshots before publishing. No backend changes are needed.
