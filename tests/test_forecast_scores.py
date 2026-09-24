@@ -79,7 +79,11 @@ class ForecastScoreTests(unittest.TestCase):
         self.assertNotIn("scores", data)
         self.assertNotIn("observed", data)
         html = BUILD.render(data)
-        self.assertIn("Synthetic example", html)
+        self.assertNotIn("Synthetic example", html)
+        self.assertNotIn("Persistence: latest observed count, with uncertainty.", html)
+        self.assertNotIn("baseline-reference", html)
+        self.assertIn("compares WIS with a persistence baseline.", html)
+        self.assertIn("Below 1 is better.", html)
         self.assertIn("prefers-reduced-motion", html)
         self.assertNotIn("MAE", html)
 

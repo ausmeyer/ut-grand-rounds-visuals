@@ -29,8 +29,10 @@ relative WIS below 1 as better than the matched persistence baseline.
 1. `#state=1`: synthetic hospital-admission history and a current-week through
    three-week-ahead forecast. Show the median and central 50%/95% intervals,
    with the label “23 quantiles per location and target week.”
-2. `#state=2`: keep the entire plot fixed and reveal the WIS explanation and
-   relative-WIS reference at 1. There is no plotted model score or outcome.
+2. `#state=2`: keep the entire plot fixed and reveal two text definitions:
+   WIS scores interval width and missed observations; relative WIS compares
+   WIS with a persistence baseline. “Lower is better” and “Below 1 is better”
+   are aligned to the right. There is no ruler, plotted model score, or outcome.
 
 Controls: dropdown, previous/next buttons, and left/right keys when a form
 control is not focused. Direct hash links work without visiting the first view.
@@ -53,8 +55,9 @@ illustration, not a submission file. The plot displays only the 0.025, 0.25,
 bounds fit the axis, remain positive, are nested, and widen with horizon.
 Lines join discrete weekly marginals; the bands are not simultaneous
 trajectory intervals. No parameters were fitted and no empirical forecast
-performance or actual patient data are represented. “Synthetic example” is
-visible in both views.
+performance or actual patient data are represented. At the user's request,
+there is no visible synthetic-example label; provenance remains in this file,
+the data's synthetic flag, and the accessible plot description.
 
 ### Claim ledger
 
@@ -66,7 +69,7 @@ visible in both views.
 | Relative WIS below 1 is better than the matched persistence baseline | [CDC 2024/25 evaluation, Scoring](https://www.cdc.gov/flu-forecasting/evaluation/2024-2025-report.html), rechecked September 24, 2026. Comparisons require consistent scoring scale and matched cases; the page shows no calculated score. |
 | Persistence carries forward the latest observed count, with uncertainty | Same CDC report, FluSight Operations: baseline median is the latest observation and uncertainty is based on observation noise. |
 
-The scale at 1 is a conceptual comparison, not a performance finding. Interval
+The comparison with 1 is conceptual, not a performance finding. Interval
 width alone and coverage alone do not establish accuracy. No hospital-use,
 clinical-benefit, calibration, or age-specific claim is made.
 

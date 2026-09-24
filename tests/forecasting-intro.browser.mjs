@@ -65,7 +65,10 @@ try {
         assert.equal(await page.locator('#scoring').isVisible(),state===2);
         assert.equal(await page.locator('#scoring').getAttribute('aria-hidden'),String(state!==2));
         assert.match(await page.locator('.quantile-heading').textContent(),/^23 quantiles/);
-        assert.equal(await page.locator('.synthetic').textContent(),'Synthetic example');
+        assert.equal(await page.locator('.synthetic, .baseline-reference').count(),0);
+        assert.equal(await page.locator('#scoring line').count(),1); // Section divider only; no ruler.
+        assert.match(await page.locator('#scoring').textContent(),/compares WIS with a persistence baseline\./);
+        assert.doesNotMatch(await page.locator('svg text').allTextContents().then(labels=>labels.join(' ')),/Synthetic example|Persistence: latest observed/);
         const marks=await page.locator('#forecast-plot').evaluate(el=>({html:el.innerHTML,box:el.getBoundingClientRect().toJSON()}));
         if(!targetGeometry) targetGeometry=marks;
         assert.deepEqual(marks,targetGeometry,'Slide 15 chart must not move when scoring is revealed');

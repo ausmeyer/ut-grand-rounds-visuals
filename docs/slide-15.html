@@ -31,7 +31,6 @@
     .tick { fill: var(--muted); font-size: 16px; }
     .direct-label { fill: var(--teal); font-size: 18px; font-weight: 650; }
     .quantile-heading { font-size: 24px; font-weight: 720; }
-    .synthetic { font-size: 14px; fill: var(--muted); }
     .scoring { opacity: 0; visibility: hidden; }
     body[data-state="2"] .scoring { opacity: 1; visibility: visible; }
     body[data-ready] .scoring { transition: opacity 280ms ease, visibility 280ms; }
@@ -55,15 +54,8 @@
           <text x="133" y="359" font-size="20">scores interval width and missed observations.</text>
           <text x="1124" y="359" text-anchor="end" class="teal" font-weight="700">Lower is better.</text>
           <text x="76" y="405" font-size="22" font-weight="700">Relative WIS</text>
-          <text x="580" y="390" text-anchor="middle" class="teal">&lt; 1: better than persistence</text>
-          <text x="973" y="390" text-anchor="middle" class="muted">&gt; 1: worse than persistence</text>
-          <line x1="430" x2="1124" y1="404" y2="404" stroke="#acb8b8" stroke-width="2"/>
-          <line x1="430" x2="777" y1="404" y2="404" stroke="#0a6670" stroke-width="3"/>
-          <line x1="430" x2="430" y1="400" y2="408" stroke="#0a6670" stroke-width="2"/>
-          <line x1="1124" x2="1124" y1="400" y2="408" stroke="#acb8b8" stroke-width="2"/>
-          <line class="baseline-reference" x1="777" x2="777" y1="397" y2="415" stroke="#14242b" stroke-width="3"/>
-          <text x="777" y="433" text-anchor="middle" font-weight="650">1 · Persistence baseline</text>
-          <text x="76" y="433" class="muted" style="font-size:15px">Persistence: latest observed count, with uncertainty.</text>
+          <text x="241" y="405" font-size="20">compares WIS with a persistence baseline.</text>
+          <text x="1124" y="405" text-anchor="end" class="teal" font-weight="700">Below 1 is better.</text>
         </g>
       </svg>
     </section>
@@ -90,7 +82,6 @@
       add("path", {d: `${path(top)} ${path(bottom).replace(/^M/, "L")} Z`, fill: "#0a6670", "fill-opacity": opacity, class: name});
     }
     text(76, 26, `${data.quantile_count} quantiles per location and target week`, {class: "quantile-heading"});
-    text(1124, 26, "Synthetic example", {class: "synthetic", "text-anchor": "end"});
     for (const value of [0, 250, 500, 750, 1000]) {
       add("line", {x1: 76, x2: 972, y1: y(value), y2: y(value), stroke: value === 0 ? "#aab7b7" : "#e8edeb"});
       text(65, y(value) + 5, value.toLocaleString("en-US"), {class: "tick", "text-anchor": "end"});
@@ -120,7 +111,7 @@
       document.body.dataset.state = String(state);
       select.value = String(state); back.disabled = state === 1; next.disabled = state === 2;
       document.getElementById("scoring").setAttribute("aria-hidden", String(state !== 2));
-      document.getElementById("chart-desc").textContent = "Synthetic weekly influenza hospital admissions. The forecast covers the current week and the next three weeks, with 23 quantiles at each horizon. The median and central 50% and 95% prediction intervals are shown." + (state === 2 ? " Weighted interval score evaluates interval width and missed observations. Lower is better. Relative WIS below one is better than the persistence baseline, which carries forward the latest observed count with uncertainty. No model score is plotted." : "");
+      document.getElementById("chart-desc").textContent = "Synthetic weekly influenza hospital admissions. The forecast covers the current week and the next three weeks, with 23 quantiles at each horizon. The median and central 50% and 95% prediction intervals are shown." + (state === 2 ? " Weighted interval score evaluates interval width and missed observations. Lower is better. Relative WIS compares WIS with a persistence baseline. Below one is better." : "");
     }
     function go(state) { location.hash = `state=${Math.max(1, Math.min(2, state))}`; }
     select.addEventListener("change", () => go(Number(select.value)));

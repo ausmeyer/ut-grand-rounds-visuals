@@ -147,8 +147,8 @@ Slides 12 and 13 each support `#state=1` through `#state=3`:
 Slide 14 supports `#state=1` through `#state=3`: one forecast median, its 50%
 prediction interval, then its 95% prediction interval. Slide 15 supports two
 views: `#state=1` shows a synthetic current-week through three-week-ahead
-forecast with 23 quantiles; `#state=2` adds WIS and a relative-WIS reference
-at 1. The plot stays fixed. Use the dropdown or arrows to move between views,
+forecast with 23 quantiles; `#state=2` adds brief definitions of WIS and relative
+WIS, with “Below 1 is better.” The plot stays fixed. Use the dropdown or arrows to move between views,
 or use the hash URLs on successive Slides.com slides. Both views fit 1240 × 540;
 keep the slide title in Slides.com, outside the iframe.
 
