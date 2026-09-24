@@ -16,6 +16,10 @@ Keep the title in Slides.com: **Borrowing history from outpatient surveillance**
   weeks from October 8, 2022 through June 27, 2026. The horizontal axis ends
   July 1, 2026 and the vertical axis expands to 5,000 admissions. There are
   717 consecutive weekly values: 456 reconstructed and 261 observed.
+  The existing history and axis ticks move together over 1.25 seconds as the
+  axes expand, followed by a 0.65-second fade-in of the new observations and
+  final tick labels. Direct entry to state 4 also plays this transition.
+  Reduced motion skips the animation, and navigation can interrupt it.
 - States 1–3 retain identical axis positions and scales. No data values are
   smoothed, rescaled, or fabricated. States 1–2 show original calendar dates; state 3
   intentionally restores the shifted model index without an extra visible label,
@@ -85,7 +89,8 @@ Tests verify all 794 source-to-chart values, date reversal, rate-to-count
 conversion, weekly uniqueness and continuity within each source, frame bounds,
 label collisions, unchanged axes and retained observations across states 1–3,
 forward/reverse animation, direct-entry animation, the exact weekly stitch,
-the full-history extension and its expanded axes, navigation, reduced motion,
+the full-history extension, coordinated axis movement, delayed fade-in,
+direct-entry animation and interruption, navigation, reduced motion,
 and absence of runtime network requests. Visual review is also
 required at the actual iframe size before publishing. Deployment verification
 checks the Pages run and exact live HTML against the local generated file.

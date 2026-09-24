@@ -112,7 +112,8 @@
         add(axes, "text", {x: xScale(stamp), y: 369, class: "tick", "text-anchor": stamp === ticks.at(-1)[0] ? "end" : "middle"}, label);
       }
     }
-    drawAxes(document.getElementById("axes"), x, y, data.axis_max, data.tick_step, [[data.start, "2009"], ["2012-01-01", "2012"], ["2015-01-01", "2015"], ["2018-01-01", "2018"], ["2020-01-01", "2020"], [data.end, "Oct 2022"]]);
+    const originalTicks = [[data.start, "2009"], ["2012-01-01", "2012"], ["2015-01-01", "2015"], ["2018-01-01", "2018"], ["2020-01-01", "2020"], [data.end, "Oct 2022"]];
+    drawAxes(document.getElementById("axes"), x, y, data.axis_max, data.tick_step, originalTicks);
     const shiftPx = data.training_shift_days * 86400000 / (end - start) * 1046;
     document.documentElement.style.setProperty("--shift-x", `${shiftPx}px`);
     const retained = data.observed.filter(point => point.date >= data.retained_observed_start);
@@ -120,9 +121,11 @@
     const observed = document.getElementById("observed");
     const early = add(observed, "g", {id: "observed-early"});
     const kept = add(observed, "g", {id: "observed-retained"});
+    function pathData(points, xScale, yScale) {
+      return points.map((point, i) => `${i ? "L" : "M"}${xScale(point.date).toFixed(2)},${yScale(point.value).toFixed(2)}`).join(" ");
+    }
     function draw(parent, points, kind, xScale = x, yScale = y) {
-      const d = points.map((point, i) => `${i ? "L" : "M"}${xScale(point.date).toFixed(2)},${yScale(point.value).toFixed(2)}`).join(" ");
-      add(parent, "path", {d, fill: "none", stroke: kind === "observed" ? "#58666c" : "#0a6670", "stroke-width": 2.7, "stroke-linejoin": "round", "stroke-linecap": "round", ...(kind === "reconstructed" ? {"stroke-dasharray": "5 3"} : {})});
+      return add(parent, "path", {d: pathData(points, xScale, yScale), fill: "none", stroke: kind === "observed" ? "#58666c" : "#0a6670", "stroke-width": 2.7, "stroke-linejoin": "round", "stroke-linecap": "round", ...(kind === "reconstructed" ? {"stroke-dasharray": "5 3"} : {})});
     }
     draw(document.getElementById("reconstructed-shift"), data.reconstructed, "reconstructed");
     draw(early, [...excluded, retained[0]], "observed");
@@ -133,15 +136,48 @@
     const fullEnd = Date.parse(`${data.full_end}T00:00:00Z`);
     const fullX = stamp => 84 + (Date.parse(`${stamp}T00:00:00Z`) - start) / (fullEnd - start) * 1046;
     const fullY = value => 338 - value / data.full_axis_max * 275;
-    drawAxes(add(full, "g", {id: "full-axes"}), fullX, fullY, data.full_axis_max, data.full_tick_step, [[data.start, "2009"], ["2012-01-01", "2012"], ["2015-01-01", "2015"], ["2018-01-01", "2018"], ["2021-01-01", "2021"], ["2024-01-01", "2024"], [data.full_end, "Jul 2026"]]);
+    const transitionAxes = add(full, "g", {id: "transition-axes", "aria-hidden": "true"});
+    const fullAxes = add(full, "g", {id: "full-axes"});
+    drawAxes(fullAxes, fullX, fullY, data.full_axis_max, data.full_tick_step, [[data.start, "2009"], ["2012-01-01", "2012"], ["2015-01-01", "2015"], ["2018-01-01", "2018"], ["2021-01-01", "2021"], ["2024-01-01", "2024"], [data.full_end, "Jul 2026"]]);
     const shifted = data.reconstructed.map(point => ({date: new Date(Date.parse(`${point.date}T00:00:00Z`) + data.training_shift_days * 86400000).toISOString().slice(0, 10), value: point.value}));
-    draw(add(full, "g", {id: "full-reconstructed"}), [...shifted, first], "reconstructed", fullX, fullY);
-    draw(add(full, "g", {id: "full-observed"}), [...retained, ...data.extended], "observed", fullX, fullY);
+    const fullReconstructed = draw(add(full, "g", {id: "full-reconstructed"}), [...shifted, first], "reconstructed", fullX, fullY);
+    const fullObserved = draw(add(full, "g", {id: "full-observed"}), retained, "observed", fullX, fullY);
+    const extension = add(full, "g", {id: "full-extension"});
+    draw(extension, [retained.at(-1), ...data.extended], "observed", fullX, fullY);
+    function fullFrame(progress, reveal) {
+      const animatedX = stamp => x(stamp) + (fullX(stamp) - x(stamp)) * progress;
+      const animatedY = value => y(value) + (fullY(value) - y(value)) * progress;
+      fullReconstructed.setAttribute("d", pathData([...shifted, first], animatedX, animatedY));
+      fullObserved.setAttribute("d", pathData(retained, animatedX, animatedY));
+      transitionAxes.replaceChildren();
+      if (reveal < 1) drawAxes(transitionAxes, animatedX, animatedY, data.axis_max, data.tick_step, originalTicks);
+      for (const [element, opacity] of [[transitionAxes, 1 - reveal], [fullAxes, reveal], [extension, reveal]]) {
+        element.style.opacity = String(opacity);
+        element.style.visibility = opacity === 0 ? "hidden" : "visible";
+      }
+    }
+    let fullAnimation = 0;
+    function animateFullHistory() {
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) { fullFrame(1, 1); return; }
+      const began = performance.now();
+      fullFrame(0, 0);
+      function frame(now) {
+        const elapsed = now - began;
+        const t = Math.min(1, elapsed / 1250);
+        const reveal = Math.max(0, Math.min(1, (elapsed - 1250) / 650));
+        fullFrame(t * t * (3 - 2 * t), reveal);
+        if (reveal < 1) fullAnimation = requestAnimationFrame(frame);
+      }
+      fullAnimation = requestAnimationFrame(frame);
+    }
     function fromHash() {
       const state = new URLSearchParams(location.hash.slice(1)).get("state");
       return ["1", "2", "3", "4"].includes(state) ? Number(state) : 1;
     }
     function render(state = fromHash()) {
+      const previous = document.body.dataset.state;
+      if (state !== 4) cancelAnimationFrame(fullAnimation);
+      else if (previous !== "4") animateFullHistory();
       document.body.dataset.state = String(state);
       select.value = String(state); back.disabled = state === 1; next.disabled = state === 4;
       document.getElementById("initial-history").setAttribute("aria-hidden", String(state === 4));
@@ -164,7 +200,7 @@
       if (["SELECT", "INPUT", "BUTTON", "A"].includes(document.activeElement.tagName)) return;
       if (event.key === "ArrowRight" || event.key === "ArrowLeft") { event.preventDefault(); go(fromHash() + (event.key === "ArrowRight" ? 1 : -1)); }
     });
-    render(fromHash() === 3 ? 2 : fromHash());
+    render(fromHash() >= 3 ? fromHash() - 1 : fromHash());
     requestAnimationFrame(() => requestAnimationFrame(() => {
       document.body.dataset.ready = "true";
       render();

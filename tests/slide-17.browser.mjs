@@ -102,8 +102,27 @@ try {
   await page.waitForFunction(shiftPx=>Math.abs(new DOMMatrix(getComputedStyle(document.querySelector('#reconstructed-shift')).transform).m41-shiftPx)<.001,shiftPx);
   await page.locator('#next-button').click();
   await page.waitForFunction(()=>document.body.dataset.state==='4');
+  await page.waitForFunction(()=>{
+    const path=document.querySelector('#full-observed path').getAttribute('d');
+    const lastX=Number(path.split(' L').at(-1).split(',')[0]);
+    return lastX>960&&lastX<1070;
+  });
+  const expansion=await page.evaluate(()=>{
+    const lastX=Number(document.querySelector('#full-observed path').getAttribute('d').split(' L').at(-1).split(',')[0]);
+    const tick=[...document.querySelectorAll('#transition-axes text')].find(el=>el.textContent==='Oct 2022');
+    return {lastX,tickX:Number(tick.getAttribute('x')),extensionOpacity:getComputedStyle(document.querySelector('#full-extension')).opacity};
+  });
+  assert.ok(Math.abs(expansion.lastX-expansion.tickX)<.006,'The old endpoint and its axis tick move together');
+  assert.equal(expansion.extensionOpacity,'0','The new observations remain hidden while the axis extends');
+  await page.screenshot({path:join(artifacts,'extension-mid-zoom.png')});
+  await page.waitForFunction(()=>{
+    const opacity=Number(getComputedStyle(document.querySelector('#full-extension')).opacity);
+    return opacity>.2&&opacity<.8;
+  });
+  await page.screenshot({path:join(artifacts,'extension-mid-fade.png')});
+  await page.waitForFunction(()=>getComputedStyle(document.querySelector('#full-extension')).opacity==='1');
   const shifted=data.reconstructed.map(point=>({date:new Date(Date.parse(point.date)+data.training_shift_days*86400000).toISOString().slice(0,10),value:point.value}));
-  for(const [kind,points] of [['full-reconstructed',[...shifted,retained[0]]],['full-observed',[...retained,...data.extended]]]) {
+  for(const [kind,points] of [['full-reconstructed',[...shifted,retained[0]]],['full-observed',retained],['full-extension',[retained.at(-1),...data.extended]]]) {
     const path=await page.locator(`#${kind} path`).getAttribute('d');
     const vertices=Array.from(path.matchAll(/[ML]([\d.]+),([\d.]+)/g),m=>[Number(m[1]),Number(m[2])]);
     assert.equal(vertices.length,points.length);
@@ -136,10 +155,23 @@ try {
   await page.goto('about:blank');
   await page.goto(`${url}#state=4`);
   await page.waitForFunction(()=>document.body.dataset.state==='4');
+  await page.waitForFunction(()=>{
+    const lastX=Number(document.querySelector('#full-observed path').getAttribute('d').split(' L').at(-1).split(',')[0]);
+    return lastX>960&&lastX<1070;
+  });
+  assert.equal(await page.locator('#full-extension').evaluate(el=>getComputedStyle(el).opacity),'0','Direct entry plays the expansion before revealing observations');
   assert.equal(await page.locator('#full-history').isVisible(),true);
   assert.equal(await page.locator('#state-select').inputValue(),'4');
+  await page.locator('#back-button').click();
+  await page.waitForFunction(()=>document.body.dataset.state==='3');
+  assert.equal(await page.locator('#full-history').isVisible(),false,'Navigation can interrupt the expansion');
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.locator('#next-button').click();
+  await page.waitForFunction(()=>document.body.dataset.state==='4');
+  assert.equal(await page.locator('#full-extension').evaluate(el=>getComputedStyle(el).opacity),'1','Reduced motion skips both the expansion and fade');
+  assert.equal(await page.locator('#transition-axes').isVisible(),false);
   await page.goto(`${url}#state=invalid`);
   assert.equal(await page.locator('#state-select').inputValue(),'1');
   assert.deepEqual(errors,[]);
-  console.log(`Slide 17: all four states, forward/reverse and direct-entry animation, source values, weekly stitch, full-history extension, layout, and reduced motion passed. Screenshots: ${artifacts}`);
+  console.log(`Slide 17: all four states, stitching and axis-expansion animation, delayed observation fade, direct entry, interruption, source values, layout, and reduced motion passed. Screenshots: ${artifacts}`);
 } finally {await browser.close();}
