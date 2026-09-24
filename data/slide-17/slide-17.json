@@ -3,6 +3,8 @@
   "location": "Texas",
   "start": "2009-09-01",
   "end": "2022-10-01",
+  "training_shift_days": 728,
+  "retained_observed_start": "2021-07-01",
   "axis_max": 2500,
   "tick_step": 500,
   "units": "Weekly influenza hospital admissions",

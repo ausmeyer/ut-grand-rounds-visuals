@@ -2,17 +2,25 @@
 
 ## Teaching and display
 
-One Texas hospitalization plot, two addressable views, fixed 1240 × 540 frame.
+One Texas hospitalization plot, three addressable views, fixed 1240 × 540 frame.
 Keep the title in Slides.com: **Borrowing history from outpatient surveillance**.
 
 - `#state=1`: reported admissions, January 11, 2020 through October 1, 2022.
 - `#state=2`: add ILINet-based reconstructed admissions, October 9, 2010 through
   June 29, 2019, with a dashed teal line. Observations remain solid gray.
-- Both views have identical axes: September 2009 to October 2022, 0–2,500
-  admissions per week. No smoothing, rescaling, synthetic points, interpolation,
-  or connecting line across the gap between the two sources.
+- `#state=3`: fade out observations before July 2021, then animate the historical
+  reconstruction forward 728 days (104 weeks), restoring its modeling time index.
+  Its last point, June 26, 2021, joins the first retained observation, July 3, 2021.
+  All 522 retained weekly values form a continuous training sequence.
+- All views retain identical axis positions and scales. No values are smoothed,
+  rescaled, or fabricated. States 1–2 show original calendar dates; state 3
+  intentionally restores the shifted model index without an extra visible label,
+  as requested. Observed dates never move. No connector crosses the historical
+  gap in state 2; the state-3 connector joins consecutive weeks only.
+- Direct entry to `#state=3` also plays the shift; returning to state 2 reverses
+  it. Reduced-motion settings show the final state without animation.
 - Texas is chosen to match the lecture's earlier local examples, not by fit.
-- Takeaway: “A longer training history, not new observations.”
+- Takeaway: “A longer training history provides more context for the model to forecast.”
 
 ## Source of truth
 
@@ -28,17 +36,16 @@ description of date stitching.
 | 456 reconstructed Texas weeks | `flusight_2023/imputed_and_stitched_hosp.csv`, Texas rows with nonmissing `pred_hosp`; `total_hosp` used without adjustment | Saved output from the published-method project, not a newly fitted reconstruction or a frozen October 2022 vintage |
 | 143 observed Texas weeks | `flusight_2022/Flusight-forecast-data/data-truth/truth-Incident Hospitalizations.csv`, Texas, January 11, 2020 through October 1, 2022 | Archived reported counts include early underreporting and the pandemic period; not every displayed observation was retained in the model's training set |
 | Reconstruction from ILINet | Paper, Data augmentation approach; local `flusight_2023/stitch.Rmd`, Combined Model and Make Historical Time Series | Pooled transformed ILI/EIP mapping transferred across locations, not direct equivalence between ILI percentages and observed hospitalization counts |
-| Original calendar dates | Paper and `flusight_2023/stitch.Rmd`, Compare To Current Data, `date + days(728)` | The display reverses this modeling-index shift for reconstructed rows only; observed dates are never shifted |
+| Calendar-to-model-index shift | Paper and `flusight_2023/stitch.Rmd`, Compare To Current Data, `date + days(728)` | State 2 reverses the shift; state 3 reapplies exactly 728 days to reconstructed rows only; observed dates never shift |
 | Reconstructed admissions are counts | `flusight_2023/stitch.Rmd`, population conversion; stored `pred_hosp`, `population`, and `total_hosp` | The saved Texas population is 29,527,941; counts match rates × population / 100,000 rounded to integers |
 
 The original modeling pipeline excluded 2019/20 and 2020/21, retained reconstructed
 history through June 2019 and observed history from July 2021, then shifted the
-reconstructed date index forward 728 days. This slide shows the reconstructed
-history on its original calendar alongside the available observed record, not
-the literal stitched training matrix. The short observed record intentionally
-includes 2020/21 to connect to slide 16; it is not presented as entirely used for
-training. These implementation details belong in presenter documentation, not
-extra explanatory paragraphs on the slide.
+reconstructed date index forward 728 days. State 2 shows original calendar dates;
+state 3 restores the shifted index and removes the excluded observations.
+The short observed record in states 1–2 includes 2020/21 to connect to slide 16.
+No extra visible time-index label is added; the interpretation remains in these
+presenter notes and the accessible chart description.
 
 The 2023 project's normalized-ILI reconstruction is used rather than the older
 2022 saved output, whose `ili` column contains unnormalized percentages and whose
@@ -68,7 +75,8 @@ repository. Do not do this as part of a routine rebuild.
 
 Tests verify all 599 source-to-chart values, date reversal, rate-to-count
 conversion, weekly uniqueness and continuity within each source, frame bounds,
-label collisions, unchanged axes and observations across builds, navigation,
-reduced motion, and absence of runtime network requests. Visual review is also
+label collisions, unchanged axes and retained observations across builds,
+forward/reverse animation, direct-entry animation, the exact weekly stitch,
+navigation, reduced motion, and absence of runtime network requests. Visual review is also
 required at the actual iframe size before publishing. Deployment verification
 checks the Pages run and exact live HTML against the local generated file.

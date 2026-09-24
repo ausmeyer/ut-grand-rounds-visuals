@@ -163,10 +163,12 @@ Slide 14's real archived example from Slide 15's synthetic illustration.
 Both build offline with `python3 scripts/build_forecast_scores.py`. The new
 Slide 15 displays no measured model score or performance claim.
 
-Slide 17 shows the Texas hospitalization reconstruction in two views:
+Slide 17 shows the Texas hospitalization reconstruction in three views:
 `#state=1` displays the short observed record; `#state=2` adds the ILINet-based
 historical estimates as a dashed line. The original calendar dates are restored
-from the model's shifted time index. Axes and observations stay fixed. Use a
+from the model's shifted time index. `#state=3` animates a 728-day forward shift
+and joins the reconstruction to retained observations from July 2021. Axes and
+retained observations stay fixed; earlier observations fade out. Use a
 1240 × 540 iframe, with the title in Slides.com. This builds offline with
 `python3 scripts/build_slide_17.py`; see the [source and date-handling notes](specs/slide-17-evidence.md).
 

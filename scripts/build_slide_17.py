@@ -96,6 +96,7 @@ def example():
         series[source["kind"]] = points
     maximum = max(point["value"] for points in series.values() for point in points)
     return {"slide": 17, "location": "Texas", "start": START, "end": END,
+            "training_shift_days": SHIFT.days, "retained_observed_start": "2021-07-01",
             "axis_max": math.ceil(maximum / 500) * 500, "tick_step": 500,
             "units": "Weekly influenza hospital admissions",
             "citation": {"label": "Meyer et al. · Epidemics · 2025",

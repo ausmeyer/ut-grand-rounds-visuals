@@ -1,6 +1,6 @@
 """Verify the chart against archived source rows, on the original calendar."""
 import csv
-from datetime import date
+from datetime import date, timedelta
 import hashlib
 import json
 from pathlib import Path
@@ -60,8 +60,24 @@ class ReconstructionTests(unittest.TestCase):
         self.assertEqual(html, BUILD.render(data))
         self.assertNotIn("—", html)
         self.assertIn("Reconstructed from ILINet", html)
-        self.assertIn("A longer training history, not new observations.", html)
+        self.assertIn("A longer training history provides more context for the model to forecast.", html)
         self.assertNotIn("<h1", html)
+
+    def test_stitched_sequence_matches_original_model_index(self):
+        data = BUILD.example()
+        self.assertEqual(data["training_shift_days"], 728)
+        self.assertEqual(data["retained_observed_start"], "2021-07-01")
+        shifted = [{"date": (date.fromisoformat(point["date"]) + timedelta(days=728)).isoformat(),
+                    "value": point["value"]} for point in data["reconstructed"]]
+        rows = BUILD.read_rows(BUILD.DATA / "reconstructed-source.csv")
+        self.assertEqual(shifted, [{"date": row["date"], "value": float(row["total_hosp"])} for row in rows])
+        retained = [point for point in data["observed"] if point["date"] >= data["retained_observed_start"]]
+        self.assertEqual(len(retained), 66)
+        self.assertEqual(shifted[-1], {"date": "2021-06-26", "value": 50})
+        self.assertEqual(retained[0], {"date": "2021-07-03", "value": 58})
+        dates = [date.fromisoformat(point["date"]) for point in shifted + retained]
+        self.assertEqual(len(dates), 522)
+        self.assertTrue(all((b - a).days == 7 for a, b in zip(dates, dates[1:])))
 
 
 if __name__ == "__main__":

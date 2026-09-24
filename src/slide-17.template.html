@@ -33,24 +33,38 @@
     .citation { fill: var(--muted); font-size: 14px; }
     a:hover .citation { fill: var(--teal); text-decoration: underline; }
     .reveal { opacity: 0; visibility: hidden; }
-    body[data-state="2"] .reveal { opacity: 1; visibility: visible; }
+    body[data-state="2"] .reveal, body[data-state="3"] .reveal { opacity: 1; visibility: visible; }
+    #reconstructed-shift { transform: translateX(0); }
+    body[data-state="3"] #reconstructed-shift { transform: translateX(var(--shift-x)); }
+    #observed-early { opacity: 1; visibility: visible; }
+    body[data-state="3"] #observed-early { opacity: 0; visibility: hidden; }
+    #stitch-join { opacity: 0; visibility: hidden; }
+    body[data-state="3"] #stitch-join { opacity: 1; visibility: visible; }
     body[data-ready] .reveal { transition: opacity 400ms ease, visibility 400ms; }
-    @media (prefers-reduced-motion: reduce) { body[data-ready] .reveal { transition: none; } }
+    body[data-ready] #observed-early { transition: opacity 300ms ease, visibility 300ms; }
+    body[data-ready] #reconstructed-shift { transition: transform 1400ms cubic-bezier(.22,.61,.36,1); }
+    body[data-ready][data-state="3"] #reconstructed-shift { transition-delay: 350ms; }
+    body[data-ready][data-state="3"] #stitch-join { transition: opacity 150ms 1750ms, visibility 0s 1750ms; }
+    @media (prefers-reduced-motion: reduce) {
+      body[data-ready][data-state] .reveal, body[data-ready][data-state] #observed-early,
+      body[data-ready][data-state] #reconstructed-shift, body[data-ready][data-state] #stitch-join { transition: none; }
+    }
   </style>
 </head>
 <body>
   <main class="app">
     <header class="topbar">
       <div class="subtitle">Texas · weekly influenza hospital admissions</div>
-      <div class="controls"><label for="state-select">View</label><button id="back-button" aria-label="Previous view">←</button><select id="state-select" aria-label="Hospitalization history view"><option value="1">1 · Observed history</option><option value="2">2 · Add reconstructed history</option></select><button id="next-button" aria-label="Next view">→</button></div>
+      <div class="controls"><label for="state-select">View</label><button id="back-button" aria-label="Previous view">←</button><select id="state-select" aria-label="Hospitalization history view"><option value="1">1 · Observed history</option><option value="2">2 · Add reconstructed history</option><option value="3">3 · Stitch the training history</option></select><button id="next-button" aria-label="Next view">→</button></div>
     </header>
     <section class="frame">
       <svg id="chart" viewBox="0 0 1158 438" role="img" aria-labelledby="chart-title chart-desc">
         <title id="chart-title">Borrowing history from outpatient surveillance in Texas</title>
         <desc id="chart-desc"></desc>
         <g id="axes"></g>
-        <g id="reconstructed" class="reveal" aria-hidden="true"></g>
+        <g id="reconstructed" class="reveal" aria-hidden="true"><g id="reconstructed-shift"></g></g>
         <g id="observed"></g>
+        <g id="stitch-join" aria-hidden="true"></g>
         <g id="labels">
           <g class="reveal" aria-hidden="true">
             <line x1="156" x2="194" y1="23" y2="23" stroke="#0a6670" stroke-width="2.7" stroke-dasharray="5 3"/>
@@ -58,9 +72,9 @@
           </g>
           <line x1="910" x2="948" y1="23" y2="23" stroke="#58666c" stroke-width="2.7"/>
           <text x="959" y="30" class="observed-label">Observed</text>
-          <text x="84" y="415" class="takeaway reveal" aria-hidden="true">A longer training history, not new observations.</text>
+          <text x="84" y="405" class="takeaway reveal" aria-hidden="true">A longer training history provides more context for the model to forecast.</text>
           <a href="https://doi.org/10.1016/j.epidem.2025.100816" target="_blank" rel="noopener noreferrer" aria-label="Meyer and colleagues, Epidemics 2025">
-            <text x="1130" y="415" text-anchor="end" class="citation">Meyer et al. · Epidemics · 2025</text>
+            <text x="1130" y="435" text-anchor="end" class="citation">Meyer et al. · Epidemics · 2025</text>
           </a>
         </g>
       </svg>
@@ -91,30 +105,50 @@
       add(axes, "line", {x1: x(stamp), x2: x(stamp), y1: 338, y2: 346, stroke: "#aab7b7"});
       add(axes, "text", {x: x(stamp), y: 369, class: "tick", "text-anchor": stamp === data.end ? "end" : "middle"}, label);
     }
-    for (const kind of ["reconstructed", "observed"]) {
-      const points = data[kind];
+    const shiftPx = data.training_shift_days * 86400000 / (end - start) * 1046;
+    document.documentElement.style.setProperty("--shift-x", `${shiftPx}px`);
+    const retained = data.observed.filter(point => point.date >= data.retained_observed_start);
+    const excluded = data.observed.filter(point => point.date < data.retained_observed_start);
+    const observed = document.getElementById("observed");
+    const early = add(observed, "g", {id: "observed-early"});
+    const kept = add(observed, "g", {id: "observed-retained"});
+    function draw(parent, points, kind) {
       const d = points.map((point, i) => `${i ? "L" : "M"}${x(point.date).toFixed(2)},${y(point.value).toFixed(2)}`).join(" ");
-      add(document.getElementById(kind), "path", {d, fill: "none", stroke: kind === "observed" ? "#58666c" : "#0a6670", "stroke-width": 2.7, "stroke-linejoin": "round", "stroke-linecap": "round", ...(kind === "reconstructed" ? {"stroke-dasharray": "5 3"} : {})});
+      add(parent, "path", {d, fill: "none", stroke: kind === "observed" ? "#58666c" : "#0a6670", "stroke-width": 2.7, "stroke-linejoin": "round", "stroke-linecap": "round", ...(kind === "reconstructed" ? {"stroke-dasharray": "5 3"} : {})});
     }
-    function fromHash() { return new URLSearchParams(location.hash.slice(1)).get("state") === "2" ? 2 : 1; }
-    function render() {
-      const state = fromHash();
+    draw(document.getElementById("reconstructed-shift"), data.reconstructed, "reconstructed");
+    draw(early, [...excluded, retained[0]], "observed");
+    draw(kept, retained, "observed");
+    const last = data.reconstructed.at(-1), first = retained[0];
+    add(document.getElementById("stitch-join"), "line", {x1: x(last.date) + shiftPx, y1: y(last.value), x2: x(first.date), y2: y(first.value), stroke: "#0a6670", "stroke-width": 2.7, "stroke-dasharray": "5 3"});
+    function fromHash() {
+      const state = new URLSearchParams(location.hash.slice(1)).get("state");
+      return state === "3" ? 3 : state === "2" ? 2 : 1;
+    }
+    function render(state = fromHash()) {
       document.body.dataset.state = String(state);
-      select.value = String(state); back.disabled = state === 1; next.disabled = state === 2;
-      for (const element of document.querySelectorAll(".reveal")) element.setAttribute("aria-hidden", String(state !== 2));
-      document.getElementById("chart-desc").textContent = "Texas weekly reported influenza hospital admissions from January 2020 through October 2022, shown as a solid gray line on a calendar beginning in September 2009." + (state === 2 ? " A dashed teal line adds the saved ILINet-based reconstruction from October 2010 through June 2019. These are estimated historical admissions, not observations. Original calendar dates are restored, and no line bridges the gap between reconstructed and observed records." : " The earlier years are left empty. Advance to reveal the reconstructed hospitalization history.");
+      select.value = String(state); back.disabled = state === 1; next.disabled = state === 3;
+      for (const element of document.querySelectorAll(".reveal")) element.setAttribute("aria-hidden", String(state === 1));
+      early.setAttribute("aria-hidden", String(state === 3));
+      document.getElementById("stitch-join").setAttribute("aria-hidden", String(state !== 3));
+      document.getElementById("chart-desc").textContent = state === 3
+        ? "Texas stitched training sequence. The reconstructed history shifts forward 728 days, or 104 weeks, without changing any values. Its last point is indexed June 26, 2021, followed by the first retained observed point on July 3, 2021. Earlier observed weeks are excluded. The axis now represents the training time index, not the reconstructed seasons' original calendar dates."
+        : "Texas weekly reported influenza hospital admissions from January 2020 through October 2022, shown as a solid gray line on a calendar beginning in September 2009." + (state === 2 ? " A dashed teal line adds the saved ILINet-based reconstruction from October 2010 through June 2019. These are estimated historical admissions, not observations. Original calendar dates are restored, and no line bridges the gap between reconstructed and observed records." : " The earlier years are left empty. Advance to reveal the reconstructed hospitalization history.");
     }
-    function go(state) { location.hash = `state=${Math.max(1, Math.min(2, state))}`; }
+    function go(state) { location.hash = `state=${Math.max(1, Math.min(3, state))}`; }
     select.addEventListener("change", () => go(Number(select.value)));
     back.addEventListener("click", () => go(fromHash() - 1));
     next.addEventListener("click", () => go(fromHash() + 1));
-    addEventListener("hashchange", render);
+    addEventListener("hashchange", () => render());
     addEventListener("keydown", event => {
       if (["SELECT", "INPUT", "BUTTON", "A"].includes(document.activeElement.tagName)) return;
       if (event.key === "ArrowRight" || event.key === "ArrowLeft") { event.preventDefault(); go(fromHash() + (event.key === "ArrowRight" ? 1 : -1)); }
     });
-    render();
-    requestAnimationFrame(() => requestAnimationFrame(() => { document.body.dataset.ready = "true"; }));
+    render(fromHash() === 3 ? 2 : fromHash());
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      document.body.dataset.ready = "true";
+      render();
+    }));
   </script>
 </body>
 </html>
