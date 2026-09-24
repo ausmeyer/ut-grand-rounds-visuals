@@ -44,12 +44,17 @@ try {
   assert.equal(vertices.length,141);
   const peak=Math.max(...data.curve.map(point=>point.density));
   data.curve.forEach((point,i)=>{
-    assert.ok(Math.abs(vertices[i][0]-(949+point.z/3.5*165))<.006);
-    assert.ok(Math.abs(vertices[i][1]-(257-point.density/peak*136))<.006);
+    assert.ok(Math.abs(vertices[i][0]-(980+point.density/peak*100))<.006);
+    assert.ok(Math.abs(vertices[i][1]-(198-point.z/3.5*124))<.006);
   });
-  assert.equal(vertices[70][0],Number(await page.locator('#center-marker').getAttribute('x1')),'Center marker aligns with the distribution center');
-  assert.ok(Math.abs(Number(await page.locator('#spread-marker').getAttribute('x1'))-(949-165/3.5))<.006);
-  assert.ok(Math.abs(Number(await page.locator('#spread-marker').getAttribute('x2'))-(949+165/3.5))<.006);
+  assert.equal(vertices[70][1],Number(await page.locator('#center-marker').getAttribute('y1')),'Center marker aligns with the forecast value');
+  assert.equal(vertices[70][1],Number(await page.locator('#forecast-center').getAttribute('cy')),'Density and future forecast point have the same vertical center');
+  assert.ok(Math.abs(Number(await page.locator('#spread-marker').getAttribute('y1'))-(198-124/3.5))<.006);
+  assert.ok(Math.abs(Number(await page.locator('#spread-marker').getAttribute('y2'))-(198+124/3.5))<.006);
+  assert.equal(await page.locator('#spread-marker').getAttribute('x1'),await page.locator('#spread-marker').getAttribute('x2'),'Spread is vertical');
+  assert.equal(await page.locator('#forecast-link').getAttribute('d'),'M911,213 L980,198');
+  assert.ok(await page.locator('#center-label').evaluate(el=>el.getBoundingClientRect().right<document.getElementById('density-axis').getBoundingClientRect().left-10),'Center label stays clear of the vertical forecast-time line');
+  assert.match(await page.locator('#diagram-desc').textContent(),/not a trajectory/);
   const pooled=await page.locator('#pooled-model').elementHandle();
   await page.locator('#back-button').click();
   await page.waitForFunction(()=>{

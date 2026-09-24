@@ -97,12 +97,20 @@
         </g>
         <g id="distribution" class="pooled-detail" aria-hidden="true">
           <path class="connector" d="M710,198 H759" marker-end="url(#arrow)"/>
-          <line x1="779" x2="1119" y1="257" y2="257" stroke="#aab7b7" stroke-width="1.5"/>
+          <g id="forecast-context">
+            <line x1="783" x2="1119" y1="333" y2="333" stroke="#aab7b7" stroke-width="1.5" marker-end="url(#arrow)"/>
+            <text x="836" y="357" font-size="16" style="fill: var(--muted)">Time</text>
+            <path id="schematic-history" d="M783,260 L811,254 L836,263 L861,226 L886,237 L911,213" fill="none" stroke="#647278" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="911" cy="213" r="3.5" fill="#647278"/>
+            <path id="forecast-link" d="M911,213 L980,198" fill="none" stroke="#0a6670" stroke-width="2" stroke-dasharray="4 4"/>
+            <circle id="forecast-center" cx="980" cy="198" r="3.5" fill="#0a6670"/>
+          </g>
+          <line id="density-axis" x1="980" x2="980" y1="74" y2="322" stroke="#aab7b7" stroke-width="1.5"/>
           <path id="density-curve" fill="none" stroke="#0a6670" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          <line id="center-marker" x1="949" x2="949" y1="108" y2="257" stroke="#0a6670" stroke-width="1.5" stroke-dasharray="4 4"/>
-          <text class="teal" x="949" y="91" font-size="23" font-weight="650">Center</text>
-          <line id="spread-marker" x1="901.86" x2="996.14" y1="284" y2="284" stroke="#0a6670" stroke-width="1.8" marker-start="url(#spread-arrow)" marker-end="url(#spread-arrow)"/>
-          <text class="teal" x="949" y="318" font-size="23" font-weight="650">Spread</text>
+          <line id="center-marker" x1="968" x2="1090" y1="198" y2="198" stroke="#0a6670" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <text id="center-label" class="teal" x="930" y="171" font-size="23" font-weight="650">Center</text>
+          <line id="spread-marker" x1="1107" x2="1107" y1="162.57" y2="233.43" stroke="#0a6670" stroke-width="1.8" marker-start="url(#spread-arrow)" marker-end="url(#spread-arrow)"/>
+          <text class="teal" x="1093" y="279" font-size="23" font-weight="650">Spread</text>
           <text id="quantile-count" class="teal" x="949" y="370" font-size="25" font-weight="730"></text>
           <text class="teal" x="949" y="401" font-size="25" font-weight="730">forecast quantiles</text>
         </g>
@@ -114,7 +122,7 @@
     const data = /*__ILLUSTRATION__*/;
     const select = document.getElementById("state-select"), back = document.getElementById("back-button"), next = document.getElementById("next-button");
     const peak = Math.max(...data.curve.map(point => point.density));
-    document.getElementById("density-curve").setAttribute("d", data.curve.map((point, i) => `${i ? "L" : "M"}${(949 + point.z / 3.5 * 165).toFixed(2)},${(257 - point.density / peak * 136).toFixed(2)}`).join(" "));
+    document.getElementById("density-curve").setAttribute("d", data.curve.map((point, i) => `${i ? "L" : "M"}${(980 + point.density / peak * 100).toFixed(2)},${(198 - point.z / 3.5 * 124).toFixed(2)}`).join(" "));
     document.getElementById("quantile-count").textContent = `Derive ${data.quantile_count}`;
     function fromHash() { return new URLSearchParams(location.hash.slice(1)).get("state") === "2" ? 2 : 1; }
     function render(state = fromHash()) {
@@ -124,7 +132,7 @@
       for (const element of document.querySelectorAll(".pooled-detail")) element.setAttribute("aria-hidden", String(state !== 2));
       document.getElementById("diagram-desc").textContent = state === 1
         ? "Model progression: regularized vector autoregression, state-specific LightGBM with separate fits, and pooled LightGBM with shared training across locations. Ensembling throughout."
-        : "Texas, California, New York, and other locations contribute training data to pooled LightGBM. Predict the center and spread of a conditional distribution on a transformed scale, then derive 23 forecast quantiles. The Gaussian curve is a schematic illustration, not observed data or measured forecast performance. Pooling training does not mean fitting a joint probability distribution across locations.";
+        : "Texas, California, New York, and other locations contribute training data to pooled LightGBM. Predict the center and spread of a conditional distribution on a transformed scale, then derive 23 forecast quantiles. A schematic time series leads to a future forecast point. Time runs horizontally and possible forecast values vertically; the sideways Gaussian density shows uncertainty at that one future time, not a trajectory. The trace and Gaussian curve are schematic illustrations, not observed data or measured forecast performance. Pooling training does not mean fitting a joint probability distribution across locations.";
     }
     function go(state) { location.hash = `state=${Math.max(1, Math.min(2, state))}`; }
     select.addEventListener("change", () => go(Number(select.value)));

@@ -13,7 +13,9 @@ presenter's influenza hospitalization forecasting research, not patient care.
 - `#state=1`: three model blocks, straight arrows, and “Ensembling throughout.”
 - `#state=2`: the same pooled-model block moves into the center. Location
   inputs and a schematic distribution fade in. Center, spread, and “Derive 23
-  forecast quantiles” are the only distribution labels.
+  forecast quantiles” label the distribution. The density is turned sideways
+  at a future point on a short schematic time series: time is horizontal,
+  forecast values and spread are vertical. All text stays upright.
 - Forward, backward, direct-entry, keyboard, and dropdown navigation work.
   Reduced motion skips transitions. Direct entry to state 2 plays the build.
 - No dates, model rankings, accuracy improvements, formulas, extra controls,
@@ -38,7 +40,10 @@ transformed scale, not synthetic hospitalization observations or a measured
 forecast. It is identified as schematic in the generated metadata and accessible
 description. There are no numerical axes or performance results. The displayed
 spread marker spans one standard deviation on each side of the center solely
-to locate width; it is not labeled as a prediction interval.
+to locate spread; it is not labeled as a prediction interval. The gray trace
+and dashed continuation are unscaled schematic context, not additional
+hospitalization data. The sideways density represents one future time point;
+its horizontal width encodes density, not another segment of the time series.
 
 Pooling and distributional fitting are distinct choices. This graphic does not
 claim pooling made distributional fitting possible, that Gaussian assumptions
