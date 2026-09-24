@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>From separate models to shared learning</title>
+  <style>
+    :root { --ink: #14242b; --muted: #647278; --teal: #0a6670; --paper: #fbfaf6; --line: #d5dad6; }
+    * { box-sizing: border-box; }
+    html, body { width: 1240px; height: 540px; margin: 0; overflow: hidden; }
+    body { background: var(--paper); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .app { width: 1240px; height: 540px; display: grid; grid-template-rows: 38px 1fr; gap: 8px; padding: 10px 16px 8px; }
+    .topbar, .controls { display: flex; align-items: center; }
+    .topbar { justify-content: space-between; gap: 16px; }
+    .subtitle { color: #42535a; font-size: 16px; font-weight: 670; }
+    .controls { gap: 7px; }
+    .controls label { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; margin-right: 3px; }
+    button, select { height: 32px; border: 1px solid #b9c3c0; border-radius: 8px; background: white; color: var(--ink); font: inherit; font-weight: 740; }
+    select { width: 257px; padding: 0 32px 0 10px; font-size: 13px; }
+    button { width: 34px; padding: 0; font-size: 17px; cursor: pointer; }
+    button:hover { border-color: var(--teal); color: var(--teal); }
+    button:disabled { opacity: .35; cursor: default; }
+    :focus-visible { outline: 3px solid #82bcc1; outline-offset: 2px; }
+    .frame { padding: 17px 24px; border: 1px solid var(--line); border-radius: 14px; background: white; box-shadow: 0 8px 24px rgb(28 49 50 / 7%); }
+    #diagram { display: block; width: 1158px; height: 438px; }
+    svg text { fill: var(--ink); text-anchor: middle; }
+    .model-name { font-size: 29px; font-weight: 730; }
+    .support { font-size: 21px; fill: var(--muted); }
+    .model-box { fill: white; stroke: var(--line); stroke-width: 1.8; }
+    .connector { fill: none; stroke: #96a6a8; stroke-width: 2.4; }
+    .teal { fill: var(--teal); }
+    #pooled-model { transform: translate(850px, 119px); }
+    #pooled-model .model-box { stroke: var(--teal); stroke-width: 2.2; fill: #f7fbfa; }
+    #earlier-models { opacity: 1; visibility: visible; }
+    .pooled-detail { opacity: 0; visibility: hidden; }
+    body[data-state="2"] #pooled-model { transform: translate(404px, 119px); }
+    body[data-state="2"] #earlier-models { opacity: 0; visibility: hidden; }
+    body[data-state="2"] .pooled-detail { opacity: 1; visibility: visible; }
+    body[data-ready] #pooled-model { transition: transform 800ms 150ms cubic-bezier(.22,.61,.36,1); }
+    body[data-ready] #earlier-models { transition: opacity 200ms ease, visibility 200ms; }
+    body[data-ready] .pooled-detail { transition: opacity 180ms ease, visibility 180ms; }
+    body[data-ready][data-state="1"] #earlier-models { transition: opacity 280ms 850ms ease, visibility 0s 850ms; }
+    body[data-ready][data-state="2"] .pooled-detail { transition: opacity 280ms 850ms ease, visibility 0s 850ms; }
+    @media (prefers-reduced-motion: reduce) {
+      body[data-ready][data-state] #pooled-model, body[data-ready][data-state] #earlier-models,
+      body[data-ready][data-state] .pooled-detail { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="subtitle">Influenza hospitalization forecasting</div>
+      <div class="controls"><label for="state-select">View</label><button id="back-button" aria-label="Previous view">←</button><select id="state-select" aria-label="Model progression view"><option value="1">1 · Model progression</option><option value="2">2 · Shared learning</option></select><button id="next-button" aria-label="Next view">→</button></div>
+    </header>
+    <section class="frame">
+      <svg id="diagram" viewBox="0 0 1158 438" role="img" aria-labelledby="diagram-title diagram-desc">
+        <title id="diagram-title">From separate models to shared learning</title>
+        <desc id="diagram-desc"></desc>
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="12" markerHeight="12" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 Z" fill="#96a6a8"/></marker>
+          <marker id="spread-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 Z" fill="#0a6670"/></marker>
+        </defs>
+        <g id="earlier-models">
+          <g transform="translate(30 119)">
+            <rect class="model-box" width="280" height="158" rx="12"/>
+            <text class="model-name" x="140" y="67">Regularized</text>
+            <text class="model-name" x="140" y="104">VAR</text>
+          </g>
+          <path class="connector" d="M336,198 H414" marker-end="url(#arrow)"/>
+          <g transform="translate(440 119)">
+            <rect class="model-box" width="280" height="158" rx="12"/>
+            <text class="model-name" x="140" y="67">State-specific</text>
+            <text class="model-name" x="140" y="104">LightGBM</text>
+            <text class="support" x="140" y="188">Separate fits</text>
+          </g>
+          <path class="connector" d="M746,198 H824" marker-end="url(#arrow)"/>
+          <text class="support" x="580" y="388" font-weight="650">Ensembling throughout</text>
+        </g>
+        <g id="location-inputs" class="pooled-detail" aria-hidden="true">
+          <g id="input-connectors" class="connector">
+            <path d="M274,122 H326 M274,183 H326 M274,244 H326 M274,305 H326 M326,122 V305"/>
+            <path d="M326,198 H383" marker-end="url(#arrow)"/>
+          </g>
+          <g transform="translate(52 100)"><rect class="model-box" width="205" height="44" rx="8"/><text x="102.5" y="29" font-size="21">Texas</text></g>
+          <g transform="translate(52 161)"><rect class="model-box" width="205" height="44" rx="8"/><text x="102.5" y="29" font-size="21">California</text></g>
+          <g transform="translate(52 222)"><rect class="model-box" width="205" height="44" rx="8"/><text x="102.5" y="29" font-size="21">New York</text></g>
+          <g transform="translate(52 283)"><rect class="model-box" width="205" height="44" rx="8"/><text x="102.5" y="29" font-size="21">Other locations</text></g>
+        </g>
+        <g id="pooled-model">
+          <rect class="model-box" width="280" height="158" rx="12"/>
+          <text class="model-name teal" x="140" y="67">Pooled</text>
+          <text class="model-name teal" x="140" y="104">LightGBM</text>
+          <text class="support" x="140" y="188">Shared training</text>
+          <text class="support" x="140" y="213">across locations</text>
+        </g>
+        <g id="distribution" class="pooled-detail" aria-hidden="true">
+          <path class="connector" d="M710,198 H759" marker-end="url(#arrow)"/>
+          <line x1="779" x2="1119" y1="257" y2="257" stroke="#aab7b7" stroke-width="1.5"/>
+          <path id="density-curve" fill="none" stroke="#0a6670" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <line id="center-marker" x1="949" x2="949" y1="108" y2="257" stroke="#0a6670" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <text class="teal" x="949" y="91" font-size="23" font-weight="650">Center</text>
+          <line id="spread-marker" x1="901.86" x2="996.14" y1="284" y2="284" stroke="#0a6670" stroke-width="1.8" marker-start="url(#spread-arrow)" marker-end="url(#spread-arrow)"/>
+          <text class="teal" x="949" y="318" font-size="23" font-weight="650">Spread</text>
+          <text id="quantile-count" class="teal" x="949" y="370" font-size="25" font-weight="730"></text>
+          <text class="teal" x="949" y="401" font-size="25" font-weight="730">forecast quantiles</text>
+        </g>
+      </svg>
+    </section>
+  </main>
+  <script>
+    "use strict";
+    const data = {"slide":18,"kind":"schematic, not observed data or measured model performance","distribution":"standard normal on an illustrative transformed scale","quantile_count":23,"curve":[{"z":-3.5,"density":0.0008726826950457602},{"z":-3.45,"density":0.0010382812956614103},{"z":-3.4,"density":0.00123221916847302},{"z":-3.35,"density":0.0014587308046667459},{"z":-3.3,"density":0.0017225689390536812},{"z":-3.25,"density":0.002029048057299768},{"z":-3.2,"density":0.0023840882014648404},{"z":-3.15,"density":0.002794258414879447},{"z":-3.1,"density":0.0032668190561999186},{"z":-3.05,"density":0.0038097620982218104},{"z":-3.0,"density":0.0044318484119380075},{"z":-2.95,"density":0.005142640923053939},{"z":-2.9,"density":0.005952532419775854},{"z":-2.85,"density":0.006872766690613971},{"z":-2.8,"density":0.007915451582979969},{"z":-2.75,"density":0.009093562501591053},{"z":-2.7,"density":0.010420934814422592},{"z":-2.65,"density":0.01191224360760518},{"z":-2.6,"density":0.013582969233685615},{"z":-2.55,"density":0.015449347134395174},{"z":-2.5,"density":0.01752830049356854},{"z":-2.45,"density":0.019837354391795313},{"z":-2.4,"density":0.0223945302948429},{"z":-2.35,"density":0.025218219915194417},{"z":-2.3,"density":0.02832703774160119},{"z":-2.25,"density":0.03173965183566742},{"z":-2.2,"density":0.035474592846231424},{"z":-2.15,"density":0.03955004158937022},{"z":-2.1,"density":0.04398359598042723},{"z":-2.05,"density":0.04879201857918277},{"z":-2.0,"density":0.05399096651318806},{"z":-1.95,"density":0.059594706068816075},{"z":-1.9,"density":0.0656158147746766},{"z":-1.85,"density":0.07206487433621803},{"z":-1.8,"density":0.07895015830089419},{"z":-1.75,"density":0.08627731882651153},{"z":-1.7,"density":0.09404907737688695},{"z":-1.65,"density":0.10226492456397804},{"z":-1.6,"density":0.1109208346794556},{"z":-1.55,"density":0.12000900069698565},{"z":-1.5,"density":0.12951759566589174},{"z":-1.45,"density":0.13943056644536034},{"z":-1.4,"density":0.14972746563574488},{"z":-1.35,"density":0.1603833273419196},{"z":-1.3,"density":0.1713685920478074},{"z":-1.25,"density":0.18264908538902191},{"z":-1.2,"density":0.19418605498321304},{"z":-1.15,"density":0.20593626871997478},{"z":-1.1,"density":0.21785217703255064},{"z":-1.05,"density":0.2298821406842331},{"z":-1.0,"density":0.24197072451914337},{"z":-0.95,"density":0.2540590564691891},{"z":-0.9,"density":0.26608524989875487},{"z":-0.85,"density":0.2779848861309966},{"z":-0.8,"density":0.28969155276148284},{"z":-0.75,"density":0.30113743215480443},{"z":-0.7,"density":0.3122539333667614},{"z":-0.65,"density":0.3229723596679144},{"z":-0.6,"density":0.3332246028917997},{"z":-0.55,"density":0.34294385501938396},{"z":-0.5,"density":0.3520653267642995},{"z":-0.45,"density":0.360526962461648},{"z":-0.4,"density":0.3682701403033234},{"z":-0.35,"density":0.375240346916938},{"z":-0.3,"density":0.38138781546052414},{"z":-0.25,"density":0.3866681168028493},{"z":-0.2,"density":0.39104269397545594},{"z":-0.15,"density":0.39447933090788895},{"z":-0.1,"density":0.3969525474770118},{"z":-0.05,"density":0.39844391409476404},{"z":0.0,"density":0.3989422804014327},{"z":0.05,"density":0.39844391409476404},{"z":0.1,"density":0.3969525474770118},{"z":0.15,"density":0.3944793309078889},{"z":0.2,"density":0.3910426939754559},{"z":0.25,"density":0.3866681168028493},{"z":0.3,"density":0.3813878154605241},{"z":0.35,"density":0.3752403469169379},{"z":0.4,"density":0.3682701403033233},{"z":0.45,"density":0.36052696246164795},{"z":0.5,"density":0.3520653267642995},{"z":0.55,"density":0.34294385501938396},{"z":0.6,"density":0.33322460289179956},{"z":0.65,"density":0.3229723596679142},{"z":0.7,"density":0.3122539333667612},{"z":0.75,"density":0.30113743215480443},{"z":0.8,"density":0.28969155276148284},{"z":0.85,"density":0.27798488613099637},{"z":0.9,"density":0.26608524989875476},{"z":0.95,"density":0.25405905646918897},{"z":1.0,"density":0.24197072451914337},{"z":1.05,"density":0.2298821406842331},{"z":1.1,"density":0.21785217703255041},{"z":1.15,"density":0.20593626871997467},{"z":1.2,"density":0.19418605498321292},{"z":1.25,"density":0.18264908538902191},{"z":1.3,"density":0.1713685920478072},{"z":1.35,"density":0.1603833273419195},{"z":1.4,"density":0.1497274656357448},{"z":1.45,"density":0.13943056644536023},{"z":1.5,"density":0.12951759566589174},{"z":1.55,"density":0.12000900069698547},{"z":1.6,"density":0.11092083467945546},{"z":1.65,"density":0.10226492456397797},{"z":1.7,"density":0.0940490773768869},{"z":1.75,"density":0.08627731882651153},{"z":1.8,"density":0.07895015830089407},{"z":1.85,"density":0.07206487433621793},{"z":1.9,"density":0.06561581477467655},{"z":1.95,"density":0.059594706068816054},{"z":2.0,"density":0.05399096651318806},{"z":2.05,"density":0.04879201857918268},{"z":2.1,"density":0.043983595980427156},{"z":2.15,"density":0.03955004158937019},{"z":2.2,"density":0.035474592846231424},{"z":2.25,"density":0.03173965183566742},{"z":2.3,"density":0.02832703774160112},{"z":2.35,"density":0.02521821991519436},{"z":2.4,"density":0.022394530294842882},{"z":2.45,"density":0.019837354391795313},{"z":2.5,"density":0.01752830049356854},{"z":2.55,"density":0.015449347134395141},{"z":2.6,"density":0.013582969233685602},{"z":2.65,"density":0.01191224360760517},{"z":2.7,"density":0.010420934814422592},{"z":2.75,"density":0.009093562501591053},{"z":2.8,"density":0.007915451582979946},{"z":2.85,"density":0.006872766690613966},{"z":2.9,"density":0.005952532419775849},{"z":2.95,"density":0.005142640923053939},{"z":3.0,"density":0.0044318484119380075},{"z":3.05,"density":0.0038097620982218004},{"z":3.1,"density":0.0032668190561999156},{"z":3.15,"density":0.0027942584148794424},{"z":3.2,"density":0.0023840882014648404},{"z":3.25,"density":0.002029048057299768},{"z":3.3,"density":0.0017225689390536767},{"z":3.35,"density":0.0014587308046667433},{"z":3.4,"density":0.0012322191684730178},{"z":3.45,"density":0.0010382812956614103},{"z":3.5,"density":0.0008726826950457602}]};
+    const select = document.getElementById("state-select"), back = document.getElementById("back-button"), next = document.getElementById("next-button");
+    const peak = Math.max(...data.curve.map(point => point.density));
+    document.getElementById("density-curve").setAttribute("d", data.curve.map((point, i) => `${i ? "L" : "M"}${(949 + point.z / 3.5 * 165).toFixed(2)},${(257 - point.density / peak * 136).toFixed(2)}`).join(" "));
+    document.getElementById("quantile-count").textContent = `Derive ${data.quantile_count}`;
+    function fromHash() { return new URLSearchParams(location.hash.slice(1)).get("state") === "2" ? 2 : 1; }
+    function render(state = fromHash()) {
+      document.body.dataset.state = String(state);
+      select.value = String(state); back.disabled = state === 1; next.disabled = state === 2;
+      document.getElementById("earlier-models").setAttribute("aria-hidden", String(state !== 1));
+      for (const element of document.querySelectorAll(".pooled-detail")) element.setAttribute("aria-hidden", String(state !== 2));
+      document.getElementById("diagram-desc").textContent = state === 1
+        ? "Model progression: regularized vector autoregression, state-specific LightGBM with separate fits, and pooled LightGBM with shared training across locations. Ensembling throughout."
+        : "Texas, California, New York, and other locations contribute training data to pooled LightGBM. Predict the center and spread of a conditional distribution on a transformed scale, then derive 23 forecast quantiles. The Gaussian curve is a schematic illustration, not observed data or measured forecast performance. Pooling training does not mean fitting a joint probability distribution across locations.";
+    }
+    function go(state) { location.hash = `state=${Math.max(1, Math.min(2, state))}`; }
+    select.addEventListener("change", () => go(Number(select.value)));
+    back.addEventListener("click", () => go(fromHash() - 1));
+    next.addEventListener("click", () => go(fromHash() + 1));
+    addEventListener("hashchange", () => render());
+    addEventListener("keydown", event => {
+      if (["SELECT", "INPUT", "BUTTON", "A"].includes(document.activeElement.tagName)) return;
+      if (event.key === "ArrowRight" || event.key === "ArrowLeft") { event.preventDefault(); go(fromHash() + (event.key === "ArrowRight" ? 1 : -1)); }
+    });
+    render(1);
+    requestAnimationFrame(() => requestAnimationFrame(() => { document.body.dataset.ready = "true"; render(); }));
+  </script>
+</body>
+</html>

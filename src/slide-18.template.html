@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>From separate models to shared learning</title>
+  <style>
+    :root { --ink: #14242b; --muted: #647278; --teal: #0a6670; --paper: #fbfaf6; --line: #d5dad6; }
+    * { box-sizing: border-box; }
+    html, body { width: 1240px; height: 540px; margin: 0; overflow: hidden; }
+    body { background: var(--paper); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    .app { width: 1240px; height: 540px; display: grid; grid-template-rows: 38px 1fr; gap: 8px; padding: 10px 16px 8px; }
+    .topbar, .controls { display: flex; align-items: center; }
+    .topbar { justify-content: space-between; gap: 16px; }
+    .subtitle { color: #42535a; font-size: 16px; font-weight: 670; }
+    .controls { gap: 7px; }
+    .controls label { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; margin-right: 3px; }
+    button, select { height: 32px; border: 1px solid #b9c3c0; border-radius: 8px; background: white; color: var(--ink); font: inherit; font-weight: 740; }
+    select { width: 257px; padding: 0 32px 0 10px; font-size: 13px; }
+    button { width: 34px; padding: 0; font-size: 17px; cursor: pointer; }
+    button:hover { border-color: var(--teal); color: var(--teal); }
+    button:disabled { opacity: .35; cursor: default; }
+    :focus-visible { outline: 3px solid #82bcc1; outline-offset: 2px; }
+    .frame { padding: 17px 24px; border: 1px solid var(--line); border-radius: 14px; background: white; box-shadow: 0 8px 24px rgb(28 49 50 / 7%); }
+    #diagram { display: block; width: 1158px; height: 438px; }
+    svg text { fill: var(--ink); text-anchor: middle; }
+    .model-name { font-size: 29px; font-weight: 730; }
+    .support { font-size: 21px; fill: var(--muted); }
+    .model-box { fill: white; stroke: var(--line); stroke-width: 1.8; }
+    .connector { fill: none; stroke: #96a6a8; stroke-width: 2.4; }
+    .teal { fill: var(--teal); }
+    #pooled-model { transform: translate(850px, 119px); }
+    #pooled-model .model-box { stroke: var(--teal); stroke-width: 2.2; fill: #f7fbfa; }
+    #earlier-models { opacity: 1; visibility: visible; }
+    .pooled-detail { opacity: 0; visibility: hidden; }
+    body[data-state="2"] #pooled-model { transform: translate(404px, 119px); }
+    body[data-state="2"] #earlier-models { opacity: 0; visibility: hidden; }
+    body[data-state="2"] .pooled-detail { opacity: 1; visibility: visible; }
+    body[data-ready] #pooled-model { transition: transform 800ms 150ms cubic-bezier(.22,.61,.36,1); }
+    body[data-ready] #earlier-models { transition: opacity 200ms ease, visibility 200ms; }
+    body[data-ready] .pooled-detail { transition: opacity 180ms ease, visibility 180ms; }
+    body[data-ready][data-state="1"] #earlier-models { transition: opacity 280ms 850ms ease, visibility 0s 850ms; }
+    body[data-ready][data-state="2"] .pooled-detail { transition: opacity 280ms 850ms ease, visibility 0s 850ms; }
+    @media (prefers-reduced-motion: reduce) {
+      body[data-ready][data-state] #pooled-model, body[data-ready][data-state] #earlier-models,
+      body[data-ready][data-state] .pooled-detail { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="subtitle">Influenza hospitalization forecasting</div>
+      <div class="controls"><label for="state-select">View</label><button id="back-button" aria-label="Previous view">←</button><select id="state-select" aria-label="Model progression view"><option value="1">1 · Model progression</option><option value="2">2 · Shared learning</option></select><button id="next-button" aria-label="Next view">→</button></div>
+    </header>
+    <section class="frame">
+      <svg id="diagram" viewBox="0 0 1158 438" role="img" aria-labelledby="diagram-title diagram-desc">
+        <title id="diagram-title">From separate models to shared learning</title>
+        <desc id="diagram-desc"></desc>
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="12" markerHeight="12" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 Z" fill="#96a6a8"/></marker>
+          <marker id="spread-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 Z" fill="#0a6670"/></marker>
+        </defs>
+        <g id="earlier-models">
+          <g transform="translate(30 119)">
+            <rect class="model-box" width="280" height="158" rx="12"/>
+            <text class="model-name" x="140" y="67">Regularized</text>
+            <text class="model-name" x="140" y="104">VAR</text>
+          </g>
+          <path class="connector" d="M336,198 H414" marker-end="url(#arrow)"/>
+          <g transform="translate(440 119)">
+            <rect class="model-box" width="280" height="158" rx="12"/>
+            <text class="model-name" x="140" y="67">State-specific</text>
+            <text class="model-name" x="140" y="104">LightGBM</text>
+            <text class="support" x="140" y="188">Separate fits</text>
+          </g>
+          <path class="connector" d="M746,198 H824" marker-end="url(#arrow)"/>
+          <text class="support" x="580" y="388" font-weight="650">Ensembling throughout</text>
+        </g>
+        <g id="location-inputs" class="pooled-detail" aria-hidden="true">
+          <g id="input-connectors" class="connector">
+            <path d="M274,122 H326 M274,183 H326 M274,244 H326 M274,305 H326 M326,122 V305"/>
+            <path d="M326,198 H383" marker-end="url(#arrow)"/>
+          </g>
+          <g transform="translate(52 100)"><rect class="model-box" width="205" height="44" rx="8"/><text x="102.5" y="29" font-size="21">Texas</text></g>
+          <g transform="translate(52 161)"><rect class="model-box" width="205" height="44" rx="8"/><text x="102.5" y="29" font-size="21">California</text></g>
+          <g transform="translate(52 222)"><rect class="model-box" width="205" height="44" rx="8"/><text x="102.5" y="29" font-size="21">New York</text></g>
+          <g transform="translate(52 283)"><rect class="model-box" width="205" height="44" rx="8"/><text x="102.5" y="29" font-size="21">Other locations</text></g>
+        </g>
+        <g id="pooled-model">
+          <rect class="model-box" width="280" height="158" rx="12"/>
+          <text class="model-name teal" x="140" y="67">Pooled</text>
+          <text class="model-name teal" x="140" y="104">LightGBM</text>
+          <text class="support" x="140" y="188">Shared training</text>
+          <text class="support" x="140" y="213">across locations</text>
+        </g>
+        <g id="distribution" class="pooled-detail" aria-hidden="true">
+          <path class="connector" d="M710,198 H759" marker-end="url(#arrow)"/>
+          <line x1="779" x2="1119" y1="257" y2="257" stroke="#aab7b7" stroke-width="1.5"/>
+          <path id="density-curve" fill="none" stroke="#0a6670" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <line id="center-marker" x1="949" x2="949" y1="108" y2="257" stroke="#0a6670" stroke-width="1.5" stroke-dasharray="4 4"/>
+          <text class="teal" x="949" y="91" font-size="23" font-weight="650">Center</text>
+          <line id="spread-marker" x1="901.86" x2="996.14" y1="284" y2="284" stroke="#0a6670" stroke-width="1.8" marker-start="url(#spread-arrow)" marker-end="url(#spread-arrow)"/>
+          <text class="teal" x="949" y="318" font-size="23" font-weight="650">Spread</text>
+          <text id="quantile-count" class="teal" x="949" y="370" font-size="25" font-weight="730"></text>
+          <text class="teal" x="949" y="401" font-size="25" font-weight="730">forecast quantiles</text>
+        </g>
+      </svg>
+    </section>
+  </main>
+  <script>
+    "use strict";
+    const data = /*__ILLUSTRATION__*/;
+    const select = document.getElementById("state-select"), back = document.getElementById("back-button"), next = document.getElementById("next-button");
+    const peak = Math.max(...data.curve.map(point => point.density));
+    document.getElementById("density-curve").setAttribute("d", data.curve.map((point, i) => `${i ? "L" : "M"}${(949 + point.z / 3.5 * 165).toFixed(2)},${(257 - point.density / peak * 136).toFixed(2)}`).join(" "));
+    document.getElementById("quantile-count").textContent = `Derive ${data.quantile_count}`;
+    function fromHash() { return new URLSearchParams(location.hash.slice(1)).get("state") === "2" ? 2 : 1; }
+    function render(state = fromHash()) {
+      document.body.dataset.state = String(state);
+      select.value = String(state); back.disabled = state === 1; next.disabled = state === 2;
+      document.getElementById("earlier-models").setAttribute("aria-hidden", String(state !== 1));
+      for (const element of document.querySelectorAll(".pooled-detail")) element.setAttribute("aria-hidden", String(state !== 2));
+      document.getElementById("diagram-desc").textContent = state === 1
+        ? "Model progression: regularized vector autoregression, state-specific LightGBM with separate fits, and pooled LightGBM with shared training across locations. Ensembling throughout."
+        : "Texas, California, New York, and other locations contribute training data to pooled LightGBM. Predict the center and spread of a conditional distribution on a transformed scale, then derive 23 forecast quantiles. The Gaussian curve is a schematic illustration, not observed data or measured forecast performance. Pooling training does not mean fitting a joint probability distribution across locations.";
+    }
+    function go(state) { location.hash = `state=${Math.max(1, Math.min(2, state))}`; }
+    select.addEventListener("change", () => go(Number(select.value)));
+    back.addEventListener("click", () => go(fromHash() - 1));
+    next.addEventListener("click", () => go(fromHash() + 1));
+    addEventListener("hashchange", () => render());
+    addEventListener("keydown", event => {
+      if (["SELECT", "INPUT", "BUTTON", "A"].includes(document.activeElement.tagName)) return;
+      if (event.key === "ArrowRight" || event.key === "ArrowLeft") { event.preventDefault(); go(fromHash() + (event.key === "ArrowRight" ? 1 : -1)); }
+    });
+    render(1);
+    requestAnimationFrame(() => requestAnimationFrame(() => { document.body.dataset.ready = "true"; render(); }));
+  </script>
+</body>
+</html>

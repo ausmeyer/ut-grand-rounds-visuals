@@ -67,6 +67,7 @@ python3 scripts/build_surveillance_section.py
 python3 scripts/build_forecasting_intro.py
 python3 scripts/build_forecast_scores.py
 python3 scripts/build_slide_17.py
+python3 scripts/build_slide_18.py
 ```
 
 `build_surveillance_section.py` reads the already-downloaded CSV files from
@@ -173,6 +174,12 @@ observations fade out. `#state=4` adds reported observations through June 27,
 2026, expanding the time axis to July 1, 2026 and the admission axis to 5,000. Use a
 1240 × 540 iframe, with the title in Slides.com. This builds offline with
 `python3 scripts/build_slide_17.py`; see the [source and date-handling notes](specs/slide-17-evidence.md).
+
+Slide 18 supports two views: `#state=1` shows the model progression, and
+`#state=2` animates the pooled model into a shared-learning diagram with a
+schematic center-and-spread illustration. Use a 1240 × 540 iframe and keep
+“From separate models to shared learning” as the title in Slides.com. Build with
+`python3 scripts/build_slide_18.py`; see the [source and interpretation notes](specs/slide-18-evidence.md).
 
 
 ## Slide 4 claymation
