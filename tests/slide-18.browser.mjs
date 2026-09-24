@@ -19,18 +19,26 @@ try {
     const pooled=new DOMMatrix(getComputedStyle(document.querySelector('#pooled-model')).transform).m41;
     const old=getComputedStyle(document.querySelector('#earlier-models'));
     const detail=getComputedStyle(document.querySelector('#distribution'));
-    return document.body.dataset.state===String(state)&&Math.abs(pooled-(state===1?850:404))<.001&&old.opacity===(state===1?'1':'0')&&detail.opacity===(state===1?'0':'1');
+    const spread=getComputedStyle(document.querySelector('#spread-fit'));
+    const quantiles=getComputedStyle(document.querySelector('#forecast-quantiles'));
+    return document.body.dataset.state===String(state)&&Math.abs(pooled-(state===1?850:404))<.001&&old.opacity===(state===1?'1':'0')&&detail.opacity===(state===1?'0':'1')&&spread.opacity===(state===3?'1':'0')&&quantiles.opacity===(state===3?'1':'0');
   },state);
-  for(const state of [1,2]) {
+  for(const state of [1,2,3]) {
     await page.goto(`${url}#state=${state}`);
     await settled(state);
     assert.equal(await page.locator('#state-select').inputValue(),String(state));
     assert.equal(await page.locator('#back-button').isDisabled(),state===1);
-    assert.equal(await page.locator('#next-button').isDisabled(),state===2);
+    assert.equal(await page.locator('#next-button').isDisabled(),state===3);
     assert.equal(await page.locator('#earlier-models').isVisible(),state===1);
-    assert.equal(await page.locator('#distribution').isVisible(),state===2);
+    assert.equal(await page.locator('#distribution').isVisible(),state!==1);
     assert.equal(await page.locator('#earlier-models').getAttribute('aria-hidden'),String(state!==1));
-    assert.equal(await page.locator('#distribution').getAttribute('aria-hidden'),String(state!==2));
+    assert.equal(await page.locator('#distribution').getAttribute('aria-hidden'),String(state===1));
+    for(const id of ['spread-fit','forecast-quantiles','fit-spread']) {
+      assert.equal(await page.locator(`#${id}`).isVisible(),state===3);
+      assert.equal(await page.locator(`#${id}`).getAttribute('aria-hidden'),String(state!==3));
+    }
+    assert.equal(await page.locator('#fit-center').isVisible(),state===2);
+    assert.equal(await page.locator('#fit-center').getAttribute('aria-hidden'),String(state!==2));
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),1240);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollHeight),540);
     const labels=await page.locator('svg text, .subtitle, .controls').evaluateAll(nodes=>nodes.filter(el=>getComputedStyle(el).visibility!=='hidden').map(el=>({text:el.textContent,r:el.getBoundingClientRect().toJSON()})));
@@ -55,6 +63,27 @@ try {
   assert.equal(await page.locator('#forecast-link').getAttribute('d'),'M911,213 L980,198');
   assert.ok(await page.locator('#center-label').evaluate(el=>el.getBoundingClientRect().right<document.getElementById('density-axis').getBoundingClientRect().left-10),'Center label stays clear of the vertical forecast-time line');
   assert.match(await page.locator('#diagram-desc').textContent(),/not a trajectory/);
+  assert.match(await page.locator('#diagram-desc').textContent(),/center fixed.*negative log-likelihood/);
+  const center=await page.locator('#forecast-center').elementHandle();
+  const stableGeometry=()=>page.evaluate(()=>Object.fromEntries(['forecast-center','center-label','schematic-history','forecast-link','pooled-model'].map(id=>[id,document.getElementById(id).getBoundingClientRect().toJSON()])));
+  const fittedGeometry=await stableGeometry();
+  await page.locator('#back-button').click();
+  await settled(2);
+  assert.deepEqual(await stableGeometry(),fittedGeometry,'Returning to the center fit preserves its geometry');
+  assert.match(await page.locator('#diagram-desc').textContent(),/squared-error loss/);
+  await page.locator('#next-button').click();
+  await page.waitForFunction(()=>{
+    const opacity=Number(getComputedStyle(document.getElementById('spread-fit')).opacity);
+    return opacity>.15&&opacity<.85;
+  });
+  assert.deepEqual(await stableGeometry(),fittedGeometry,'The fitted center and time series stay fixed while spread fades in');
+  assert.equal(await center.evaluate(el=>el===document.getElementById('forecast-center')),true,'The same forecast point persists');
+  assert.equal(await page.locator('#forecast-quantiles').evaluate(el=>getComputedStyle(el).opacity),'0','Quantiles appear after the distribution');
+  await page.screenshot({path:join(artifacts,'spread-transition.png')});
+  await settled(3);
+  assert.deepEqual(await stableGeometry(),fittedGeometry);
+  await page.locator('#back-button').click();
+  await settled(2);
   const pooled=await page.locator('#pooled-model').elementHandle();
   await page.locator('#back-button').click();
   await page.waitForFunction(()=>{
@@ -75,6 +104,10 @@ try {
   await page.evaluate(()=>document.activeElement.blur());
   await page.keyboard.press('ArrowRight');
   await settled(2);
+  await page.keyboard.press('ArrowRight');
+  await settled(3);
+  await page.keyboard.press('ArrowLeft');
+  await settled(2);
   await page.keyboard.press('ArrowLeft');
   await settled(1);
   await page.goto('about:blank');
@@ -85,12 +118,29 @@ try {
   });
   await page.locator('#back-button').click();
   await settled(1);
+  await page.locator('#state-select').selectOption('3');
+  await settled(3);
+  await page.goto('about:blank');
+  await page.goto(`${url}#state=3`);
+  await page.waitForFunction(()=>{
+    const x=new DOMMatrix(getComputedStyle(document.querySelector('#pooled-model')).transform).m41;
+    return document.body.dataset.state==='3'&&x>480&&x<780;
+  });
+  await page.locator('#back-button').click();
+  await settled(2);
+  await page.locator('#next-button').click();
+  await page.waitForFunction(()=>Number(getComputedStyle(document.getElementById('spread-fit')).opacity)>.1);
+  await page.locator('#back-button').click();
+  await settled(2);
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.locator('#next-button').click();
-  await settled(2);
-  for(const id of ['pooled-model','earlier-models','distribution']) assert.equal(await page.locator(`#${id}`).evaluate(el=>getComputedStyle(el).transitionDuration),'0s');
+  await settled(3);
+  for(const id of ['pooled-model','earlier-models','distribution','spread-fit','forecast-quantiles']) assert.equal(await page.locator(`#${id}`).evaluate(el=>getComputedStyle(el).transitionDuration),'0s');
+  await page.goto(`${url}#state=3`);
+  await settled(3);
+  for(const id of ['spread-fit','forecast-quantiles']) assert.equal(await page.locator(`#${id}`).evaluate(el=>getComputedStyle(el).transitionDelay),'0s');
   await page.goto(`${url}#state=invalid`);
   await settled(1);
   assert.deepEqual(errors,[]);
-  console.log(`Slide 18: both views, bounds, label spacing, curve geometry, forward/reverse animation, direct entry, interruption, keyboard navigation, reduced motion, and offline rendering passed. Screenshots: ${artifacts}`);
+  console.log(`Slide 18: all three views, bounds, label spacing, curve geometry, fixed center during spread fitting, staged quantile reveal, forward/reverse animation, direct entry, interruption, keyboard navigation, reduced motion, and offline rendering passed. Screenshots: ${artifacts}`);
 } finally {await browser.close();}

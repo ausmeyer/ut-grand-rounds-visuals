@@ -175,9 +175,11 @@ observations fade out. `#state=4` adds reported observations through June 27,
 1240 × 540 iframe, with the title in Slides.com. This builds offline with
 `python3 scripts/build_slide_17.py`; see the [source and date-handling notes](specs/slide-17-evidence.md).
 
-Slide 18 supports two views: `#state=1` shows the model progression, and
-`#state=2` animates the pooled model into a shared-learning diagram with a
-schematic center-and-spread illustration. Use a 1240 × 540 iframe and keep
+Slide 18 supports three views: `#state=1` shows the model progression;
+`#state=2` animates the pooled model into a shared-learning diagram and fits
+the center using squared-error loss; `#state=3` keeps that center fixed and
+reveals the spread fit using negative log-likelihood, then the derived quantiles.
+Use a 1240 × 540 iframe and keep
 “From separate models to shared learning” as the title in Slides.com. Build with
 `python3 scripts/build_slide_18.py`; see the [source and interpretation notes](specs/slide-18-evidence.md).
 

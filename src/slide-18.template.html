@@ -33,18 +33,27 @@
     #pooled-model { transform: translate(850px, 119px); }
     #pooled-model .model-box { stroke: var(--teal); stroke-width: 2.2; fill: #f7fbfa; }
     #earlier-models { opacity: 1; visibility: visible; }
-    .pooled-detail { opacity: 0; visibility: hidden; }
-    body[data-state="2"] #pooled-model { transform: translate(404px, 119px); }
-    body[data-state="2"] #earlier-models { opacity: 0; visibility: hidden; }
-    body[data-state="2"] .pooled-detail { opacity: 1; visibility: visible; }
+    .pooled-detail, .spread-detail, .quantile-detail, .fit-copy { opacity: 0; visibility: hidden; }
+    body:is([data-state="2"], [data-state="3"]) #pooled-model { transform: translate(404px, 119px); }
+    body:is([data-state="2"], [data-state="3"]) #earlier-models { opacity: 0; visibility: hidden; }
+    body:is([data-state="2"], [data-state="3"]) .pooled-detail,
+    body[data-state="2"] #fit-center, body[data-state="3"] #fit-spread,
+    body[data-state="3"] .spread-detail, body[data-state="3"] .quantile-detail { opacity: 1; visibility: visible; }
     body[data-ready] #pooled-model { transition: transform 800ms 150ms cubic-bezier(.22,.61,.36,1); }
     body[data-ready] #earlier-models { transition: opacity 200ms ease, visibility 200ms; }
     body[data-ready] .pooled-detail { transition: opacity 180ms ease, visibility 180ms; }
     body[data-ready][data-state="1"] #earlier-models { transition: opacity 280ms 850ms ease, visibility 0s 850ms; }
-    body[data-ready][data-state="2"] .pooled-detail { transition: opacity 280ms 850ms ease, visibility 0s 850ms; }
+    body[data-ready]:is([data-state="2"], [data-state="3"]) .pooled-detail { transition: opacity 280ms 850ms ease, visibility 0s 850ms; }
+    body[data-ready] .spread-detail, body[data-ready] .quantile-detail { transition: opacity 180ms ease, visibility 180ms; }
+    body[data-ready][data-state="3"] .spread-detail { transition: opacity 600ms ease, visibility 0s; }
+    body[data-ready][data-state="3"] .quantile-detail { transition: opacity 300ms 600ms ease, visibility 0s 600ms; }
+    body[data-ready][data-from="1"][data-state="3"] .spread-detail { transition-delay: 850ms; }
+    body[data-ready][data-from="1"][data-state="3"] .quantile-detail { transition-delay: 1450ms; }
     @media (prefers-reduced-motion: reduce) {
       body[data-ready][data-state] #pooled-model, body[data-ready][data-state] #earlier-models,
-      body[data-ready][data-state] .pooled-detail { transition: none; }
+      body[data-ready][data-state] .pooled-detail,
+      body[data-ready][data-from][data-state] .spread-detail,
+      body[data-ready][data-from][data-state] .quantile-detail { transition: none; }
     }
   </style>
 </head>
@@ -52,7 +61,7 @@
   <main class="app">
     <header class="topbar">
       <div class="subtitle">Influenza hospitalization forecasting</div>
-      <div class="controls"><label for="state-select">View</label><button id="back-button" aria-label="Previous view">←</button><select id="state-select" aria-label="Model progression view"><option value="1">1 · Model progression</option><option value="2">2 · Shared learning</option></select><button id="next-button" aria-label="Next view">→</button></div>
+      <div class="controls"><label for="state-select">View</label><button id="back-button" aria-label="Previous view">←</button><select id="state-select" aria-label="Model progression view"><option value="1">1 · Model progression</option><option value="2">2 · Fit the center</option><option value="3">3 · Fit the spread</option></select><button id="next-button" aria-label="Next view">→</button></div>
     </header>
     <section class="frame">
       <svg id="diagram" viewBox="0 0 1158 438" role="img" aria-labelledby="diagram-title diagram-desc">
@@ -95,6 +104,16 @@
           <text class="support" x="140" y="188">Shared training</text>
           <text class="support" x="140" y="213">across locations</text>
         </g>
+        <g id="fitting-step" class="pooled-detail" aria-hidden="true">
+          <g id="fit-center" class="fit-copy" aria-hidden="true">
+            <text class="teal" x="544" y="383" font-size="24" font-weight="730">Fit the center</text>
+            <text class="support" x="544" y="414">Squared-error loss</text>
+          </g>
+          <g id="fit-spread" class="fit-copy" aria-hidden="true">
+            <text class="teal" x="544" y="383" font-size="24" font-weight="730">Fit the spread</text>
+            <text class="support" x="544" y="414">Negative log-likelihood</text>
+          </g>
+        </g>
         <g id="distribution" class="pooled-detail" aria-hidden="true">
           <path class="connector" d="M710,198 H759" marker-end="url(#arrow)"/>
           <g id="forecast-context">
@@ -105,14 +124,18 @@
             <path id="forecast-link" d="M911,213 L980,198" fill="none" stroke="#0a6670" stroke-width="2" stroke-dasharray="4 4"/>
             <circle id="forecast-center" cx="980" cy="198" r="3.5" fill="#0a6670"/>
           </g>
-          <line id="density-axis" x1="980" x2="980" y1="74" y2="322" stroke="#aab7b7" stroke-width="1.5"/>
-          <path id="density-curve" fill="none" stroke="#0a6670" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          <line id="center-marker" x1="968" x2="1090" y1="198" y2="198" stroke="#0a6670" stroke-width="1.5" stroke-dasharray="4 4"/>
           <text id="center-label" class="teal" x="930" y="171" font-size="23" font-weight="650">Center</text>
-          <line id="spread-marker" x1="1107" x2="1107" y1="162.57" y2="233.43" stroke="#0a6670" stroke-width="1.8" marker-start="url(#spread-arrow)" marker-end="url(#spread-arrow)"/>
-          <text class="teal" x="1093" y="279" font-size="23" font-weight="650">Spread</text>
-          <text id="quantile-count" class="teal" x="949" y="370" font-size="25" font-weight="730"></text>
-          <text class="teal" x="949" y="401" font-size="25" font-weight="730">forecast quantiles</text>
+          <g id="spread-fit" class="spread-detail" aria-hidden="true">
+            <line id="density-axis" x1="980" x2="980" y1="74" y2="322" stroke="#aab7b7" stroke-width="1.5"/>
+            <path id="density-curve" fill="none" stroke="#0a6670" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <line id="center-marker" x1="968" x2="1090" y1="198" y2="198" stroke="#0a6670" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <line id="spread-marker" x1="1107" x2="1107" y1="162.57" y2="233.43" stroke="#0a6670" stroke-width="1.8" marker-start="url(#spread-arrow)" marker-end="url(#spread-arrow)"/>
+            <text class="teal" x="1093" y="279" font-size="23" font-weight="650">Spread</text>
+          </g>
+          <g id="forecast-quantiles" class="quantile-detail" aria-hidden="true">
+            <text id="quantile-count" class="teal" x="949" y="383" font-size="25" font-weight="730"></text>
+            <text class="teal" x="949" y="414" font-size="25" font-weight="730">forecast quantiles</text>
+          </g>
         </g>
       </svg>
     </section>
@@ -124,17 +147,25 @@
     const peak = Math.max(...data.curve.map(point => point.density));
     document.getElementById("density-curve").setAttribute("d", data.curve.map((point, i) => `${i ? "L" : "M"}${(980 + point.density / peak * 100).toFixed(2)},${(198 - point.z / 3.5 * 124).toFixed(2)}`).join(" "));
     document.getElementById("quantile-count").textContent = `Derive ${data.quantile_count}`;
-    function fromHash() { return new URLSearchParams(location.hash.slice(1)).get("state") === "2" ? 2 : 1; }
+    function fromHash() {
+      const state = new URLSearchParams(location.hash.slice(1)).get("state");
+      return ["2", "3"].includes(state) ? Number(state) : 1;
+    }
     function render(state = fromHash()) {
+      document.body.dataset.from = document.body.dataset.state || "1";
       document.body.dataset.state = String(state);
-      select.value = String(state); back.disabled = state === 1; next.disabled = state === 2;
+      select.value = String(state); back.disabled = state === 1; next.disabled = state === 3;
       document.getElementById("earlier-models").setAttribute("aria-hidden", String(state !== 1));
-      for (const element of document.querySelectorAll(".pooled-detail")) element.setAttribute("aria-hidden", String(state !== 2));
+      for (const element of document.querySelectorAll(".pooled-detail")) element.setAttribute("aria-hidden", String(state === 1));
+      for (const element of document.querySelectorAll(".spread-detail, .quantile-detail, #fit-spread")) element.setAttribute("aria-hidden", String(state !== 3));
+      document.getElementById("fit-center").setAttribute("aria-hidden", String(state !== 2));
       document.getElementById("diagram-desc").textContent = state === 1
         ? "Model progression: regularized vector autoregression, state-specific LightGBM with separate fits, and pooled LightGBM with shared training across locations. Ensembling throughout."
-        : "Texas, California, New York, and other locations contribute training data to pooled LightGBM. Predict the center and spread of a conditional distribution on a transformed scale, then derive 23 forecast quantiles. A schematic time series leads to a future forecast point. Time runs horizontally and possible forecast values vertically; the sideways Gaussian density shows uncertainty at that one future time, not a trajectory. The trace and Gaussian curve are schematic illustrations, not observed data or measured forecast performance. Pooling training does not mean fitting a joint probability distribution across locations.";
+        : state === 2
+          ? "Texas, California, New York, and other locations contribute training data to pooled LightGBM. Fit the center on a transformed scale using squared-error loss. A schematic time series leads to a future forecast point; no uncertainty distribution is shown yet. The trace is a schematic illustration, not observed data or measured forecast performance."
+          : "Keep the fitted center fixed and fit the spread using Gaussian negative log-likelihood on the transformed scale, then derive 23 forecast quantiles. Time runs horizontally and possible forecast values vertically; the sideways Gaussian density shows uncertainty at that one future time, not a trajectory. The trace and Gaussian curve are schematic illustrations, not observed data or measured forecast performance. Pooling training does not mean fitting a joint probability distribution across locations.";
     }
-    function go(state) { location.hash = `state=${Math.max(1, Math.min(2, state))}`; }
+    function go(state) { location.hash = `state=${Math.max(1, Math.min(3, state))}`; }
     select.addEventListener("change", () => go(Number(select.value)));
     back.addEventListener("click", () => go(fromHash() - 1));
     next.addEventListener("click", () => go(fromHash() + 1));

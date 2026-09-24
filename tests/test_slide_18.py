@@ -40,6 +40,11 @@ class ModelProgressionTests(unittest.TestCase):
         self.assertNotIn("<h1", html)
         self.assertIn("prefers-reduced-motion", html)
         self.assertIn("not observed data or measured forecast performance", html)
+        self.assertIn('value="2">2 · Fit the center', html)
+        self.assertIn('value="3">3 · Fit the spread', html)
+        self.assertIn("Squared-error loss", html)
+        self.assertIn("Negative log-likelihood", html)
+        self.assertIn("Keep the fitted center fixed", html)
 
 
 if __name__ == "__main__":

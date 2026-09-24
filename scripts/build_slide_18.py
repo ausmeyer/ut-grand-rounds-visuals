@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the two-view model progression schematic for Slide 18."""
+"""Build the three-view model progression schematic for Slide 18."""
 
 import json
 import math
@@ -35,7 +35,7 @@ def main():
     DATA.mkdir(parents=True, exist_ok=True)
     (DATA / "slide-18.json").write_text(json.dumps(data, indent=2) + "\n")
     (ROOT / "docs" / "slide-18.html").write_text(render(data))
-    print("Built Slide 18: model progression and shared learning, two views.")
+    print("Built Slide 18: model progression, center fit, and spread fit, three views.")
 
 
 if __name__ == "__main__":

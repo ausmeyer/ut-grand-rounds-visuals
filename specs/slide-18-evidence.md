@@ -2,7 +2,7 @@
 
 ## Teaching and display
 
-Two views in a fixed 1240 × 540 iframe. Keep the title in Slides.com:
+Three views in a fixed 1240 × 540 iframe. Keep the title in Slides.com:
 **From separate models to shared learning**.
 
 Objective: identify the progression from regularized VAR through separate
@@ -12,12 +12,15 @@ presenter's influenza hospitalization forecasting research, not patient care.
 
 - `#state=1`: three model blocks, straight arrows, and “Ensembling throughout.”
 - `#state=2`: the same pooled-model block moves into the center. Location
-  inputs and a schematic distribution fade in. Center, spread, and “Derive 23
-  forecast quantiles” label the distribution. The density is turned sideways
+  inputs and a schematic time series fade in. Only the center forecast is shown,
+  with “Fit the center” and “Squared-error loss.”
+- `#state=3`: the center forecast, time series, and pooled model stay fixed.
+  The distribution and spread fade in with “Fit the spread” and “Negative
+  log-likelihood,” followed by “Derive 23 forecast quantiles.” The density is turned sideways
   at a future point on a short schematic time series: time is horizontal,
   forecast values and spread are vertical. All text stays upright.
 - Forward, backward, direct-entry, keyboard, and dropdown navigation work.
-  Reduced motion skips transitions. Direct entry to state 2 plays the build.
+  Reduced motion skips transitions. Direct entry to states 2 and 3 plays the build.
 - No dates, model rankings, accuracy improvements, formulas, extra controls,
   clinical cases, or speaker-note text are displayed.
 
@@ -31,7 +34,7 @@ Sources were inspected September 24, 2026. No model is fitted by this slide.
 | Regularized VAR | `flusight_2022/var_experimental/flu_var_all.Rmd`, `constructModel` with `struct = 'HLAGOO'`, `cv.BigVAR`, and `VAR_regularized` outputs | One part of the earlier modeling program, not an exhaustive model inventory. VAR itself can link locations; the title does not imply all earlier models were independent. |
 | State-specific LightGBM, separate fits | `flusight_2024/flu-forecast-2024/src/lgbm-predict_future-production_individual.py`, `generate_prospective_forecasts`, lines 77–108 | Loops over locations, constructs a model using location-specific parameters, and fits it to that location's series. |
 | Pooled LightGBM, shared training across locations | `flusight_2025_meyer_ensemble/joint_twostage_pool_test/README.md`; `joint_twostage_pool.py`, pooled feature construction with location indicators and `fit_two_stage_one_bag` | Shared training, not a joint probability distribution across locations. No claim about deployment start date or comparative skill. |
-| Center and spread | Same pooled script, two-stage fit, lines 366–411, and `predict_quantiles`, lines 431–456 | Stage 1 uses squared-error LightGBM for the transformed center; Stage 2 estimates spread with the center frozen. These are prediction-specific distribution parameters, not two coefficients for the entire model. |
+| Center and spread, squared-error loss and negative log-likelihood | Same pooled script, two-stage fit, lines 366–411, and `predict_quantiles`, lines 431–456; `flusight_2025_meyer_ensemble/src/utils/distributions.py`, `GaussianFrozenLocBoundedWide`, `loss_fn="nll"` and frozen location gradients | Stage 1 uses squared-error LightGBM for the transformed center; Stage 2 estimates spread by Gaussian negative log-likelihood with the center frozen. These are prediction-specific distribution parameters, not two coefficients for the entire model. |
 | Derive 23 forecast quantiles | Same pooled script uses `norm.ppf` with predicted center and spread and transforms back with `expm1`; `scripts/build_forecast_scores.py` supplies the 23 quantile levels already used on slide 15 | The count is reused directly from the existing verified slide-15 builder. Its pinned CDC source is recorded in `specs/forecast-scores-evidence.md`. |
 | Ensembling throughout | User's stated development history and accepted `UT_grand_rounds/PRESENTATION_OUTLINE.md`; later implementation in `flusight_2025_mighte_joint/src/generate_joint_adaptive_ensemble.R` | A qualitative research-history statement, not a claim that identical components or weighting were used every year. |
 
@@ -66,6 +69,7 @@ request, package download, data refresh, or model fit occurs in the iframe.
 Tests check reproducibility, symmetry and values of the schematic density,
 agreement with slide 15's quantile count, all curve vertices, center/spread
 alignment, label bounds and overlap, navigation, stable pooled-model identity,
+unchanged forecast-center geometry during spread fitting, delayed quantile reveal,
 forward/reverse and direct-entry animation, interrupted transitions, and reduced
 motion. Inspect screenshots at 1240 × 540 before publishing. Verify the Pages
 deployment and exact live HTML against the tested build before handing off.
