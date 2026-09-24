@@ -31,14 +31,14 @@ try {
     },{state,shiftPx});
     assert.equal(await page.locator('#state-select').inputValue(),String(state));
     assert.equal(await page.locator('#back-button').isDisabled(),state===1);
-    assert.equal(await page.locator('#next-button').isDisabled(),state===3);
+    assert.equal(await page.locator('#next-button').isDisabled(),false);
     assert.equal(await page.locator('#reconstructed').isVisible(),state>=2);
     assert.equal(await page.locator('#reconstructed').getAttribute('aria-hidden'),String(state===1));
     assert.equal(await page.locator('#observed-early').isVisible(),state!==3);
     assert.equal(await page.locator('#observed-retained').isVisible(),true);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth),1240);
     assert.equal(await page.evaluate(()=>document.documentElement.scrollHeight),540);
-    const labels=await page.locator('svg text, .subtitle, .controls').evaluateAll(nodes=>nodes.filter(el=>getComputedStyle(el).visibility!=='hidden').map(el=>({text:el.textContent,r:el.getBoundingClientRect().toJSON()})));
+    const labels=await page.locator('svg text, .subtitle, .controls').evaluateAll(nodes=>nodes.filter(el=>getComputedStyle(el).visibility!=='hidden'&&el.getBoundingClientRect().width>0).map(el=>({text:el.textContent,r:el.getBoundingClientRect().toJSON()})));
     assert.deepEqual(labels.filter(({r})=>r.left<0||r.top<0||r.right>1240||r.bottom>540),[],'All labels fit the iframe');
     const overlaps=labels.flatMap((a,i)=>labels.slice(i+1).filter(b=>a.r.left<b.r.right&&a.r.right>b.r.left&&a.r.top<b.r.bottom&&a.r.bottom>b.r.top).map(b=>[a.text,b.text]));
     assert.deepEqual(overlaps,[],'Visible text does not overlap');
@@ -100,8 +100,46 @@ try {
     return offset>shiftPx*.25&&offset<shiftPx*.85;
   },shiftPx);
   await page.waitForFunction(shiftPx=>Math.abs(new DOMMatrix(getComputedStyle(document.querySelector('#reconstructed-shift')).transform).m41-shiftPx)<.001,shiftPx);
+  await page.locator('#next-button').click();
+  await page.waitForFunction(()=>document.body.dataset.state==='4');
+  const shifted=data.reconstructed.map(point=>({date:new Date(Date.parse(point.date)+data.training_shift_days*86400000).toISOString().slice(0,10),value:point.value}));
+  for(const [kind,points] of [['full-reconstructed',[...shifted,retained[0]]],['full-observed',[...retained,...data.extended]]]) {
+    const path=await page.locator(`#${kind} path`).getAttribute('d');
+    const vertices=Array.from(path.matchAll(/[ML]([\d.]+),([\d.]+)/g),m=>[Number(m[1]),Number(m[2])]);
+    assert.equal(vertices.length,points.length);
+    assert.equal((path.match(/M/g)||[]).length,1);
+    for(let index=0;index<vertices.length;index++) {
+      const point=points[index];
+      const expectedX=84+1046*(Date.parse(point.date)-Date.parse(data.start))/(Date.parse(data.full_end)-Date.parse(data.start));
+      const expectedY=338-point.value/data.full_axis_max*275;
+      assert.ok(Math.abs(vertices[index][0]-expectedX)<.006,'Full history preserves every date on the expanded axis');
+      assert.ok(Math.abs(vertices[index][1]-expectedY)<.006,'Full history preserves every count on the expanded axis');
+      assert.ok(vertices[index][0]>=84&&vertices[index][0]<=1130&&vertices[index][1]>=63&&vertices[index][1]<=338,'Full history fits the plot');
+    }
+  }
+  assert.equal(await page.locator('#full-history').isVisible(),true);
+  assert.equal(await page.locator('#initial-history').isVisible(),false);
+  assert.equal(await page.locator('#full-history').getAttribute('aria-hidden'),'false');
+  assert.equal(await page.locator('#next-button').isDisabled(),true);
+  assert.equal(await page.locator('#back-button').isDisabled(),false);
+  assert.ok((await page.locator('#full-axes text').allTextContents()).includes('Jul 2026'));
+  assert.ok((await page.locator('#full-axes text').allTextContents()).includes('5,000'));
+  const fullLabels=await page.locator('svg text, .subtitle, .controls').evaluateAll(nodes=>nodes.filter(el=>getComputedStyle(el).visibility!=='hidden'&&el.getBoundingClientRect().width>0).map(el=>({text:el.textContent,r:el.getBoundingClientRect().toJSON()})));
+  assert.deepEqual(fullLabels.filter(({r})=>r.left<0||r.top<0||r.right>1240||r.bottom>540),[],'Full-history labels fit the iframe');
+  assert.deepEqual(fullLabels.flatMap((a,i)=>fullLabels.slice(i+1).filter(b=>a.r.left<b.r.right&&a.r.right>b.r.left&&a.r.top<b.r.bottom&&a.r.bottom>b.r.top).map(b=>[a.text,b.text])),[],'Full-history labels do not overlap');
+  await page.screenshot({path:join(artifacts,'state-4.png')});
+  await page.locator('#back-button').click();
+  await page.waitForFunction(()=>document.body.dataset.state==='3');
+  assert.deepEqual(await page.locator('#axes, #observed-retained').evaluateAll(nodes=>nodes.map(el=>el.innerHTML)),geometry,'Returning from stage 4 restores the unchanged original plot');
+  assert.equal(await page.locator('#observed-early').evaluate(el=>getComputedStyle(el).opacity),'0','Excluded observations stay hidden when returning to stage 3');
+  assert.equal(await page.locator('#full-history').isVisible(),false);
+  await page.goto('about:blank');
+  await page.goto(`${url}#state=4`);
+  await page.waitForFunction(()=>document.body.dataset.state==='4');
+  assert.equal(await page.locator('#full-history').isVisible(),true);
+  assert.equal(await page.locator('#state-select').inputValue(),'4');
   await page.goto(`${url}#state=invalid`);
   assert.equal(await page.locator('#state-select').inputValue(),'1');
   assert.deepEqual(errors,[]);
-  console.log(`Slide 17: all three states, forward/reverse and direct-entry animation, source values, weekly stitch, layout, and reduced motion passed. Screenshots: ${artifacts}`);
+  console.log(`Slide 17: all four states, forward/reverse and direct-entry animation, source values, weekly stitch, full-history extension, layout, and reduced motion passed. Screenshots: ${artifacts}`);
 } finally {await browser.close();}

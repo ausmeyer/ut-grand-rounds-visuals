@@ -53,6 +53,24 @@ class ReconstructionTests(unittest.TestCase):
             self.assertTrue(all(0 <= point["value"] < data["axis_max"] for point in data[key]))
         self.assertLess(data["reconstructed"][-1]["date"], data["observed"][0]["date"])
 
+    def test_full_history_extension_uses_reported_counts(self):
+        data = BUILD.example()
+        rows = BUILD.read_rows(BUILD.DATA / "extended-source.csv")
+        self.assertTrue(all(row["jurisdiction"] == "TX" for row in rows))
+        expected = [{"date": row["weekendingdate"][:10], "value": float(row["totalconfflunewadm"])} for row in rows]
+        self.assertEqual(data["extended"], sorted(expected, key=lambda point: point["date"]))
+        self.assertEqual(len(data["extended"]), 195)
+        self.assertEqual(data["extended"][0], {"date": "2022-10-08", "value": 213})
+        self.assertEqual(data["extended"][-1], {"date": "2026-06-27", "value": 73})
+        self.assertEqual(max(point["value"] for point in data["extended"]), 4729)
+        self.assertEqual((data["full_end"], data["full_axis_max"], data["full_tick_step"]), ("2026-07-01", 5000, 1000))
+        self.assertTrue(all(data["end"] < point["date"] <= data["full_end"] for point in data["extended"]))
+        retained = [point for point in data["observed"] if point["date"] >= data["retained_observed_start"]]
+        full_observed = retained + data["extended"]
+        self.assertEqual(len(full_observed), 261)
+        dates = [date.fromisoformat(point["date"]) for point in full_observed]
+        self.assertTrue(all((b - a).days == 7 for a, b in zip(dates, dates[1:])))
+
     def test_generated_artifacts(self):
         data = BUILD.example()
         self.assertEqual(json.loads((BUILD.DATA / "slide-17.json").read_text()), data)

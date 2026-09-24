@@ -33,13 +33,16 @@
     .citation { fill: var(--muted); font-size: 14px; }
     a:hover .citation { fill: var(--teal); text-decoration: underline; }
     .reveal { opacity: 0; visibility: hidden; }
-    body[data-state="2"] .reveal, body[data-state="3"] .reveal { opacity: 1; visibility: visible; }
+    body[data-state="2"] .reveal, body[data-state="3"] .reveal, body[data-state="4"] .reveal { opacity: 1; visibility: visible; }
+    #full-history { display: none; }
+    body[data-state="4"] #full-history { display: inline; }
+    body[data-state="4"] #initial-history { display: none; }
     #reconstructed-shift { transform: translateX(0); }
-    body[data-state="3"] #reconstructed-shift { transform: translateX(var(--shift-x)); }
+    body[data-state="3"] #reconstructed-shift, body[data-state="4"] #reconstructed-shift { transform: translateX(var(--shift-x)); }
     #observed-early { opacity: 1; visibility: visible; }
-    body[data-state="3"] #observed-early { opacity: 0; visibility: hidden; }
+    body[data-state="3"] #observed-early, body[data-state="4"] #observed-early { opacity: 0; visibility: hidden; }
     #stitch-join { opacity: 0; visibility: hidden; }
-    body[data-state="3"] #stitch-join { opacity: 1; visibility: visible; }
+    body[data-state="3"] #stitch-join, body[data-state="4"] #stitch-join { opacity: 1; visibility: visible; }
     body[data-ready] .reveal { transition: opacity 400ms ease, visibility 400ms; }
     body[data-ready] #observed-early { transition: opacity 300ms ease, visibility 300ms; }
     body[data-ready] #reconstructed-shift { transition: transform 1400ms cubic-bezier(.22,.61,.36,1); }
@@ -55,16 +58,19 @@
   <main class="app">
     <header class="topbar">
       <div class="subtitle">Texas · weekly influenza hospital admissions</div>
-      <div class="controls"><label for="state-select">View</label><button id="back-button" aria-label="Previous view">←</button><select id="state-select" aria-label="Hospitalization history view"><option value="1">1 · Observed history</option><option value="2">2 · Add reconstructed history</option><option value="3">3 · Stitch the training history</option></select><button id="next-button" aria-label="Next view">→</button></div>
+      <div class="controls"><label for="state-select">View</label><button id="back-button" aria-label="Previous view">←</button><select id="state-select" aria-label="Hospitalization history view"><option value="1">1 · Observed history</option><option value="2">2 · Add reconstructed history</option><option value="3">3 · Stitch the training history</option><option value="4">4 · Full history through 2026</option></select><button id="next-button" aria-label="Next view">→</button></div>
     </header>
     <section class="frame">
       <svg id="chart" viewBox="0 0 1158 438" role="img" aria-labelledby="chart-title chart-desc">
         <title id="chart-title">Borrowing history from outpatient surveillance in Texas</title>
         <desc id="chart-desc"></desc>
-        <g id="axes"></g>
-        <g id="reconstructed" class="reveal" aria-hidden="true"><g id="reconstructed-shift"></g></g>
-        <g id="observed"></g>
-        <g id="stitch-join" aria-hidden="true"></g>
+        <g id="initial-history">
+          <g id="axes"></g>
+          <g id="reconstructed" class="reveal" aria-hidden="true"><g id="reconstructed-shift"></g></g>
+          <g id="observed"></g>
+          <g id="stitch-join" aria-hidden="true"></g>
+        </g>
+        <g id="full-history" aria-hidden="true"></g>
         <g id="labels">
           <g class="reveal" aria-hidden="true">
             <line x1="156" x2="194" y1="23" y2="23" stroke="#0a6670" stroke-width="2.7" stroke-dasharray="5 3"/>
@@ -94,17 +100,19 @@
       parent.appendChild(element);
       return element;
     }
-    const axes = document.getElementById("axes");
-    for (let value = 0; value <= data.axis_max; value += data.tick_step) {
-      add(axes, "line", {x1: 84, x2: 1130, y1: y(value), y2: y(value), stroke: value === 0 ? "#aab7b7" : "#e8edeb"});
-      add(axes, "text", {x: 72, y: y(value) + 5, class: "tick", "text-anchor": "end"}, value.toLocaleString("en-US"));
+    function drawAxes(axes, xScale, yScale, maximum, step, ticks) {
+      for (let value = 0; value <= maximum; value += step) {
+        add(axes, "line", {x1: 84, x2: 1130, y1: yScale(value), y2: yScale(value), stroke: value === 0 ? "#aab7b7" : "#e8edeb"});
+        add(axes, "text", {x: 72, y: yScale(value) + 5, class: "tick", "text-anchor": "end"}, value.toLocaleString("en-US"));
+      }
+      add(axes, "line", {x1: 84, x2: 84, y1: 63, y2: 338, stroke: "#aab7b7"});
+      add(axes, "text", {x: 19, y: 200, transform: "rotate(-90 19 200)", "text-anchor": "middle", fill: "#647278"}, "Hospital admissions");
+      for (const [stamp, label] of ticks) {
+        add(axes, "line", {x1: xScale(stamp), x2: xScale(stamp), y1: 338, y2: 346, stroke: "#aab7b7"});
+        add(axes, "text", {x: xScale(stamp), y: 369, class: "tick", "text-anchor": stamp === ticks.at(-1)[0] ? "end" : "middle"}, label);
+      }
     }
-    add(axes, "line", {x1: 84, x2: 84, y1: 63, y2: 338, stroke: "#aab7b7"});
-    add(axes, "text", {x: 19, y: 200, transform: "rotate(-90 19 200)", "text-anchor": "middle", fill: "#647278"}, "Hospital admissions");
-    for (const [stamp, label] of [[data.start, "2009"], ["2012-01-01", "2012"], ["2015-01-01", "2015"], ["2018-01-01", "2018"], ["2020-01-01", "2020"], [data.end, "Oct 2022"]]) {
-      add(axes, "line", {x1: x(stamp), x2: x(stamp), y1: 338, y2: 346, stroke: "#aab7b7"});
-      add(axes, "text", {x: x(stamp), y: 369, class: "tick", "text-anchor": stamp === data.end ? "end" : "middle"}, label);
-    }
+    drawAxes(document.getElementById("axes"), x, y, data.axis_max, data.tick_step, [[data.start, "2009"], ["2012-01-01", "2012"], ["2015-01-01", "2015"], ["2018-01-01", "2018"], ["2020-01-01", "2020"], [data.end, "Oct 2022"]]);
     const shiftPx = data.training_shift_days * 86400000 / (end - start) * 1046;
     document.documentElement.style.setProperty("--shift-x", `${shiftPx}px`);
     const retained = data.observed.filter(point => point.date >= data.retained_observed_start);
@@ -112,8 +120,8 @@
     const observed = document.getElementById("observed");
     const early = add(observed, "g", {id: "observed-early"});
     const kept = add(observed, "g", {id: "observed-retained"});
-    function draw(parent, points, kind) {
-      const d = points.map((point, i) => `${i ? "L" : "M"}${x(point.date).toFixed(2)},${y(point.value).toFixed(2)}`).join(" ");
+    function draw(parent, points, kind, xScale = x, yScale = y) {
+      const d = points.map((point, i) => `${i ? "L" : "M"}${xScale(point.date).toFixed(2)},${yScale(point.value).toFixed(2)}`).join(" ");
       add(parent, "path", {d, fill: "none", stroke: kind === "observed" ? "#58666c" : "#0a6670", "stroke-width": 2.7, "stroke-linejoin": "round", "stroke-linecap": "round", ...(kind === "reconstructed" ? {"stroke-dasharray": "5 3"} : {})});
     }
     draw(document.getElementById("reconstructed-shift"), data.reconstructed, "reconstructed");
@@ -121,21 +129,33 @@
     draw(kept, retained, "observed");
     const last = data.reconstructed.at(-1), first = retained[0];
     add(document.getElementById("stitch-join"), "line", {x1: x(last.date) + shiftPx, y1: y(last.value), x2: x(first.date), y2: y(first.value), stroke: "#0a6670", "stroke-width": 2.7, "stroke-dasharray": "5 3"});
+    const full = document.getElementById("full-history");
+    const fullEnd = Date.parse(`${data.full_end}T00:00:00Z`);
+    const fullX = stamp => 84 + (Date.parse(`${stamp}T00:00:00Z`) - start) / (fullEnd - start) * 1046;
+    const fullY = value => 338 - value / data.full_axis_max * 275;
+    drawAxes(add(full, "g", {id: "full-axes"}), fullX, fullY, data.full_axis_max, data.full_tick_step, [[data.start, "2009"], ["2012-01-01", "2012"], ["2015-01-01", "2015"], ["2018-01-01", "2018"], ["2021-01-01", "2021"], ["2024-01-01", "2024"], [data.full_end, "Jul 2026"]]);
+    const shifted = data.reconstructed.map(point => ({date: new Date(Date.parse(`${point.date}T00:00:00Z`) + data.training_shift_days * 86400000).toISOString().slice(0, 10), value: point.value}));
+    draw(add(full, "g", {id: "full-reconstructed"}), [...shifted, first], "reconstructed", fullX, fullY);
+    draw(add(full, "g", {id: "full-observed"}), [...retained, ...data.extended], "observed", fullX, fullY);
     function fromHash() {
       const state = new URLSearchParams(location.hash.slice(1)).get("state");
-      return state === "3" ? 3 : state === "2" ? 2 : 1;
+      return ["1", "2", "3", "4"].includes(state) ? Number(state) : 1;
     }
     function render(state = fromHash()) {
       document.body.dataset.state = String(state);
-      select.value = String(state); back.disabled = state === 1; next.disabled = state === 3;
+      select.value = String(state); back.disabled = state === 1; next.disabled = state === 4;
+      document.getElementById("initial-history").setAttribute("aria-hidden", String(state === 4));
+      full.setAttribute("aria-hidden", String(state !== 4));
       for (const element of document.querySelectorAll(".reveal")) element.setAttribute("aria-hidden", String(state === 1));
       early.setAttribute("aria-hidden", String(state === 3));
       document.getElementById("stitch-join").setAttribute("aria-hidden", String(state !== 3));
-      document.getElementById("chart-desc").textContent = state === 3
+      document.getElementById("chart-desc").textContent = state === 4
+        ? "Texas stitched history with 456 reconstructed weeks followed by 261 observed weeks. The reconstructed history retains its 728-day forward shift. Observed weekly counts extend from July 3, 2021 through June 27, 2026, on an axis ending July 1, 2026. The vertical axis expands to 5,000 admissions."
+        : state === 3
         ? "Texas stitched training sequence. The reconstructed history shifts forward 728 days, or 104 weeks, without changing any values. Its last point is indexed June 26, 2021, followed by the first retained observed point on July 3, 2021. Earlier observed weeks are excluded. The axis now represents the training time index, not the reconstructed seasons' original calendar dates."
         : "Texas weekly reported influenza hospital admissions from January 2020 through October 2022, shown as a solid gray line on a calendar beginning in September 2009." + (state === 2 ? " A dashed teal line adds the saved ILINet-based reconstruction from October 2010 through June 2019. These are estimated historical admissions, not observations. Original calendar dates are restored, and no line bridges the gap between reconstructed and observed records." : " The earlier years are left empty. Advance to reveal the reconstructed hospitalization history.");
     }
-    function go(state) { location.hash = `state=${Math.max(1, Math.min(3, state))}`; }
+    function go(state) { location.hash = `state=${Math.max(1, Math.min(4, state))}`; }
     select.addEventListener("change", () => go(Number(select.value)));
     back.addEventListener("click", () => go(fromHash() - 1));
     next.addEventListener("click", () => go(fromHash() + 1));

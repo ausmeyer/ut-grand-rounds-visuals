@@ -2,7 +2,7 @@
 
 ## Teaching and display
 
-One Texas hospitalization plot, three addressable views, fixed 1240 × 540 frame.
+One Texas hospitalization plot, four addressable views, fixed 1240 × 540 frame.
 Keep the title in Slides.com: **Borrowing history from outpatient surveillance**.
 
 - `#state=1`: reported admissions, January 11, 2020 through October 1, 2022.
@@ -12,8 +12,12 @@ Keep the title in Slides.com: **Borrowing history from outpatient surveillance**
   reconstruction forward 728 days (104 weeks), restoring its modeling time index.
   Its last point, June 26, 2021, joins the first retained observation, July 3, 2021.
   All 522 retained weekly values form a continuous training sequence.
-- All views retain identical axis positions and scales. No values are smoothed,
-  rescaled, or fabricated. States 1–2 show original calendar dates; state 3
+- `#state=4`: extend the stitched sequence with 195 additional reported Texas
+  weeks from October 8, 2022 through June 27, 2026. The horizontal axis ends
+  July 1, 2026 and the vertical axis expands to 5,000 admissions. There are
+  717 consecutive weekly values: 456 reconstructed and 261 observed.
+- States 1–3 retain identical axis positions and scales. No data values are
+  smoothed, rescaled, or fabricated. States 1–2 show original calendar dates; state 3
   intentionally restores the shifted model index without an extra visible label,
   as requested. Observed dates never move. No connector crosses the historical
   gap in state 2; the state-3 connector joins consecutive weeks only.
@@ -35,6 +39,7 @@ description of date stitching.
 | --- | --- | --- |
 | 456 reconstructed Texas weeks | `flusight_2023/imputed_and_stitched_hosp.csv`, Texas rows with nonmissing `pred_hosp`; `total_hosp` used without adjustment | Saved output from the published-method project, not a newly fitted reconstruction or a frozen October 2022 vintage |
 | 143 observed Texas weeks | `flusight_2022/Flusight-forecast-data/data-truth/truth-Incident Hospitalizations.csv`, Texas, January 11, 2020 through October 1, 2022 | Archived reported counts include early underreporting and the pandemic period; not every displayed observation was retained in the model's training set |
+| 195 additional observed Texas weeks | `UT_grand_rounds/data/raw/nhsn_flu_admissions_raw.csv`, CDC NHSN dataset `vdzy-6i9v`, `jurisdiction=TX`, `totalconfflunewadm`, October 8, 2022 through June 27, 2026 | Reported counts, not per-capita rates; these later observations appear only in state 4. The extract is not a frozen forecast-time vintage. July 1 is the axis cutoff, not an imputed observation. |
 | Reconstruction from ILINet | Paper, Data augmentation approach; local `flusight_2023/stitch.Rmd`, Combined Model and Make Historical Time Series | Pooled transformed ILI/EIP mapping transferred across locations, not direct equivalence between ILI percentages and observed hospitalization counts |
 | Calendar-to-model-index shift | Paper and `flusight_2023/stitch.Rmd`, Compare To Current Data, `date + days(728)` | State 2 reverses the shift; state 3 reapplies exactly 728 days to reconstructed rows only; observed dates never shift |
 | Reconstructed admissions are counts | `flusight_2023/stitch.Rmd`, population conversion; stored `pred_hosp`, `population`, and `total_hosp` | The saved Texas population is 29,527,941; counts match rates × population / 100,000 rounded to integers |
@@ -46,6 +51,9 @@ state 3 restores the shifted index and removes the excluded observations.
 The short observed record in states 1–2 includes 2020/21 to connect to slide 16.
 No extra visible time-index label is added; the interpretation remains in these
 presenter notes and the accessible chart description.
+State 4 keeps that stitched history and appends the newer observed counts;
+earlier source values and states 1–3 remain unchanged. The additional series
+includes 2022/23; the exclusion used on slide 11 does not apply to this slide.
 
 The 2023 project's normalized-ILI reconstruction is used rather than the older
 2022 saved output, whose `ili` column contains unnormalized percentages and whose
@@ -73,10 +81,11 @@ To intentionally refresh the selected source rows from the original project
 files, run `python3 scripts/build_slide_17.py --import-sources ../..` from this
 repository. Do not do this as part of a routine rebuild.
 
-Tests verify all 599 source-to-chart values, date reversal, rate-to-count
+Tests verify all 794 source-to-chart values, date reversal, rate-to-count
 conversion, weekly uniqueness and continuity within each source, frame bounds,
-label collisions, unchanged axes and retained observations across builds,
+label collisions, unchanged axes and retained observations across states 1–3,
 forward/reverse animation, direct-entry animation, the exact weekly stitch,
-navigation, reduced motion, and absence of runtime network requests. Visual review is also
+the full-history extension and its expanded axes, navigation, reduced motion,
+and absence of runtime network requests. Visual review is also
 required at the actual iframe size before publishing. Deployment verification
 checks the Pages run and exact live HTML against the local generated file.

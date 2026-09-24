@@ -12,10 +12,12 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "slide-17"
 START, END = "2009-09-01", "2022-10-01"
+FULL_END = "2026-07-01"
 SHIFT = timedelta(days=728)
 SOURCE_PATHS = {
     "reconstructed": "flusight_2023/imputed_and_stitched_hosp.csv",
     "observed": "flusight_2022/Flusight-forecast-data/data-truth/truth-Incident Hospitalizations.csv",
+    "extended": "UT_grand_rounds/data/raw/nhsn_flu_admissions_raw.csv",
 }
 
 
@@ -40,6 +42,10 @@ def import_sources(source_root):
         original = source_root / relative
         selected = []
         for row in read_rows(original):
+            if kind == "extended":
+                if row["jurisdiction"] == "TX" and END < row["weekendingdate"][:10] <= FULL_END:
+                    selected.append(row)
+                continue
             if row["location_name"] != "Texas":
                 continue
             if kind == "reconstructed":
@@ -75,18 +81,24 @@ def example():
             raise ValueError("Source row count changed")
         points = []
         for row in rows:
-            if row["location_name"] != "Texas":
+            extended = source["kind"] == "extended"
+            location = row["jurisdiction"] if extended else row["location_name"]
+            if location != ("TX" if extended else "Texas"):
                 raise ValueError("Expected Texas only")
-            stamp = date.fromisoformat(row["date"])
+            stamp = date.fromisoformat(row["weekendingdate"][:10] if extended else row["date"])
             if source["kind"] == "reconstructed":
                 stamp -= SHIFT
                 value = float(row["total_hosp"])
                 rate_count = float(row["pred_hosp"]) * float(row["population"]) / 100000
                 if abs(value - rate_count) > .500001 or stamp > date(2019, 6, 30):
                     raise ValueError("Reconstruction date or rate-to-count mismatch")
+            elif extended:
+                value = float(row["totalconfflunewadm"])
+                if stamp.isoformat() <= END:
+                    raise ValueError("Extension must follow the original observations")
             else:
                 value = float(row["value"])
-            if not math.isfinite(value) or value < 0 or not START <= stamp.isoformat() <= END:
+            if not math.isfinite(value) or value < 0 or not START <= stamp.isoformat() <= (FULL_END if extended else END):
                 raise ValueError("Invalid chart row")
             points.append({"date": stamp.isoformat(), "value": value})
         points.sort(key=lambda point: point["date"])
@@ -94,8 +106,13 @@ def example():
         if any((b - a).days != 7 for a, b in zip(dates, dates[1:])):
             raise ValueError("Expected unique weekly source rows")
         series[source["kind"]] = points
-    maximum = max(point["value"] for points in series.values() for point in points)
+    maximum = max(point["value"] for kind in ("reconstructed", "observed") for point in series[kind])
+    full_maximum = max(maximum, max(point["value"] for point in series["extended"]))
+    if (date.fromisoformat(series["extended"][0]["date"]) - date.fromisoformat(series["observed"][-1]["date"])).days != 7:
+        raise ValueError("Extension must begin the week after the original observations")
     return {"slide": 17, "location": "Texas", "start": START, "end": END,
+            "full_end": FULL_END, "full_axis_max": math.ceil(full_maximum / 1000) * 1000,
+            "full_tick_step": 1000,
             "training_shift_days": SHIFT.days, "retained_observed_start": "2021-07-01",
             "axis_max": math.ceil(maximum / 500) * 500, "tick_step": 500,
             "units": "Weekly influenza hospital admissions",
@@ -103,7 +120,8 @@ def example():
                          "url": "https://doi.org/10.1016/j.epidem.2025.100816"},
             "provenance": {"date_shift_undone_days": SHIFT.days,
                            "reconstruction": "Saved normalized-ILI reconstruction from the published-method project; not a new fit or a frozen October 2022 data vintage.",
-                           "observations": "Archived reported admission counts, including pandemic-era observations. Not all displayed observations were retained for model training."},
+                           "observations": "Archived reported admission counts, including pandemic-era observations. Not all displayed observations were retained for model training.",
+                           "extended_observations": "Texas totalconfflunewadm counts from the local CDC NHSN vdzy-6i9v extract, after October 1, 2022 through July 1, 2026. Weekly observations end June 27, 2026; no value is imputed at the axis endpoint."},
             **series}
 
 
@@ -123,7 +141,7 @@ def main():
     data = example()
     write_json(DATA / "slide-17.json", data)
     (ROOT / "docs" / "slide-17.html").write_text(render(data))
-    print(f"Built Slide 17: {len(data['observed'])} observed and {len(data['reconstructed'])} reconstructed Texas weeks.")
+    print(f"Built Slide 17: {len(data['observed'])} original observed, {len(data['extended'])} additional observed, and {len(data['reconstructed'])} reconstructed Texas weeks.")
 
 
 if __name__ == "__main__":

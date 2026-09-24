@@ -14,5 +14,13 @@
     "snapshot": "observed-source.csv",
     "snapshot_sha256": "b1ae605cf1f9dfbc47dc7a66f07bda3d4d344033d870f14d4663832a2206396d",
     "rows": 143
+  },
+  {
+    "kind": "extended",
+    "source_path": "UT_grand_rounds/data/raw/nhsn_flu_admissions_raw.csv",
+    "source_sha256": "2ba713fbf3050eee133bbfb79aaa0215c65e15ed0583047755acef2bdc2a8732",
+    "snapshot": "extended-source.csv",
+    "snapshot_sha256": "905d1765be48a08fb8edd15fc47a62d14baf713d2eac2f003aaeaf80e0a28ffc",
+    "rows": 195
   }
 ]
