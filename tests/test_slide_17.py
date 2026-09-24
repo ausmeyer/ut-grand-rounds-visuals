@@ -1,0 +1,68 @@
+"""Verify the chart against archived source rows, on the original calendar."""
+import csv
+from datetime import date
+import hashlib
+import json
+from pathlib import Path
+import sys
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+import build_slide_17 as BUILD
+
+
+class ReconstructionTests(unittest.TestCase):
+    def test_source_snapshots(self):
+        for source in json.loads((BUILD.DATA / "sources.json").read_text()):
+            raw = (BUILD.DATA / source["snapshot"]).read_bytes()
+            self.assertEqual(hashlib.sha256(raw).hexdigest(), source["snapshot_sha256"])
+            self.assertEqual(len(list(csv.DictReader(raw.decode().splitlines()))), source["rows"])
+
+    def test_every_reconstruction_row_and_date(self):
+        data = BUILD.example()
+        rows = BUILD.read_rows(BUILD.DATA / "reconstructed-source.csv")
+        self.assertEqual(len(data["reconstructed"]), 456)
+        for row, point in zip(rows, data["reconstructed"]):
+            self.assertEqual(row["location_name"], "Texas")
+            self.assertEqual((date.fromisoformat(row["date"]) - date.fromisoformat(point["date"])).days, 728)
+            self.assertEqual(point["value"], float(row["total_hosp"]))
+            self.assertEqual(point["value"], round(float(row["pred_hosp"]) * 29527941 / 100000))
+        self.assertEqual(data["reconstructed"][0], {"date": "2010-10-09", "value": 74})
+        self.assertEqual(data["reconstructed"][-1]["date"], "2019-06-29")
+        self.assertEqual(max(data["reconstructed"], key=lambda point: point["value"]),
+                         {"date": "2018-01-27", "value": 2321})
+
+    def test_all_observations_preserved(self):
+        points = BUILD.example()["observed"]
+        rows = BUILD.read_rows(BUILD.DATA / "observed-source.csv")
+        self.assertEqual(len(points), 143)
+        self.assertEqual(points, [{"date": row["date"], "value": float(row["value"])} for row in rows])
+        self.assertEqual(points[0]["date"], "2020-01-11")
+        self.assertEqual(points[-1]["date"], "2022-10-01")
+        self.assertEqual(max(point["value"] for point in points), 663)
+
+    def test_calendar_range_and_no_filled_gaps(self):
+        data = BUILD.example()
+        self.assertEqual((data["start"], data["end"]), ("2009-09-01", "2022-10-01"))
+        self.assertEqual(data["axis_max"], 2500)
+        for key in ("observed", "reconstructed"):
+            dates = [date.fromisoformat(point["date"]) for point in data[key]]
+            self.assertEqual(len(set(dates)), len(dates))
+            self.assertTrue(all((b - a).days == 7 for a, b in zip(dates, dates[1:])))
+            self.assertTrue(all(0 <= point["value"] < data["axis_max"] for point in data[key]))
+        self.assertLess(data["reconstructed"][-1]["date"], data["observed"][0]["date"])
+
+    def test_generated_artifacts(self):
+        data = BUILD.example()
+        self.assertEqual(json.loads((BUILD.DATA / "slide-17.json").read_text()), data)
+        html = (ROOT / "docs" / "slide-17.html").read_text()
+        self.assertEqual(html, BUILD.render(data))
+        self.assertNotIn("—", html)
+        self.assertIn("Reconstructed from ILINet", html)
+        self.assertIn("A longer training history, not new observations.", html)
+        self.assertNotIn("<h1", html)
+
+
+if __name__ == "__main__":
+    unittest.main()

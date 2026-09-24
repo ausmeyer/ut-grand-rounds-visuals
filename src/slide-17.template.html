@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Borrowing history from outpatient surveillance</title>
+  <style>
+    :root { --ink: #14242b; --muted: #647278; --teal: #0a6670; --paper: #fbfaf6; --line: #d5dad6; }
+    * { box-sizing: border-box; }
+    html, body { width: 1240px; height: 540px; margin: 0; overflow: hidden; }
+    body { background: var(--paper); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-variant-numeric: tabular-nums; }
+    .app { width: 1240px; height: 540px; display: grid; grid-template-rows: 38px 1fr; gap: 8px; padding: 10px 16px 8px; }
+    .topbar, .controls { display: flex; align-items: center; }
+    .topbar { justify-content: space-between; gap: 16px; }
+    .subtitle { color: #42535a; font-size: 16px; font-weight: 670; }
+    .controls { gap: 7px; }
+    .controls label { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; margin-right: 3px; }
+    button, select { height: 32px; border: 1px solid #b9c3c0; border-radius: 8px; background: white; color: var(--ink); font: inherit; font-weight: 740; }
+    select { width: 257px; padding: 0 32px 0 10px; font-size: 13px; }
+    button { width: 34px; padding: 0; font-size: 17px; cursor: pointer; }
+    button:hover { border-color: var(--teal); color: var(--teal); }
+    button:disabled { opacity: .35; cursor: default; }
+    :focus-visible { outline: 3px solid #82bcc1; outline-offset: 2px; }
+    .frame { padding: 17px 24px; border: 1px solid var(--line); border-radius: 14px; background: white; box-shadow: 0 8px 24px rgb(28 49 50 / 7%); }
+    #chart { display: block; width: 1158px; height: 438px; }
+    svg { font-size: 18px; }
+    svg text { fill: var(--ink); }
+    .tick { fill: var(--muted); font-size: 16px; }
+    .reconstructed-label { fill: var(--teal); font-size: 20px; font-weight: 670; }
+    .observed-label { fill: #58666c; font-size: 20px; font-weight: 670; }
+    .takeaway { font-size: 23px; font-weight: 700; }
+    .citation { fill: var(--muted); font-size: 14px; }
+    a:hover .citation { fill: var(--teal); text-decoration: underline; }
+    .reveal { opacity: 0; visibility: hidden; }
+    body[data-state="2"] .reveal { opacity: 1; visibility: visible; }
+    body[data-ready] .reveal { transition: opacity 400ms ease, visibility 400ms; }
+    @media (prefers-reduced-motion: reduce) { body[data-ready] .reveal { transition: none; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="subtitle">Texas · weekly influenza hospital admissions</div>
+      <div class="controls"><label for="state-select">View</label><button id="back-button" aria-label="Previous view">←</button><select id="state-select" aria-label="Hospitalization history view"><option value="1">1 · Observed history</option><option value="2">2 · Add reconstructed history</option></select><button id="next-button" aria-label="Next view">→</button></div>
+    </header>
+    <section class="frame">
+      <svg id="chart" viewBox="0 0 1158 438" role="img" aria-labelledby="chart-title chart-desc">
+        <title id="chart-title">Borrowing history from outpatient surveillance in Texas</title>
+        <desc id="chart-desc"></desc>
+        <g id="axes"></g>
+        <g id="reconstructed" class="reveal" aria-hidden="true"></g>
+        <g id="observed"></g>
+        <g id="labels">
+          <g class="reveal" aria-hidden="true">
+            <line x1="156" x2="194" y1="23" y2="23" stroke="#0a6670" stroke-width="2.7" stroke-dasharray="5 3"/>
+            <text x="205" y="30" class="reconstructed-label">Reconstructed from ILINet</text>
+          </g>
+          <line x1="910" x2="948" y1="23" y2="23" stroke="#58666c" stroke-width="2.7"/>
+          <text x="959" y="30" class="observed-label">Observed</text>
+          <text x="84" y="415" class="takeaway reveal" aria-hidden="true">A longer training history, not new observations.</text>
+          <a href="https://doi.org/10.1016/j.epidem.2025.100816" target="_blank" rel="noopener noreferrer" aria-label="Meyer and colleagues, Epidemics 2025">
+            <text x="1130" y="415" text-anchor="end" class="citation">Meyer et al. · Epidemics · 2025</text>
+          </a>
+        </g>
+      </svg>
+    </section>
+  </main>
+  <script>
+    "use strict";
+    const data = /*__SLIDE_DATA__*/;
+    const select = document.getElementById("state-select"), back = document.getElementById("back-button"), next = document.getElementById("next-button");
+    const start = Date.parse(`${data.start}T00:00:00Z`), end = Date.parse(`${data.end}T00:00:00Z`);
+    const x = stamp => 84 + (Date.parse(`${stamp}T00:00:00Z`) - start) / (end - start) * 1046;
+    const y = value => 338 - value / data.axis_max * 275;
+    function add(parent, tag, attributes, content) {
+      const element = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [key, value] of Object.entries(attributes)) element.setAttribute(key, value);
+      if (content !== undefined) element.textContent = content;
+      parent.appendChild(element);
+      return element;
+    }
+    const axes = document.getElementById("axes");
+    for (let value = 0; value <= data.axis_max; value += data.tick_step) {
+      add(axes, "line", {x1: 84, x2: 1130, y1: y(value), y2: y(value), stroke: value === 0 ? "#aab7b7" : "#e8edeb"});
+      add(axes, "text", {x: 72, y: y(value) + 5, class: "tick", "text-anchor": "end"}, value.toLocaleString("en-US"));
+    }
+    add(axes, "line", {x1: 84, x2: 84, y1: 63, y2: 338, stroke: "#aab7b7"});
+    add(axes, "text", {x: 19, y: 200, transform: "rotate(-90 19 200)", "text-anchor": "middle", fill: "#647278"}, "Hospital admissions");
+    for (const [stamp, label] of [[data.start, "2009"], ["2012-01-01", "2012"], ["2015-01-01", "2015"], ["2018-01-01", "2018"], ["2020-01-01", "2020"], [data.end, "Oct 2022"]]) {
+      add(axes, "line", {x1: x(stamp), x2: x(stamp), y1: 338, y2: 346, stroke: "#aab7b7"});
+      add(axes, "text", {x: x(stamp), y: 369, class: "tick", "text-anchor": stamp === data.end ? "end" : "middle"}, label);
+    }
+    for (const kind of ["reconstructed", "observed"]) {
+      const points = data[kind];
+      const d = points.map((point, i) => `${i ? "L" : "M"}${x(point.date).toFixed(2)},${y(point.value).toFixed(2)}`).join(" ");
+      add(document.getElementById(kind), "path", {d, fill: "none", stroke: kind === "observed" ? "#58666c" : "#0a6670", "stroke-width": 2.7, "stroke-linejoin": "round", "stroke-linecap": "round", ...(kind === "reconstructed" ? {"stroke-dasharray": "5 3"} : {})});
+    }
+    function fromHash() { return new URLSearchParams(location.hash.slice(1)).get("state") === "2" ? 2 : 1; }
+    function render() {
+      const state = fromHash();
+      document.body.dataset.state = String(state);
+      select.value = String(state); back.disabled = state === 1; next.disabled = state === 2;
+      for (const element of document.querySelectorAll(".reveal")) element.setAttribute("aria-hidden", String(state !== 2));
+      document.getElementById("chart-desc").textContent = "Texas weekly reported influenza hospital admissions from January 2020 through October 2022, shown as a solid gray line on a calendar beginning in September 2009." + (state === 2 ? " A dashed teal line adds the saved ILINet-based reconstruction from October 2010 through June 2019. These are estimated historical admissions, not observations. Original calendar dates are restored, and no line bridges the gap between reconstructed and observed records." : " The earlier years are left empty. Advance to reveal the reconstructed hospitalization history.");
+    }
+    function go(state) { location.hash = `state=${Math.max(1, Math.min(2, state))}`; }
+    select.addEventListener("change", () => go(Number(select.value)));
+    back.addEventListener("click", () => go(fromHash() - 1));
+    next.addEventListener("click", () => go(fromHash() + 1));
+    addEventListener("hashchange", render);
+    addEventListener("keydown", event => {
+      if (["SELECT", "INPUT", "BUTTON", "A"].includes(document.activeElement.tagName)) return;
+      if (event.key === "ArrowRight" || event.key === "ArrowLeft") { event.preventDefault(); go(fromHash() + (event.key === "ArrowRight" ? 1 : -1)); }
+    });
+    render();
+    requestAnimationFrame(() => requestAnimationFrame(() => { document.body.dataset.ready = "true"; }));
+  </script>
+</body>
+</html>

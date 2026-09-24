@@ -1,0 +1,18 @@
+[
+  {
+    "kind": "reconstructed",
+    "source_path": "flusight_2023/imputed_and_stitched_hosp.csv",
+    "source_sha256": "4ba0aece5517cd04915300011a33d3a508a33bafc3755af89dc40602a0bec9b5",
+    "snapshot": "reconstructed-source.csv",
+    "snapshot_sha256": "dc20735d20fa90223f200b0a5271f6ff433e7ecf13d36019bfa45e7db447e936",
+    "rows": 456
+  },
+  {
+    "kind": "observed",
+    "source_path": "flusight_2022/Flusight-forecast-data/data-truth/truth-Incident Hospitalizations.csv",
+    "source_sha256": "c0dd1a190e896c17de27f984bbdf715b8855dbae6f20ef342b80ee65840d28c9",
+    "snapshot": "observed-source.csv",
+    "snapshot_sha256": "b1ae605cf1f9dfbc47dc7a66f07bda3d4d344033d870f14d4663832a2206396d",
+    "rows": 143
+  }
+]

@@ -66,6 +66,7 @@ python3 scripts/build_slide_04.py
 python3 scripts/build_surveillance_section.py
 python3 scripts/build_forecasting_intro.py
 python3 scripts/build_forecast_scores.py
+python3 scripts/build_slide_17.py
 ```
 
 `build_surveillance_section.py` reads the already-downloaded CSV files from
@@ -161,6 +162,13 @@ The [Slides 14–15 evidence notes](specs/forecast-scores-evidence.md) distingui
 Slide 14's real archived example from Slide 15's synthetic illustration.
 Both build offline with `python3 scripts/build_forecast_scores.py`. The new
 Slide 15 displays no measured model score or performance claim.
+
+Slide 17 shows the Texas hospitalization reconstruction in two views:
+`#state=1` displays the short observed record; `#state=2` adds the ILINet-based
+historical estimates as a dashed line. The original calendar dates are restored
+from the model's shifted time index. Axes and observations stay fixed. Use a
+1240 × 540 iframe, with the title in Slides.com. This builds offline with
+`python3 scripts/build_slide_17.py`; see the [source and date-handling notes](specs/slide-17-evidence.md).
 
 
 ## Slide 4 claymation
