@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Texas influenza hospitalization forecasts</title>
+  <style>
+    :root { --ink: #14242b; --muted: #647278; --teal: #0a6670; --paper: #fbfaf6; --line: #d5dad6; }
+    * { box-sizing: border-box; }
+    html, body { width: 1240px; height: 540px; margin: 0; overflow: hidden; }
+    body { background: var(--paper); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-variant-numeric: tabular-nums; }
+    .app { width: 1240px; height: 540px; display: grid; grid-template-rows: 38px 1fr; gap: 8px; padding: 10px 16px 8px; }
+    .topbar, .controls { display: flex; align-items: center; }
+    .topbar { justify-content: space-between; gap: 16px; }
+    .subtitle { color: #42535a; font-size: 16px; font-weight: 670; }
+    .controls { gap: 7px; }
+    .controls label { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; margin-right: 3px; }
+    button, select { height: 32px; border: 1px solid #b9c3c0; border-radius: 8px; background: white; color: var(--ink); font: inherit; font-weight: 740; }
+    select { width: 270px; padding: 0 32px 0 10px; font-size: 13px; }
+    button { width: 34px; padding: 0; font-size: 17px; cursor: pointer; }
+    button:hover { border-color: var(--teal); color: var(--teal); }
+    button:disabled { opacity: .35; cursor: default; }
+    :focus-visible { outline: 3px solid #82bcc1; outline-offset: 2px; }
+    .frame { padding: 8px 12px; border: 1px solid var(--line); border-radius: 14px; background: white; box-shadow: 0 8px 24px rgb(28 49 50 / 7%); }
+    #chart { display: block; width: 1182px; height: 458px; }
+    svg text { fill: var(--ink); font-size: 17px; }
+    .tick { fill: var(--muted); font-size: 16px; }
+    .forecast-layer { opacity: 0; visibility: hidden; }
+    .forecast-layer.active { opacity: 1; visibility: visible; }
+    body[data-ready] .forecast-layer { transition: opacity 450ms ease, visibility 450ms; }
+    @media (prefers-reduced-motion: reduce) { body[data-ready] .forecast-layer { transition: none; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="subtitle">Texas · MIGHTE-Base without additional covariates</div>
+      <div class="controls"><label for="state-select">Horizon</label><button id="back-button" aria-label="Previous horizon">←</button><select id="state-select" aria-label="Forecast horizon"><option value="1">1 · Current week (horizon 0)</option><option value="2">2 · 1 week ahead</option><option value="3">3 · 2 weeks ahead</option><option value="4">4 · 3 weeks ahead</option></select><button id="next-button" aria-label="Next horizon">→</button></div>
+    </header>
+    <section class="frame">
+      <svg id="chart" viewBox="0 0 1182 458" role="img" aria-labelledby="chart-title chart-desc">
+        <title id="chart-title">Texas influenza hospitalization forecasts without additional covariates</title>
+        <desc id="chart-desc"></desc>
+        <g id="axes"></g>
+        <g id="forecasts"></g>
+        <g id="observed"></g>
+        <g id="legend">
+          <line x1="98" x2="135" y1="20" y2="20" stroke="#111111" stroke-width="2.8"/>
+          <text x="146" y="26">Observed</text>
+          <line x1="304" x2="341" y1="20" y2="20" stroke="#0a6670" stroke-width="2.5" stroke-dasharray="6 3"/>
+          <text x="352" y="26">Forecast median</text>
+          <rect x="571" y="11" width="30" height="18" fill="#0a6670" fill-opacity=".4"/>
+          <text x="612" y="26">50% prediction interval</text>
+          <rect x="879" y="11" width="30" height="18" fill="#0a6670" fill-opacity=".16"/>
+          <text x="920" y="26">90% prediction interval</text>
+        </g>
+      </svg>
+    </section>
+  </main>
+  <script>
+    "use strict";
+    const data = /*__SLIDE_DATA__*/;
+    const select = document.getElementById("state-select"), back = document.getElementById("back-button"), next = document.getElementById("next-button");
+    const stamp = value => Date.parse(`${value}T00:00:00Z`), week = 7 * 86400000;
+    const x = value => 88 + (stamp(value) - stamp(data.start)) / (stamp(data.end) - stamp(data.start)) * 1070;
+    const y = value => 408 - value / data.axis_max * 354;
+    function add(parent, tag, attributes, content) {
+      const element = document.createElementNS("http://www.w3.org/2000/svg", tag);
+      for (const [key, value] of Object.entries(attributes)) element.setAttribute(key, value);
+      if (content !== undefined) element.textContent = content;
+      parent.appendChild(element);
+      return element;
+    }
+    const axes = document.getElementById("axes");
+    for (let value = 0; value <= data.axis_max; value += data.tick_step) {
+      add(axes, "line", {x1: 88, x2: 1158, y1: y(value), y2: y(value), stroke: value === 0 ? "#aab7b7" : "#e8edeb"});
+      add(axes, "text", {x: 77, y: y(value) + 5, class: "tick", "text-anchor": "end"}, value.toLocaleString("en-US"));
+    }
+    add(axes, "line", {x1: 88, x2: 88, y1: 54, y2: 408, stroke: "#aab7b7"});
+    add(axes, "text", {x: 20, y: 231, transform: "rotate(-90 20 231)", "text-anchor": "middle"}, "Weekly influenza admissions");
+    const dates = [data.start, "2025-01-01", "2025-04-01", "2025-07-01", "2025-10-01", "2026-01-01", data.end];
+    dates.forEach((value, i) => {
+      const date = new Date(stamp(value)), edge = i === 0 || i === dates.length - 1;
+      const label = date.toLocaleDateString("en-US", {month: "short", ...(edge ? {day: "numeric"} : {}), timeZone: "UTC"});
+      add(axes, "line", {x1: x(value), x2: x(value), y1: 408, y2: 414, stroke: "#aab7b7"});
+      const anchor = i === 0 ? "start" : i === dates.length - 1 ? "end" : "middle";
+      add(axes, "text", {x: x(value), y: 433, class: "tick", "text-anchor": anchor}, label);
+      add(axes, "text", {x: x(value), y: 452, class: "tick", "text-anchor": anchor}, date.getUTCFullYear());
+    });
+    function segments(points) {
+      const result = [];
+      for (const point of points) {
+        const previous = result.at(-1)?.at(-1);
+        if (!previous || stamp(point.date) - stamp(previous.date) !== week) result.push([]);
+        result.at(-1).push(point);
+      }
+      return result;
+    }
+    function line(points, key) {
+      return points.map((point, i) => `${i ? "L" : "M"}${x(point.date).toFixed(2)},${y(point[key]).toFixed(2)}`).join(" ");
+    }
+    for (const group of data.series) {
+      const layer = add(document.getElementById("forecasts"), "g", {id: `horizon-${group.horizon}`, class: "forecast-layer", "aria-hidden": "true"});
+      for (const points of segments(group.points)) {
+        const segment = add(layer, "g", {"data-start": points[0].date, "data-end": points.at(-1).date});
+        for (const [low, high, opacity, level] of [["q05", "q95", .16, 90], ["q25", "q75", .29, 50]]) {
+          const d = `${line(points, high)} ${line([...points].reverse(), low).replace(/^M/, "L")} Z`;
+          add(segment, "path", {class: `band-${level}`, d, fill: "#0a6670", "fill-opacity": opacity});
+        }
+        add(segment, "path", {class: "median", d: line(points, "median"), fill: "none", stroke: "#0a6670", "stroke-width": 2.5, "stroke-dasharray": "6 3", "stroke-linejoin": "round", "stroke-linecap": "round"});
+        if (points.length === 1) {
+          const point = points[0];
+          for (const [low, high, width, opacity] of [["q05", "q95", 5, .16], ["q25", "q75", 5, .29]]) add(segment, "line", {x1: x(point.date), x2: x(point.date), y1: y(point[low]), y2: y(point[high]), stroke: "#0a6670", "stroke-width": width, opacity});
+          add(segment, "circle", {cx: x(point.date), cy: y(point.median), r: 2.5, fill: "#0a6670"});
+        }
+      }
+    }
+    add(document.getElementById("observed"), "path", {id: "truth-line", d: line(data.observed, "value"), fill: "none", stroke: "#111111", "stroke-width": 2.8, "stroke-linejoin": "round", "stroke-linecap": "round"});
+    function fromHash() {
+      const state = new URLSearchParams(location.hash.slice(1)).get("state");
+      return ["1", "2", "3", "4"].includes(state) ? Number(state) : 1;
+    }
+    function render() {
+      const state = fromHash(), horizon = state - 1;
+      document.body.dataset.state = String(state);
+      select.value = String(state); back.disabled = state === 1; next.disabled = state === 4;
+      for (const layer of document.querySelectorAll(".forecast-layer")) {
+        const active = layer.id === `horizon-${horizon}`;
+        layer.classList.toggle("active", active);
+        layer.setAttribute("aria-hidden", String(!active));
+      }
+      document.getElementById("chart-desc").textContent = `Texas weekly influenza admissions from ${data.start} through ${data.end}. Black: observed admissions. Teal dashed: the saved forecast median at horizon ${horizon}. Darker band: 50% prediction interval, 25th to 75th percentiles. Lighter band: 90% prediction interval, 5th to 95th percentiles. Forecasts are aligned to their target weeks; horizon 0 is the reference week, one week beyond the data cutoff. All views share the same observations and axes. This is the saved ${data.season_bags}-bag no-external-covariate ablation, not the current 100-bag production configuration. Missing forecasts are not interpolated. These rolling-origin results do not constitute an independent validation of the later production-model selection.`;
+    }
+    function go(state) { location.hash = `state=${Math.max(1, Math.min(4, state))}`; }
+    select.addEventListener("change", () => go(Number(select.value)));
+    back.addEventListener("click", () => go(fromHash() - 1));
+    next.addEventListener("click", () => go(fromHash() + 1));
+    addEventListener("hashchange", render);
+    addEventListener("keydown", event => {
+      if (["SELECT", "INPUT", "BUTTON", "A"].includes(document.activeElement.tagName)) return;
+      if (event.key === "ArrowRight" || event.key === "ArrowLeft") { event.preventDefault(); go(fromHash() + (event.key === "ArrowRight" ? 1 : -1)); }
+    });
+    render();
+    requestAnimationFrame(() => requestAnimationFrame(() => { document.body.dataset.ready = "true"; }));
+  </script>
+</body>
+</html>

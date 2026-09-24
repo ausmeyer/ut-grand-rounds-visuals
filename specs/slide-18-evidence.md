@@ -11,6 +11,9 @@ the center and spread used to derive forecast quantiles. The setting is the
 presenter's influenza hospitalization forecasting research, not patient care.
 
 - `#state=1`: three model blocks, straight arrows, and “Ensembling throughout.”
+  Both LightGBM boxes contain a small editable SVG cartoon of three additive
+  decision trees beneath the LightGBM title. The same pooled cartoon moves with
+  its box in the later views. Three trees are illustrative, not a fitted tree count.
 - `#state=2`: the same pooled-model block moves into the center. Location
   inputs and a schematic time series fade in. Only the center forecast is shown,
   with “Fit the center” and “Squared-error loss.”

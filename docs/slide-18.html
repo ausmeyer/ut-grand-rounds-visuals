@@ -70,6 +70,17 @@
         <defs>
           <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="12" markerHeight="12" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 Z" fill="#96a6a8"/></marker>
           <marker id="spread-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 Z" fill="#0a6670"/></marker>
+          <g id="decision-tree" stroke="#0a6670" stroke-width="1.8" stroke-linejoin="round">
+            <path d="M24,3 L9,24 L0,48 M9,24 L18,48 M24,3 L39,24 L30,48 M39,24 L48,48" fill="none"/>
+            <circle cx="24" cy="3" r="4" fill="white"/>
+            <circle cx="9" cy="24" r="3.5" fill="#d0e6e5"/><circle cx="39" cy="24" r="3.5" fill="#d0e6e5"/>
+            <rect x="-3.5" y="44.5" width="7" height="7" rx="1" fill="#0a6670"/><rect x="14.5" y="44.5" width="7" height="7" rx="1" fill="#85b8b9"/>
+            <rect x="26.5" y="44.5" width="7" height="7" rx="1" fill="#85b8b9"/><rect x="44.5" y="44.5" width="7" height="7" rx="1" fill="#0a6670"/>
+          </g>
+          <g id="boosted-trees">
+            <use href="#decision-tree"/><use href="#decision-tree" x="82"/><use href="#decision-tree" x="164"/>
+            <path d="M60,26 H70 M65,21 V31 M142,26 H152 M147,21 V31" stroke="#647278" stroke-width="2" stroke-linecap="round"/>
+          </g>
         </defs>
         <g id="earlier-models">
           <g transform="translate(30 119)">
@@ -78,10 +89,11 @@
             <text class="model-name" x="140" y="104">VAR</text>
           </g>
           <path class="connector" d="M336,198 H414" marker-end="url(#arrow)"/>
-          <g transform="translate(440 119)">
+          <g id="state-model" transform="translate(440 119)">
             <rect class="model-box" width="280" height="158" rx="12"/>
-            <text class="model-name" x="140" y="67">State-specific</text>
-            <text class="model-name" x="140" y="104">LightGBM</text>
+            <text x="140" y="31" font-size="20" font-weight="650">State-specific</text>
+            <text class="model-name" x="140" y="66">LightGBM</text>
+            <use class="lightgbm-cartoon" href="#boosted-trees" x="34" y="86" aria-hidden="true"/>
             <text class="support" x="140" y="188">Separate fits</text>
           </g>
           <path class="connector" d="M746,198 H824" marker-end="url(#arrow)"/>
@@ -99,8 +111,9 @@
         </g>
         <g id="pooled-model">
           <rect class="model-box" width="280" height="158" rx="12"/>
-          <text class="model-name teal" x="140" y="67">Pooled</text>
-          <text class="model-name teal" x="140" y="104">LightGBM</text>
+          <text class="teal" x="140" y="31" font-size="20" font-weight="650">Pooled</text>
+          <text class="model-name teal" x="140" y="66">LightGBM</text>
+          <use class="lightgbm-cartoon" href="#boosted-trees" x="34" y="86" aria-hidden="true"/>
           <text class="support" x="140" y="188">Shared training</text>
           <text class="support" x="140" y="213">across locations</text>
         </g>
@@ -160,7 +173,7 @@
       for (const element of document.querySelectorAll(".spread-detail, .quantile-detail, #fit-spread")) element.setAttribute("aria-hidden", String(state !== 3));
       document.getElementById("fit-center").setAttribute("aria-hidden", String(state !== 2));
       document.getElementById("diagram-desc").textContent = state === 1
-        ? "Model progression: regularized vector autoregression, state-specific LightGBM with separate fits, and pooled LightGBM with shared training across locations. Ensembling throughout."
+        ? "Model progression: regularized vector autoregression, state-specific LightGBM with separate fits, and pooled LightGBM with shared training across locations. The LightGBM boxes show three schematic decision trees joined by plus signs to represent additive tree predictions, not the actual number of fitted trees. Ensembling throughout."
         : state === 2
           ? "Texas, California, New York, and other locations contribute training data to pooled LightGBM. Fit the center on a transformed scale using squared-error loss. A schematic time series leads to a future forecast point; no uncertainty distribution is shown yet. The trace is a schematic illustration, not observed data or measured forecast performance."
           : "Keep the fitted center fixed and fit the spread using Gaussian negative log-likelihood on the transformed scale, then derive 23 forecast quantiles. Time runs horizontally and possible forecast values vertically; the sideways Gaussian density shows uncertainty at that one future time, not a trajectory. The trace and Gaussian curve are schematic illustrations, not observed data or measured forecast performance. Pooling training does not mean fitting a joint probability distribution across locations.";

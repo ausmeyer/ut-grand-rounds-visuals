@@ -183,6 +183,13 @@ Use a 1240 × 540 iframe and keep
 “From separate models to shared learning” as the title in Slides.com. Build with
 `python3 scripts/build_slide_18.py`; see the [source and interpretation notes](specs/slide-18-evidence.md).
 
+Slide 19 shows the saved Texas hospitalization-only MIGHTE-Base ablation.
+`#state=1` through `#state=4` select hub horizons 0 through 3. Black observations
+stay fixed while the median and 50%/90% prediction bands change. Use a 1240 × 540
+iframe with the title in Slides.com. This uses the existing 20-bag no-covariate
+run, not the 100-bag production model with NSSP and wastewater. Build offline
+with `python3 scripts/build_slide_19.py`; see the [source and horizon notes](specs/slide-19-evidence.md).
+
 
 ## Slide 4 claymation
 

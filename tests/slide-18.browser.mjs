@@ -46,6 +46,12 @@ try {
     assert.deepEqual(labels.flatMap((a,i)=>labels.slice(i+1).filter(b=>a.r.left<b.r.right&&a.r.right>b.r.left&&a.r.top<b.r.bottom&&a.r.bottom>b.r.top).map(b=>[a.text,b.text])),[],'Visible labels do not overlap');
     assert.equal(await page.locator('#quantile-count').textContent(),'Derive 23');
     assert.doesNotMatch(await page.locator('body').innerText(),/—/);
+    for(const id of state===1?['state-model','pooled-model']:['pooled-model']) {
+      assert.ok(await page.locator(`#${id}`).evaluate(el=>{
+        const box=el.querySelector('rect').getBoundingClientRect(),icon=el.querySelector('.lightgbm-cartoon').getBoundingClientRect(),title=el.querySelector('.model-name').getBoundingClientRect();
+        return icon.width>200&&icon.left>box.left&&icon.right<box.right&&icon.top>title.bottom&&icon.bottom<box.bottom;
+      }),'The tree cartoon fits inside its box beneath LightGBM');
+    }
     await page.screenshot({path:join(artifacts,`state-${state}.png`)});
   }
   const vertices=Array.from((await page.locator('#density-curve').getAttribute('d')).matchAll(/[ML]([\d.]+),([\d.]+)/g),m=>[Number(m[1]),Number(m[2])]);
@@ -85,6 +91,7 @@ try {
   await page.locator('#back-button').click();
   await settled(2);
   const pooled=await page.locator('#pooled-model').elementHandle();
+  const cartoon=await page.locator('#pooled-model .lightgbm-cartoon').elementHandle();
   await page.locator('#back-button').click();
   await page.waitForFunction(()=>{
     const x=new DOMMatrix(getComputedStyle(document.querySelector('#pooled-model')).transform).m41;
@@ -97,6 +104,7 @@ try {
     return x>480&&x<780;
   });
   assert.equal(await pooled.evaluate(el=>el===document.getElementById('pooled-model')),true,'The same pooled model element moves between views');
+  assert.equal(await cartoon.evaluate(el=>el===document.querySelector('#pooled-model .lightgbm-cartoon')),true,'The cartoon moves with its pooled-model box');
   await page.screenshot({path:join(artifacts,'mid-transition.png')});
   await settled(2);
   await page.locator('#state-select').selectOption('1');
