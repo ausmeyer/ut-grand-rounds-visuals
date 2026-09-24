@@ -6,7 +6,7 @@
   "season_bags": 20,
   "start": "2024-10-05",
   "end": "2026-04-25",
-  "axis_max": 10000,
+  "axis_max": 12000,
   "tick_step": 2000,
   "horizon_convention": "target_end_date = reference_date + 7 * horizon days; data cutoff is reference_date minus 7 days",
   "intervals": {

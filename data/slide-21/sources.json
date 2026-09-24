@@ -1,0 +1,138 @@
+{
+  "source_project": "joint_twostage_distribution_study",
+  "files": [
+    {
+      "kind": "forecast",
+      "source_path": "outputs/checkpoint_distributional_gaussian_nll_joint_base_no_donors_wastewaterscan_lags124_conditional_gaussian_log_sigma_v2.csv",
+      "source_sha256": "063a0a87caf25411d9d5a42da8a3d6839a4ac3945938ed0931b3b24ff9d52540",
+      "snapshot": "forecast-source.csv",
+      "snapshot_sha256": "2edbc876a2e55ac3986c3f865e8610643a273a1d2490b7012d0d105fd2073521",
+      "rows": 1110
+    },
+    {
+      "kind": "truth",
+      "source_path": "data/imputed_sets/imputed_and_stitched_hosp_2026-04-25.csv",
+      "source_sha256": "58ff14790fc5fa0c3dd5c9daf34ff6219dc07cce0f1ab35e6e88bd4b4c0f226c",
+      "snapshot": "truth-source.csv",
+      "snapshot_sha256": "5534078033abf397f8ccda3b437bad50809c255610849cc62d50605dbad71abd",
+      "rows": 82
+    },
+    {
+      "kind": "origins",
+      "source_path": "outputs/asof_anchor_audit.csv",
+      "source_sha256": "d30a14e3d3c23c5508189cc1e4eb40192d61413047005af123f7aaadb5d99df3",
+      "snapshot": "origins-source.csv",
+      "snapshot_sha256": "76d78fab7db78c446c9b6c5eae3086ebfffcfc08b6b022b85134335942ad6dbf",
+      "rows": 57
+    }
+  ],
+  "config_sha256": "419d5f86786633222e399580d41ac1843621b471aea72359919cd8ecce5ec42e",
+  "model_config": {
+    "source_model_id": "joint_apriori_delta_cap100",
+    "fit_algorithm": "conditional_gaussian_log_sigma_v2",
+    "scale_parameterization": "uncapped_log_sigma",
+    "feature_set": "joint_base",
+    "runtime_profile": "joint_base",
+    "fit_config_profile": "joint_base",
+    "paired_seed_offset": 100000,
+    "runtime_overrides": {},
+    "model_id": "distributional_gaussian_nll_joint_base_no_donors_wastewaterscan_lags124",
+    "description": "Paired corrected-NLL surveillance ablation using the parsimonious no-donor base plus the availability-constrained national WastewaterSCAN Flu A level and backward 1-, 2-, and 4-week lag block. All fit settings and the paired seed match the no-donor base.",
+    "feature_recipe": {
+      "spatial_mode": "none"
+    },
+    "external_covariates": {
+      "file": "data/surveillance_covariates/wastewaterscan_flu_a_national.csv",
+      "columns": [
+        "wastewaterscan_flu_a_log10_pmmov",
+        "wastewaterscan_flu_a_log10_pmmov_lag1",
+        "wastewaterscan_flu_a_log10_pmmov_lag2",
+        "wastewaterscan_flu_a_log10_pmmov_lag4"
+      ],
+      "source_lag_weeks": 1,
+      "max_staleness_weeks": 1,
+      "add_availability_features": true,
+      "vintage_status": "latency_constrained_current_revised_snapshot"
+    }
+  },
+  "runtime": {
+    "max_horizons": 4,
+    "anchor_step_weeks": 1,
+    "num_bags": 20,
+    "bag_frac": 0.8,
+    "stage1_rounds": 250,
+    "stage2_rounds": 120,
+    "min_train_rows": 1000,
+    "num_threads": 4,
+    "own_lags": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      8,
+      12,
+      26,
+      52
+    ],
+    "donor_top_k": 5,
+    "donor_lags": [
+      1,
+      2,
+      3,
+      4,
+      8,
+      12,
+      52
+    ],
+    "donor_min_overlap": 40
+  },
+  "evaluation_period": {
+    "start": "2024-10-01",
+    "end": "2026-05-01",
+    "clip_to_available_truth": true,
+    "excluded_locations": [
+      "US"
+    ],
+    "location_scope": "50 states, Washington DC, and Puerto Rico; US national forecasts are retained in forecast artifacts but excluded from evaluation."
+  },
+  "as_of_data": {
+    "enabled": true,
+    "training_cutoff": "2024-10-01",
+    "path_globs": [
+      "data/imputed_vintages/imputed_and_stitched_hosp_*.csv"
+    ],
+    "note": "Evaluation model fits use current revised data before 2024-10-01 and the exact weekly stitched vintage from 2024-10-01 through each Saturday anchor. Missing vintages are skipped rather than replaced with revised truth."
+  },
+  "location": {
+    "abbreviation": "TX",
+    "location": "48",
+    "location_name": "Texas",
+    "population": "29527941",
+    "count_rate1per100k": "295",
+    "count_rate2per100k": "591"
+  },
+  "production_lineup": {
+    "frozen_on": "2026-08-21",
+    "selection_status": "post_evaluation_production_selection",
+    "models": [
+      {
+        "submission_model_id": "MIGHTE-Base",
+        "retrospective_model_id": "distributional_gaussian_nll_joint_base_no_donors_wwlags_nssp_influenza_bags100",
+        "role": "base"
+      },
+      {
+        "submission_model_id": "MIGHTE-Nsemble",
+        "retrospective_model_id": "average_equal_no_donor_ww_nssp_panel_ar_partial_bags100",
+        "role": "ensemble"
+      },
+      {
+        "submission_model_id": "MIGHTE-Linear",
+        "retrospective_model_id": "distributional_panel_ar_partial_pool",
+        "role": "linear"
+      }
+    ],
+    "note": "The public submission names are mapped to unique retrospective model ids so the new MIGHTE-Nsemble does not collide with the historical benchmark of the same name. This lineup was chosen after reviewing the 2024-25 and 2025-26 ablations, so scores on that period characterize the final configuration but are not an independent confirmation set."
+  }
+}

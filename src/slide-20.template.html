@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Additional surveillance signals</title>
+  <style>
+    :root { --ink: #14242b; --muted: #647278; --teal: #0a6670; --paper: #fbfaf6; --line: #d5dad6; }
+    * { box-sizing: border-box; }
+    html, body { width: 1240px; height: 540px; margin: 0; overflow: hidden; }
+    body { background: var(--paper); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-variant-numeric: tabular-nums; }
+    .app { width: 1240px; height: 540px; display: grid; grid-template-rows: 38px 1fr; gap: 8px; padding: 10px 16px 8px; }
+    .topbar, .controls { display: flex; align-items: center; }
+    .topbar { justify-content: space-between; gap: 16px; }
+    .subtitle { color: #42535a; font-size: 16px; font-weight: 670; }
+    .controls { gap: 7px; }
+    .controls label { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; margin-right: 3px; }
+    button, select { height: 32px; border: 1px solid #b9c3c0; border-radius: 8px; background: white; color: var(--ink); font: inherit; font-weight: 740; }
+    select { width: 270px; padding: 0 32px 0 10px; font-size: 13px; }
+    button { width: 34px; padding: 0; font-size: 17px; cursor: pointer; }
+    button:hover { border-color: var(--teal); color: var(--teal); }
+    button:disabled { opacity: .35; cursor: default; }
+    :focus-visible { outline: 3px solid #82bcc1; outline-offset: 2px; }
+    .frame { padding: 8px 12px; border: 1px solid var(--line); border-radius: 14px; background: white; box-shadow: 0 8px 24px rgb(28 49 50 / 7%); }
+    #chart { display: block; width: 1182px; height: 458px; }
+    svg text { fill: var(--ink); font-size: 17px; }
+    .tick { fill: var(--muted); font-size: 16px; }
+    .panel-label { font-size: 18px; font-weight: 720; }
+    .unit { fill: var(--muted); font-size: 14px; }
+    .view { opacity: 0; visibility: hidden; }
+    .view.active { opacity: 1; visibility: visible; }
+    body[data-ready] .view { transition: opacity 450ms ease, visibility 450ms; }
+    @media (prefers-reduced-motion: reduce) { body[data-ready] .view { transition: none; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="subtitle">Adding surveillance signals</div>
+      <div class="controls"><label for="state-select">View</label><button id="back-button" aria-label="Previous view">←</button><select id="state-select" aria-label="Surveillance signals"><option value="1">1 · Hospitalization history</option><option value="2">2 · Add influenza signals</option><option value="3">3 · Add RSV</option></select><button id="next-button" aria-label="Next view">→</button></div>
+    </header>
+    <section class="frame">
+      <svg id="chart" viewBox="0 0 1182 458" role="img" aria-labelledby="chart-title chart-desc">
+        <title id="chart-title">Hospitalizations and additional surveillance signals</title><desc id="chart-desc"></desc>
+        <g id="views"></g><g id="calendar"></g>
+      </svg>
+    </section>
+  </main>
+  <script>
+    "use strict";
+    const data = /*__SLIDE_DATA__*/;
+    const select = document.getElementById('state-select'), back = document.getElementById('back-button'), next = document.getElementById('next-button');
+    const stamp = value => Date.parse(`${value}T00:00:00Z`), week = 7 * 86400000;
+    const x = value => 248 + (stamp(value) - stamp(data.start)) / (stamp(data.end) - stamp(data.start)) * 910;
+    function add(parent, tag, attrs, text) {
+      const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+      for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, value);
+      if (text !== undefined) el.textContent = text;
+      parent.appendChild(el); return el;
+    }
+    for (const [index, count] of [1, 3, 4].entries()) {
+      const view = add(document.getElementById('views'), 'g', {id: `view-${index + 1}`, class: 'view', 'aria-hidden': 'true'});
+      const height = (380 - 20 * (count - 1)) / count;
+      for (const [i, signal] of data.panels.slice(0, count).entries()) {
+        const top = 24 + i * (height + 20), bottom = top + height;
+        const y = value => bottom - (value - signal.domain[0]) / (signal.domain[1] - signal.domain[0]) * height;
+        const panel = add(view, 'g', {'data-signal': signal.id});
+        const center = (top + bottom) / 2, labelTop = center - (signal.label.length - 1) * 11 - 6;
+        signal.label.forEach((line, n) => add(panel, 'text', {x: 8, y: labelTop + n * 22, class: 'panel-label', style: `fill:${signal.color}`}, line));
+        add(panel, 'text', {x: 8, y: labelTop + signal.label.length * 22, class: 'unit'}, signal.unit);
+        for (const tick of signal.ticks) {
+          add(panel, 'line', {x1: 248, x2: 1158, y1: y(tick), y2: y(tick), stroke: tick === signal.domain[0] ? '#aab7b7' : '#e8edeb'});
+          add(panel, 'text', {x: 236, y: y(tick) + 5, class: 'tick', 'text-anchor': 'end'}, tick.toLocaleString('en-US'));
+        }
+        add(panel, 'line', {x1: 248, x2: 248, y1: top, y2: bottom, stroke: '#aab7b7'});
+        let previous = null, path = '';
+        for (const point of signal.points) {
+          if (point.value === null) { previous = null; continue; }
+          path += `${previous && stamp(point.date) - stamp(previous.date) === week ? 'L' : 'M'}${x(point.date).toFixed(2)},${y(point.value).toFixed(2)} `;
+          previous = point;
+        }
+        add(panel, 'path', {class: 'signal-line', d: path.trim(), fill: 'none', stroke: signal.color, 'stroke-width': 2.6, 'stroke-linejoin': 'round', 'stroke-linecap': 'round'});
+      }
+    }
+    const calendar = document.getElementById('calendar');
+    const dates = [data.start, '2025-01-01', '2025-04-01', '2025-07-01', '2025-10-01', '2026-01-01', data.end];
+    dates.forEach((value, i) => {
+      const date = new Date(stamp(value)), edge = i === 0 || i === dates.length - 1;
+      const anchor = i === 0 ? 'start' : i === dates.length - 1 ? 'end' : 'middle';
+      add(calendar, 'line', {x1: x(value), x2: x(value), y1: 404, y2: 410, stroke: '#aab7b7'});
+      add(calendar, 'text', {x: x(value), y: 430, class: 'tick', 'text-anchor': anchor}, date.toLocaleDateString('en-US', {month: 'short', ...(edge ? {day: 'numeric'} : {}), timeZone: 'UTC'}));
+      add(calendar, 'text', {x: x(value), y: 451, class: 'tick', 'text-anchor': anchor}, date.getUTCFullYear());
+    });
+    function fromHash() {
+      const state = new URLSearchParams(location.hash.slice(1)).get('state');
+      return ['1', '2', '3'].includes(state) ? Number(state) : 1;
+    }
+    function render() {
+      const state = fromHash(); document.body.dataset.state = String(state);
+      select.value = String(state); back.disabled = state === 1; next.disabled = state === 3;
+      for (const view of document.querySelectorAll('.view')) {
+        const active = view.id === `view-${state}`;
+        view.classList.toggle('active', active); view.setAttribute('aria-hidden', String(!active));
+      }
+      document.getElementById('chart-desc').textContent = `Signals from ${data.start} to ${data.end}, sharing calendar dates with independently labeled scales. Texas hospital admissions; national NSSP influenza and RSV percentages of emergency department visits; national WastewaterSCAN influenza A, median across site-week median log10 PMMoV-normalized concentrations with a 0.00001 pseudocount. Displayed NSSP curves use the latest retained issue for each week, not the values available at each historical forecast origin. Wastewater uses a revised snapshot. No curves are shifted or interpolated, and no predictive improvement is asserted. View ${state} shows ${[1, 3, 4][state - 1]} signals.`;
+    }
+    function go(state) { location.hash = `state=${Math.max(1, Math.min(3, state))}`; }
+    select.addEventListener('change', () => go(Number(select.value)));
+    back.addEventListener('click', () => go(fromHash() - 1)); next.addEventListener('click', () => go(fromHash() + 1));
+    addEventListener('hashchange', render);
+    addEventListener('keydown', event => {
+      if (['SELECT', 'INPUT', 'BUTTON', 'A'].includes(document.activeElement.tagName)) return;
+      if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') { event.preventDefault(); go(fromHash() + (event.key === 'ArrowRight' ? 1 : -1)); }
+    });
+    render(); requestAnimationFrame(() => requestAnimationFrame(() => { document.body.dataset.ready = 'true'; }));
+  </script>
+</body>
+</html>

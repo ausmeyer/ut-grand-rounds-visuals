@@ -35,12 +35,12 @@
 <body>
   <main class="app">
     <header class="topbar">
-      <div class="subtitle">Texas · MIGHTE-Base without additional covariates</div>
+      <div class="subtitle"></div>
       <div class="controls"><label for="state-select">Horizon</label><button id="back-button" aria-label="Previous horizon">←</button><select id="state-select" aria-label="Forecast horizon"><option value="1">1 · Current week (horizon 0)</option><option value="2">2 · 1 week ahead</option><option value="3">3 · 2 weeks ahead</option><option value="4">4 · 3 weeks ahead</option></select><button id="next-button" aria-label="Next horizon">→</button></div>
     </header>
     <section class="frame">
       <svg id="chart" viewBox="0 0 1182 458" role="img" aria-labelledby="chart-title chart-desc">
-        <title id="chart-title">Texas influenza hospitalization forecasts without additional covariates</title>
+        <title id="chart-title"></title>
         <desc id="chart-desc"></desc>
         <g id="axes"></g>
         <g id="forecasts"></g>
@@ -61,6 +61,8 @@
   <script>
     "use strict";
     const data = /*__SLIDE_DATA__*/;
+    document.querySelector('.subtitle').textContent = `${data.location} · ${data.model_label}`;
+    document.getElementById('chart-title').textContent = `${data.location} influenza hospitalization forecasts: ${data.model_label}`;
     const select = document.getElementById("state-select"), back = document.getElementById("back-button"), next = document.getElementById("next-button");
     const stamp = value => Date.parse(`${value}T00:00:00Z`), week = 7 * 86400000;
     const x = value => 88 + (stamp(value) - stamp(data.start)) / (stamp(data.end) - stamp(data.start)) * 1070;
@@ -130,7 +132,7 @@
         layer.classList.toggle("active", active);
         layer.setAttribute("aria-hidden", String(!active));
       }
-      document.getElementById("chart-desc").textContent = `Texas weekly influenza admissions from ${data.start} through ${data.end}. Black: observed admissions. Teal dashed: the saved forecast median at horizon ${horizon}. Darker band: 50% prediction interval, 25th to 75th percentiles. Lighter band: 90% prediction interval, 5th to 95th percentiles. Forecasts are aligned to their target weeks; horizon 0 is the reference week, one week beyond the data cutoff. All views share the same observations and axes. This is the saved ${data.season_bags}-bag no-external-covariate ablation, not the current 100-bag production configuration. Missing forecasts are not interpolated. These rolling-origin results do not constitute an independent validation of the later production-model selection.`;
+      document.getElementById("chart-desc").textContent = `Texas weekly influenza admissions from ${data.start} through ${data.end}. Black: observed admissions. Teal dashed: the saved forecast median at horizon ${horizon}. Darker band: 50% prediction interval, 25th to 75th percentiles. Lighter band: 90% prediction interval, 5th to 95th percentiles. Forecasts are aligned to their target weeks; horizon 0 is the reference week, one week beyond the data cutoff. All views share the same observations and axes. ${data.model_label}, ${data.season_bags} season bags. Missing forecasts are not interpolated. These rolling-origin results do not constitute an independent validation of the later production-model selection.`;
     }
     function go(state) { location.hash = `state=${Math.max(1, Math.min(4, state))}`; }
     select.addEventListener("change", () => go(Number(select.value)));

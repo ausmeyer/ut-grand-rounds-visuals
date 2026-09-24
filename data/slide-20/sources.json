@@ -1,0 +1,124 @@
+{
+  "source_project": "joint_twostage_distribution_study",
+  "start": "2024-10-05",
+  "end": "2026-04-25",
+  "files": [
+    {
+      "id": "hospital",
+      "source_path": "data/slide-19/truth-source.csv",
+      "source_sha256": "5534078033abf397f8ccda3b437bad50809c255610849cc62d50605dbad71abd",
+      "snapshot": "hospital-source.csv",
+      "snapshot_sha256": "5534078033abf397f8ccda3b437bad50809c255610849cc62d50605dbad71abd",
+      "rows": 82
+    },
+    {
+      "id": "influenza_ed",
+      "source_path": "data/surveillance_covariates/nssp_influenza_national.csv",
+      "source_sha256": "8b4582982b637e64f33b51b14e0025ff9e706373c75bdd48bbc200d774601ae2",
+      "snapshot": "influenza_ed-source.csv",
+      "snapshot_sha256": "2723ba2e8fbd6c21496c5084ecc9707c9bd8e3d5319bc2c87705f4c5653dab28",
+      "rows": 82
+    },
+    {
+      "id": "wastewater",
+      "source_path": "data/surveillance_covariates/wastewaterscan_flu_a_national.csv",
+      "source_sha256": "5aa6d554a24bd8143eb1784e346883a2ae71a93dbacb6fd7a8b14289e2248e33",
+      "snapshot": "wastewater-source.csv",
+      "snapshot_sha256": "b1dda4cf28b07549b59980592663da8b34b79ddf842b551995d4ab5a16225703",
+      "rows": 82
+    },
+    {
+      "id": "rsv_ed",
+      "source_path": "data/surveillance_covariates/nssp_rsv_national.csv",
+      "source_sha256": "c1f77d750bc567c2659442631ba23b41a4bd811f94ba5eefd70cc2b58bc8582a",
+      "snapshot": "rsv_ed-source.csv",
+      "snapshot_sha256": "5548534505eeddac22043bf7b5be218ca7a9806dac6679736f7201e61d8b5d82",
+      "rows": 82
+    }
+  ],
+  "signal_metadata": {
+    "requested_source_date_range": {
+      "end": "2026-05-31",
+      "start": "2019-07-01"
+    },
+    "retrieved_at_utc": "2026-08-08T21:06:44+00:00",
+    "signals": {
+      "fluview_wili_nhsn_era": {
+        "availability": "exact historical issue week; nominal one week from forecast reference",
+        "geography": "nation/us",
+        "leakage_control": "forced missing for displayed model dates before the genuine NHSN hospitalization era because ILI contributed to construction of the shifted proxy target",
+        "model_date_min": "2022-06-04",
+        "source_dataset": "fluview/national weighted ILI",
+        "source_url": "https://api.delphi.cmu.edu/epidata/fluview/",
+        "transform": "none; values are percentage points",
+        "vintage_control": "historical issues retained and selected at each forecast origin"
+      },
+      "nrevss_rsv_pct_positive": {
+        "availability": "source week plus two weeks",
+        "geography": "National",
+        "source_dataset": "rgnm-fkqb",
+        "source_url": "https://data.cdc.gov/resource/rgnm-fkqb.json",
+        "transform": "none; raw weekly percent positivity",
+        "vintage_control": "current revised snapshot; no historical issue archive"
+      },
+      "nssp_influenza_pct_ed_visits": {
+        "availability": "exact historical issue week; nominal one week from forecast reference",
+        "geography": "nation/us",
+        "source_dataset": "nssp/pct_ed_visits_influenza",
+        "source_url": "https://api.delphi.cmu.edu/epidata/covidcast/",
+        "transform": "none; values are percentage points",
+        "vintage_control": "historical issues retained and selected at each forecast origin"
+      },
+      "nssp_rsv_pct_ed_visits": {
+        "availability": "exact historical issue week; nominal one week from forecast reference",
+        "geography": "nation/us",
+        "source_dataset": "nssp/pct_ed_visits_rsv",
+        "source_url": "https://api.delphi.cmu.edu/epidata/covidcast/",
+        "transform": "none; values are percentage points",
+        "vintage_control": "historical issues retained and selected at each forecast origin"
+      },
+      "state_matched_power_rh2m_pct": {
+        "aggregation": "mean of seven daily values in each Sunday-through-Saturday CDC week",
+        "availability": "source week ending Saturday marked available the following Saturday",
+        "coordinate_source_url": "https://www2.census.gov/geo/docs/reference/cenpop2020/CenPop2020_Mean_ST.txt",
+        "forecast_reference_lag_weeks": 1,
+        "geography": "2020 Census mean center of population for each state/DC/Puerto Rico; Charlotte Amalie representative point for U.S. Virgin Islands; national is population-weighted across the 50 states and DC",
+        "live_cadence_check": "queried 2026-08-08; valid RH2M extended through 2026-08-06 (two-day lag)",
+        "location_count": 54,
+        "power_sources_seen": [
+          "MERRA2",
+          "POWER"
+        ],
+        "reported_near_real_time_latency": "3-7 days",
+        "requested_source_date_range": {
+          "end": "2026-05-31",
+          "start": "1997-01-01"
+        },
+        "source_parameter": "RH2M daily mean relative humidity at 2 meters",
+        "source_time_standard": "UTC",
+        "source_url": "https://power.larc.nasa.gov/api/temporal/daily/point",
+        "state_coordinate_count": 53,
+        "vintage_control": "current revised snapshot; no historical issued-vintage archive"
+      },
+      "wastewaterscan_flu_a_log10_pmmov": {
+        "availability": "source week plus two weeks",
+        "backward_lag_weeks": [
+          1,
+          2,
+          4
+        ],
+        "geography": "national equal-site robust aggregate",
+        "license_note": "CDC metadata states that research users of WastewaterSCAN data should contact the WastewaterSCAN team and comply with CC BY-NC 4.0 terms.",
+        "minimum_sites": 10,
+        "pseudocount": 1e-05,
+        "source_dataset": "ymmh-divb",
+        "source_filter": "source=WastewaterSCAN; pcr_target=fluav",
+        "source_url": "https://data.cdc.gov/resource/ymmh-divb.json",
+        "transform": "within-site-week median log10(pcr_target_mic_lin + pseudocount), then national median across sites",
+        "vintage_control": "current revised snapshot; no historical issue archive"
+      }
+    }
+  },
+  "signal_metadata_sha256": "eeac7b8c78a4c3fa689caaf0d389430f792bbebe10b0f742cd51c2f74f2419e6",
+  "selection": "Latest retained issue for each source week, for a retrospective signal illustration. This is not an as-of forecast input trace. No smoothing, interpolation, normalization across signals, or calendar shifting."
+}

@@ -66,7 +66,7 @@ class TexasForecastTests(unittest.TestCase):
                 self.assertEqual(values, sorted(values))
                 self.assertGreaterEqual(values[0], 0)
                 self.assertLessEqual(values[-1], self.data["axis_max"])
-        self.assertEqual(self.data["axis_max"], 10000)
+        self.assertEqual(self.data["axis_max"], 12000)
 
     def test_reproducible_build(self):
         self.assertEqual(self.data, BUILD.chart_data())

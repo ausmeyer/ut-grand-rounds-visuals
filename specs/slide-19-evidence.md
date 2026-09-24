@@ -37,7 +37,7 @@ hospitalization-only no-donor ablation uses **20 season bags**. The current
 production name MIGHTE-Base maps to a **100-bag** model with wastewater and NSSP
 covariates. This slide uses the former existing results; it is not a newly fitted
 100-bag model with only the covariates removed. This distinction is recorded in
-the generated data, source metadata, and accessible chart description.
+the generated data and source metadata, not an on-slide caveat.
 
 The study's README and production-lineup configuration explicitly state that
 the final production choice followed inspection of the 2024/25 and 2025/26
@@ -53,7 +53,14 @@ SHA-256 hashes, model configuration, runtime, scope, and source paths.
 Forecasts are placed at target dates, without calendar shifts or smoothing.
 Missing forecast weeks remain unfilled; separate line/band segments do not
 bridge gaps. The shared y-axis includes every 95th-percentile bound in all
-four views. There is no season, week, or curve selection based on apparent fit.
+four views. The axis now runs to 12,000 to match the paired wastewater-lag
+forecast on slide 21, whose largest displayed 95th percentile is 11,890.32.
+There is no season, week, or curve selection based on apparent fit.
+
+The September 24 export under `outputs/visualization_mighte_base_no_covariates`
+has the same original checkpoint hash and explicitly retains missing/stale-vintage
+gaps. It does not supply additional forecasts. The slide's forecast values remain
+unchanged until a distinct completed output is supplied and checked.
 
 ## Rebuild and verify
 

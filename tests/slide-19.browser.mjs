@@ -5,10 +5,12 @@ import {join} from 'node:path';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 
 const {chromium}=await import(process.env.SLIDE_PLAYWRIGHT?pathToFileURL(process.env.SLIDE_PLAYWRIGHT).href:'playwright');
+const slide=process.env.SLIDE_NUMBER||'19';
+assert.ok(['19','21'].includes(slide));
 const browser=await chromium.launch({channel:'chrome',headless:true});
-const artifacts=await mkdtemp(join(tmpdir(),'slide-19-browser-'));
-const data=JSON.parse(await readFile(new URL('../data/slide-19/slide-19.json',import.meta.url),'utf8'));
-const url=pathToFileURL(fileURLToPath(new URL('../docs/slide-19.html',import.meta.url))).href;
+const artifacts=await mkdtemp(join(tmpdir(),`slide-${slide}-browser-`));
+const data=JSON.parse(await readFile(new URL(`../data/slide-${slide}/slide-${slide}.json`,import.meta.url),'utf8'));
+const url=pathToFileURL(fileURLToPath(new URL(`../docs/slide-${slide}.html`,import.meta.url))).href;
 const errors=[];
 const stamp=d=>Date.parse(`${d}T00:00:00Z`);
 const x=d=>88+(stamp(d)-stamp(data.start))/(stamp(data.end)-stamp(data.start))*1070;
@@ -87,5 +89,5 @@ try {
   await page.goto(`${url}#state=invalid`);
   await settled(1);
   assert.deepEqual(errors,[]);
-  console.log(`Slide 19: all four horizons, every plotted quantile and observation, gap preservation, shared axes, label layout, navigation, fades, reduced motion, and offline rendering passed. Screenshots: ${artifacts}`);
+  console.log(`Slide ${slide}: all four horizons, every plotted quantile and observation, gap preservation, shared axes, label layout, navigation, fades, reduced motion, and offline rendering passed. Screenshots: ${artifacts}`);
 } finally {await browser.close();}
