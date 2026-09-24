@@ -67,6 +67,14 @@ try {
         assert.match(await page.locator('.quantile-heading').textContent(),/^23 quantiles/);
         assert.equal(await page.locator('.synthetic, .baseline-reference').count(),0);
         assert.equal(await page.locator('#scoring line').count(),1); // Section divider only; no ruler.
+        const scoringCells=await page.locator('#scoring text').evaluateAll(nodes=>nodes.map(el=>({
+          x:el.getBoundingClientRect().left,y:Number(el.getAttribute('y')),
+          size:getComputedStyle(el).fontSize,weight:getComputedStyle(el).fontWeight
+        })));
+        for(let column=0;column<3;column++) {
+          assert.deepEqual({...scoringCells[column],y:405},scoringCells[column+3],'Scoring rows must share column alignment and typography');
+          assert.equal(scoringCells[column].y,359);
+        }
         assert.match(await page.locator('#scoring').textContent(),/compares WIS with a persistence baseline\./);
         assert.doesNotMatch(await page.locator('svg text').allTextContents().then(labels=>labels.join(' ')),/Synthetic example|Persistence: latest observed/);
         const marks=await page.locator('#forecast-plot').evaluate(el=>({html:el.innerHTML,box:el.getBoundingClientRect().toJSON()}));

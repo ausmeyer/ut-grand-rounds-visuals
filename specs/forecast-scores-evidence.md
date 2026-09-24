@@ -32,7 +32,9 @@ relative WIS below 1 as better than the matched persistence baseline.
 2. `#state=2`: keep the entire plot fixed and reveal two text definitions:
    WIS scores interval width and missed observations; relative WIS compares
    WIS with a persistence baseline. “Lower is better” and “Below 1 is better”
-   are aligned to the right. There is no ruler, plotted model score, or outcome.
+   form the third column. Metric names, definitions, and takeaways share
+   consistent left-aligned columns and typography across both rows.
+   There is no ruler, plotted model score, or outcome.
 
 Controls: dropdown, previous/next buttons, and left/right keys when a form
 control is not focused. Direct hash links work without visiting the first view.
