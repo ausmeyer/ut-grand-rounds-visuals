@@ -83,10 +83,19 @@
           </g>
         </defs>
         <g id="earlier-models">
-          <g transform="translate(30 119)">
+          <g id="var-model" transform="translate(30 119)">
             <rect class="model-box" width="280" height="158" rx="12"/>
-            <text class="model-name" x="140" y="67">Regularized</text>
-            <text class="model-name" x="140" y="104">VAR</text>
+            <text x="140" y="31" font-size="20" font-weight="650">Regularized</text>
+            <text class="model-name" x="140" y="66">VAR</text>
+            <g id="var-cartoon" transform="translate(34 86)" aria-hidden="true" fill="none" stroke-linejoin="round" stroke-linecap="round">
+              <path d="M78,8 L207,28 M78,8 L207,48 M78,28 L207,8 M78,28 L207,48 M78,48 L207,8" stroke="#0a6670" stroke-width="1.4" opacity=".17"/>
+              <path d="M78,8 L207,8 M78,28 L207,28 M78,48 L207,48 M78,48 L207,28" stroke="#0a6670" stroke-width="1.7" opacity=".8"/>
+              <path d="M0,11 L13,9 L25,13 L38,3 L50,9 L63,4 L78,8" stroke="#0a6670" stroke-width="2"/>
+              <path d="M0,33 L13,34 L25,26 L38,29 L50,21 L63,26 L78,28" stroke="#647278" stroke-width="2"/>
+              <path d="M0,52 L13,47 L25,49 L38,44 L50,52 L63,45 L78,48" stroke="#85a3a3" stroke-width="2"/>
+              <g fill="#0a6670"><circle cx="78" cy="8" r="2.5"/><circle cx="78" cy="28" r="2.5"/><circle cx="78" cy="48" r="2.5"/></g>
+              <g fill="#0a6670"><circle cx="212" cy="8" r="5"/><circle cx="212" cy="28" r="5"/><circle cx="212" cy="48" r="5"/></g>
+            </g>
           </g>
           <path class="connector" d="M336,198 H414" marker-end="url(#arrow)"/>
           <g id="state-model" transform="translate(440 119)">
@@ -173,7 +182,7 @@
       for (const element of document.querySelectorAll(".spread-detail, .quantile-detail, #fit-spread")) element.setAttribute("aria-hidden", String(state !== 3));
       document.getElementById("fit-center").setAttribute("aria-hidden", String(state !== 2));
       document.getElementById("diagram-desc").textContent = state === 1
-        ? "Model progression: regularized vector autoregression, state-specific LightGBM with separate fits, and pooled LightGBM with shared training across locations. The LightGBM boxes show three schematic decision trees joined by plus signs to represent additive tree predictions, not the actual number of fitted trees. Ensembling throughout."
+        ? "Model progression: regularized vector autoregression, state-specific LightGBM with separate fits, and pooled LightGBM with shared training across locations. The VAR cartoon shows three schematic histories connected to future values of their own and other series; faint connections represent coefficient shrinkage, not actual fitted coefficients. The LightGBM boxes show three schematic decision trees joined by plus signs to represent additive tree predictions, not the actual number of fitted trees. Ensembling throughout."
         : state === 2
           ? "Texas, California, New York, and other locations contribute training data to pooled LightGBM. Fit the center on a transformed scale using squared-error loss. A schematic time series leads to a future forecast point; no uncertainty distribution is shown yet. The trace is a schematic illustration, not observed data or measured forecast performance."
           : "Keep the fitted center fixed and fit the spread using Gaussian negative log-likelihood on the transformed scale, then derive 23 forecast quantiles. Time runs horizontally and possible forecast values vertically; the sideways Gaussian density shows uncertainty at that one future time, not a trajectory. The trace and Gaussian curve are schematic illustrations, not observed data or measured forecast performance. Pooling training does not mean fitting a joint probability distribution across locations.";

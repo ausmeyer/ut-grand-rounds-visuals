@@ -11,6 +11,9 @@ the center and spread used to derive forecast quantiles. The setting is the
 presenter's influenza hospitalization forecasting research, not patient care.
 
 - `#state=1`: three model blocks, straight arrows, and “Ensembling throughout.”
+  The VAR box contains three miniature histories connected to future values of
+  their own and other series. Faint connections illustrate regularization's
+  coefficient shrinkage. These are schematic links, not fitted coefficients.
   Both LightGBM boxes contain a small editable SVG cartoon of three additive
   decision trees beneath the LightGBM title. The same pooled cartoon moves with
   its box in the later views. Three trees are illustrative, not a fitted tree count.

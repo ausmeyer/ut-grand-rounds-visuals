@@ -52,6 +52,14 @@ try {
         return icon.width>200&&icon.left>box.left&&icon.right<box.right&&icon.top>title.bottom&&icon.bottom<box.bottom;
       }),'The tree cartoon fits inside its box beneath LightGBM');
     }
+    assert.equal(await page.locator('#var-cartoon').isVisible(),state===1);
+    if(state===1) {
+      assert.ok(await page.locator('#var-model').evaluate(el=>{
+        const box=el.querySelector('rect').getBoundingClientRect(),icon=el.querySelector('#var-cartoon').getBoundingClientRect(),title=el.querySelector('.model-name').getBoundingClientRect();
+        return icon.width>200&&icon.height>40&&icon.left>box.left&&icon.right<box.right&&icon.top>title.bottom&&icon.bottom<box.bottom;
+      }),'The VAR cartoon fits beneath its title inside its box');
+      assert.match(await page.locator('#diagram-desc').textContent(),/faint connections represent coefficient shrinkage/);
+    }
     await page.screenshot({path:join(artifacts,`state-${state}.png`)});
   }
   const vertices=Array.from((await page.locator('#density-curve').getAttribute('d')).matchAll(/[ML]([\d.]+),([\d.]+)/g),m=>[Number(m[1]),Number(m[2])]);
