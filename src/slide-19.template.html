@@ -77,7 +77,7 @@
     const axes = document.getElementById("axes");
     for (let value = 0; value <= data.axis_max; value += data.tick_step) {
       add(axes, "line", {x1: 88, x2: 1158, y1: y(value), y2: y(value), stroke: value === 0 ? "#aab7b7" : "#e8edeb"});
-      add(axes, "text", {x: 77, y: y(value) + 5, class: "tick", "text-anchor": "end"}, value.toLocaleString("en-US"));
+      add(axes, "text", {x: 82, y: y(value) + 5, class: "tick", "text-anchor": "end"}, value.toLocaleString("en-US"));
     }
     add(axes, "line", {x1: 88, x2: 88, y1: 54, y2: 408, stroke: "#aab7b7"});
     add(axes, "text", {x: 20, y: 231, transform: "rotate(-90 20 231)", "text-anchor": "middle"}, "Weekly influenza admissions");
@@ -132,7 +132,7 @@
         layer.classList.toggle("active", active);
         layer.setAttribute("aria-hidden", String(!active));
       }
-      document.getElementById("chart-desc").textContent = `Texas weekly influenza admissions from ${data.start} through ${data.end}. Black: observed admissions. Teal dashed: the saved forecast median at horizon ${horizon}. Darker band: 50% prediction interval, 25th to 75th percentiles. Lighter band: 90% prediction interval, 5th to 95th percentiles. Forecasts are aligned to their target weeks; horizon 0 is the reference week, one week beyond the data cutoff. All views share the same observations and axes. ${data.model_label}, ${data.season_bags} season bags. Missing forecasts are not interpolated. These rolling-origin results do not constitute an independent validation of the later production-model selection.`;
+      document.getElementById("chart-desc").textContent = `Texas weekly influenza admissions from ${data.start} through ${data.end}. Black: observed admissions. Teal dashed: the saved forecast median at horizon ${horizon}. Darker band: 50% prediction interval, 25th to 75th percentiles. Lighter band: 90% prediction interval, 5th to 95th percentiles. Forecasts are aligned to their target weeks; horizon 0 is the reference week, one week beyond the data cutoff. All views share the same observations and axes. ${data.model_label}, ${data.season_bags} season bags. Weekly rolling refits use the frozen revised study history; no forecast values are interpolated.`;
     }
     function go(state) { location.hash = `state=${Math.max(1, Math.min(4, state))}`; }
     select.addEventListener("change", () => go(Number(select.value)));

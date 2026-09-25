@@ -189,8 +189,9 @@ Use a 1240 × 540 iframe and keep
 Slide 19 shows the saved Texas hospitalization-only MIGHTE-Base ablation.
 `#state=1` through `#state=4` select hub horizons 0 through 3. Black observations
 stay fixed while the median and 50%/90% prediction bands change. Use a 1240 × 540
-iframe with the title in Slides.com. This uses the existing 20-bag no-covariate
-run, not the 100-bag production model with NSSP and wastewater. Build offline
+iframe with the title in Slides.com. This uses the completed 20-bag no-covariate
+rolling run in `outputs/visualization_rolling_revised/no_covariates`, with every
+eligible forecast week present. Build offline
 with `python3 scripts/build_slide_19.py`; see the [source and horizon notes](specs/slide-19-evidence.md).
 
 Slide 20 introduces the additional surveillance signals in three builds:
@@ -199,8 +200,9 @@ wastewater, and `#state=3` added RSV ED visits. Calendar dates remain aligned.
 Build with `python3 scripts/build_slide_20.py`; see the [source notes](specs/slide-20-evidence.md).
 
 Slide 21 uses the same four horizons and chart format as slide 19, with the
-paired wastewater level/lag model. Its observations, calendar, and y-axis are
-identical to slide 19. Build with `python3 scripts/build_slide_21.py`; see the
+paired completed run in `outputs/visualization_rolling_revised/wastewater_lags`.
+Its observations, calendar, and 0–14,000 y-axis are identical to slide 19.
+Build with `python3 scripts/build_slide_21.py`; see the
 [source and comparison notes](specs/slide-21-evidence.md). Both new slides use
 the 1240 × 540 iframe, with their titles in Slides.com.
 

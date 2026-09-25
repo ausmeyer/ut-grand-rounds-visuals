@@ -46,6 +46,9 @@ try {
     assert.ok(await page.locator('#observed').evaluate(el=>Boolean(document.getElementById('forecasts').compareDocumentPosition(el)&Node.DOCUMENT_POSITION_FOLLOWING)),'Observed line is drawn above forecast bands');
     const group=data.series[state-1];
     const segments=await page.locator(`#horizon-${state-1} > g`).all();
+    assert.equal(segments.length,1,'Complete weekly forecasts render as one continuous segment');
+    assert.equal(group.points.length,82-state);
+    assert.equal(group.points.filter(p=>p.reference_date==='2025-01-25').length,1,'January 25 reference week is plotted');
     const plotted=[];
     for(const segment of segments) {
       const start=await segment.getAttribute('data-start'),end=await segment.getAttribute('data-end');
@@ -89,5 +92,5 @@ try {
   await page.goto(`${url}#state=invalid`);
   await settled(1);
   assert.deepEqual(errors,[]);
-  console.log(`Slide ${slide}: all four horizons, every plotted quantile and observation, gap preservation, shared axes, label layout, navigation, fades, reduced motion, and offline rendering passed. Screenshots: ${artifacts}`);
+  console.log(`Slide ${slide}: all four horizons, every plotted quantile and observation, continuous weekly coverage, shared axes, label layout, navigation, fades, reduced motion, and offline rendering passed. Screenshots: ${artifacts}`);
 } finally {await browser.close();}

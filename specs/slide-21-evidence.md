@@ -5,7 +5,7 @@
 Same renderer as slide 19: four horizon views, observed admissions in black,
 forecast median in dashed teal, 50% interval (25th–75th percentiles), and
 90% interval (5th–95th percentiles). Dates, observations, and axes are identical
-across the two slides. Both y-axes run from 0 to 12,000. No scorecard, caveat
+across the two slides. Both y-axes run from 0 to 14,000. No scorecard, caveat
 badge, or extra explanatory text is shown.
 
 Suggested Slides.com title: **Adding wastewater to the forecast**.
@@ -13,12 +13,12 @@ The visible subtitle is **Texas · MIGHTE-Base + wastewater lags**.
 
 ## Source identity and comparison
 
-Inspected September 24, 2026 in `joint_twostage_distribution_study`:
+Inspected September 25, 2026 in `joint_twostage_distribution_study`:
 
-- Model: `distributional_gaussian_nll_joint_base_no_donors_wastewaterscan_lags124`.
-- Saved source: `outputs/checkpoint_distributional_gaussian_nll_joint_base_no_donors_wastewaterscan_lags124_conditional_gaussian_log_sigma_v2.csv`.
-- Configuration: `corrected_nll_ablation_defaults` plus that exact recipe in
-  `configs/study_config.json`.
+- Forecast model: `distributional_gaussian_nll_joint_base_no_donors_wastewaterscan_lags124_revised_visualization`.
+- Saved source: `outputs/visualization_rolling_revised/wastewater_lags/forecasts.csv`.
+- Configuration and runtime: that run's frozen `manifest.json`, with comparator
+  `distributional_gaussian_nll_joint_base_no_donors_wastewaterscan_lags124`.
 - Texas FIPS 48; target `wk inc flu hosp`; hub horizons 0–3; five saved quantiles.
 - 20 season bags, 80% seasonal sampling, 250 center-fitting rounds,
   120 spread-fitting rounds, corrected Gaussian NLL, no spatial donors.
@@ -40,10 +40,22 @@ that combines wastewater and NSSP. No model fitting, scoring, tuning,
 interpolation, or new forecast generation occurs here. No performance-gain
 claim is made from a visual comparison.
 
-The same frozen Texas truth and archived hospitalization-origin audit as
-slide 19 are retained. Target dates span October 5, 2024 to April 25, 2026,
-with 57/56/55/54 plotted forecasts at horizons 0/1/2/3. The source has the
-same missing-origin pattern as the currently available no-covariate output.
+The same frozen Texas truth as slide 19 is retained, October 5, 2024 to
+April 25, 2026. The completed run has 82 weekly origins, 53 locations, four
+horizons, and 23 quantiles. Within the observed target window, 81/80/79/78
+Texas forecasts are plotted at horizons 0/1/2/3. Every eligible week is present,
+including the January 25, 2025 reference week at all four horizons.
+
+Each rolling fit restricts training origins and training target dates to its
+anchor, using the frozen revised hospitalization history. This replaces the
+entire previous forecast dataset; no old checkpoints or interpolated values
+are mixed in. Run manifest, completion record, and date coverage are retained.
+
+The supplied wide `forecast_intervals.csv` contains 50%, 80%, and 95% intervals.
+The plotted 90% bounds are taken from the exact 0.05 and 0.95 quantiles in the
+companion long `forecasts.csv`. The median and 50% bounds are verified against
+the wide export. The largest plotted 95th percentile is 12,765.73, inside the
+shared 14,000 axis limit.
 
 ## Rebuild and checks
 
@@ -60,6 +72,6 @@ browser test checks all four views and every rendered observation/quantile:
 SLIDE_NUMBER=21 SLIDE_PLAYWRIGHT=/absolute/path/to/playwright/index.mjs node tests/slide-19.browser.mjs
 ```
 
-It also checks gaps, labels, animations, keyboard/buttons/dropdown, direct
+It also checks continuous weekly coverage, labels, animations, keyboard/buttons/dropdown, direct
 hash entry, reduced motion, and offline rendering. Screenshots are visually
 reviewed before publishing.

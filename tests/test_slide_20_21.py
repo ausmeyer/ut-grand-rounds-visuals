@@ -3,7 +3,9 @@ import csv
 from datetime import date, timedelta
 import json
 from pathlib import Path
+import shutil
 import sys
+import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -61,7 +63,7 @@ class WastewaterForecastTests(unittest.TestCase):
                    for group in data["series"] for point in group["points"] for quantile, field in FORECAST.QUANTILES.items()}
         self.assertEqual(source, plotted)
         self.assertEqual(len(source), len(rows))
-        self.assertEqual({r["model_id"] for r in rows}, {FORECAST.WASTEWATER_MODEL})
+        self.assertEqual({r["model_id"] for r in rows}, {FORECAST.WASTEWATER_MODEL + "_revised_visualization"})
         for group in data["series"]:
             for point in group["points"]:
                 reference = date.fromisoformat(point["reference_date"])
@@ -72,12 +74,47 @@ class WastewaterForecastTests(unittest.TestCase):
                 self.assertGreaterEqual(values[0], 0)
                 self.assertLessEqual(values[-1], data["axis_max"])
 
+    def test_complete_weekly_coverage_including_january_25(self):
+        data = WASTEWATER.build_data()
+        self.assertEqual([len(g["points"]) for g in data["series"]], [81, 80, 79, 78])
+        for group in data["series"]:
+            points = group["points"]
+            first = date(2024, 10, 12) + timedelta(weeks=group["horizon"])
+            self.assertEqual([p["date"] for p in points],
+                             [(first + timedelta(weeks=i)).isoformat() for i in range(81 - group["horizon"])])
+            self.assertEqual(points[-1]["date"], data["end"])
+            self.assertEqual(sum(p["reference_date"] == "2025-01-25" for p in points), 1)
+
+    def test_builder_rejects_a_reintroduced_missing_week(self):
+        for directory, model in [(FORECAST.DATA, FORECAST.MODEL), (WASTEWATER.DATA, FORECAST.WASTEWATER_MODEL)]:
+            with self.subTest(model=model), tempfile.TemporaryDirectory() as temporary:
+                destination = Path(temporary)
+                provenance = json.loads((directory / "sources.json").read_text())
+                for source in provenance["files"]:
+                    path = destination / source["snapshot"]
+                    shutil.copyfile(directory / source["snapshot"], path)
+                    if source["kind"] == "forecast":
+                        retained = [r for r in FORECAST.rows(path) if r["reference_date"] != "2025-01-25"]
+                        with path.open("w", newline="") as stream:
+                            writer = csv.DictWriter(stream, fieldnames=list(retained[0]))
+                            writer.writeheader()
+                            writer.writerows(retained)
+                        source["rows"] = len(retained)
+                        source["snapshot_sha256"] = FORECAST.sha256(path)
+                FORECAST.write_json(destination / "sources.json", provenance)
+                with self.assertRaisesRegex(ValueError, "Missing weekly forecast"):
+                    FORECAST.chart_data(destination, model)
+
     def test_comparable_configuration_observations_and_axes(self):
         base = json.loads((ROOT / "data/slide-19/sources.json").read_text())
         ww = json.loads((WASTEWATER.DATA / "sources.json").read_text())
         self.assertEqual(base["runtime"], ww["runtime"])
         self.assertEqual(base["evaluation_period"], ww["evaluation_period"])
         self.assertEqual(base["as_of_data"], ww["as_of_data"])
+        self.assertFalse(ww["as_of_data"]["enabled"])
+        self.assertTrue(ww["completion"]["complete"])
+        self.assertEqual(ww["completion"]["origins"], 82)
+        self.assertTrue(all("outputs/visualization_rolling_revised/" in f["source_path"] for f in ww["files"]))
         for key in ["paired_seed_offset", "fit_config_profile", "fit_algorithm", "scale_parameterization", "feature_recipe"]:
             self.assertEqual(base["model_config"][key], ww["model_config"][key])
         self.assertEqual(ww["model_config"]["external_covariates"]["columns"], FORECAST.WASTEWATER_COLUMNS)

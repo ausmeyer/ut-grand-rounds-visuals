@@ -35,7 +35,7 @@ class TexasForecastTests(unittest.TestCase):
                    for group in self.data["series"] for point in group["points"] for quantile, field in fields.items()}
         self.assertEqual(plotted, source)
         self.assertEqual(len(source), len(self.forecasts))
-        self.assertEqual([len(group["points"]) for group in self.data["series"]], [57, 56, 55, 54])
+        self.assertEqual([len(group["points"]) for group in self.data["series"]], [81, 80, 79, 78])
         self.assertEqual(self.data["intervals"], {"50": [.25, .75], "90": [.05, .95]})
 
     def test_horizons_and_cutoffs(self):
@@ -49,15 +49,34 @@ class TexasForecastTests(unittest.TestCase):
                 self.assertLess(point["data_cutoff"], point["date"])
                 self.assertLessEqual(point["date"], self.data["end"])
 
+    def test_complete_weekly_coverage_including_january_25(self):
+        for group in self.data["series"]:
+            points = group["points"]
+            first = date(2024, 10, 12) + timedelta(weeks=group["horizon"])
+            self.assertEqual([p["date"] for p in points],
+                             [(first + timedelta(weeks=i)).isoformat() for i in range(81 - group["horizon"])])
+            self.assertEqual(points[-1]["date"], self.data["end"])
+            self.assertEqual(sum(p["reference_date"] == "2025-01-25" for p in points), 1)
+        with (BUILD.DATA / "intervals-source.csv").open() as stream:
+            intervals = {(int(r["horizon"]), r["target_end_date"]): r for r in csv.DictReader(stream)}
+        for group in self.data["series"]:
+            for point in group["points"]:
+                row = intervals[(group["horizon"], point["date"])]
+                for field, column in [("q25", "lower_50"), ("median", "median"), ("q75", "upper_50")]:
+                    self.assertAlmostEqual(point[field], float(row[column]))
+
     def test_no_added_covariates_and_honest_scope(self):
         provenance = json.loads((BUILD.DATA / "sources.json").read_text())
         self.assertEqual(provenance["model_config"]["model_id"], BUILD.MODEL)
         self.assertNotIn("external_covariates", provenance["model_config"])
         self.assertEqual(provenance["model_config"]["feature_recipe"]["spatial_mode"], "none")
         self.assertEqual(self.data["season_bags"], 20)
-        self.assertTrue(provenance["as_of_data"]["enabled"])
+        self.assertFalse(provenance["as_of_data"]["enabled"])
+        self.assertTrue(provenance["completion"]["complete"])
+        self.assertEqual(provenance["completion"]["origins"], 82)
+        self.assertTrue(all("outputs/visualization_rolling_revised/" in f["source_path"] for f in provenance["files"]))
         self.assertEqual({row["location"] for row in self.forecasts}, {"48"})
-        self.assertEqual({row["model_id"] for row in self.forecasts}, {BUILD.MODEL})
+        self.assertEqual({row["model_id"] for row in self.forecasts}, {BUILD.MODEL + "_revised_visualization"})
 
     def test_intervals_and_shared_axis(self):
         for group in self.data["series"]:
@@ -66,7 +85,7 @@ class TexasForecastTests(unittest.TestCase):
                 self.assertEqual(values, sorted(values))
                 self.assertGreaterEqual(values[0], 0)
                 self.assertLessEqual(values[-1], self.data["axis_max"])
-        self.assertEqual(self.data["axis_max"], 12000)
+        self.assertEqual(self.data["axis_max"], 14000)
 
     def test_reproducible_build(self):
         self.assertEqual(self.data, BUILD.chart_data())

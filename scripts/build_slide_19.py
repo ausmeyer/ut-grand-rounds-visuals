@@ -46,49 +46,70 @@ def write_json(path, value):
 
 
 def import_sources(source_root, data_dir=DATA, model_id=MODEL):
-    config_path = source_root / "configs/study_config.json"
+    run_name = {MODEL: "no_covariates", WASTEWATER_MODEL: "wastewater_lags"}[model_id]
+    export_root = source_root / "outputs/visualization_rolling_revised"
+    run_root = export_root / run_name
+    run_manifest = json.loads((run_root / "manifest.json").read_text())
+    completion = json.loads((run_root / "completion.json").read_text())
+    forecast_model_id = model_id + "_revised_visualization"
+    if (run_manifest["model_id"] != forecast_model_id or run_manifest["source_model_id"] != model_id
+            or not completion["complete"] or completion["origins"] != run_manifest["expected_origins"]
+            or completion["forecast_instances"] != run_manifest["expected_forecast_instances"]
+            or completion["quantile_rows"] != completion["forecast_instances"] * 23):
+        raise ValueError("Unexpected or incomplete rolling forecast run")
+    for filename, expected in run_manifest["input_sha256"].items():
+        if sha256(export_root / "inputs" / filename) != expected:
+            raise ValueError(f"Frozen run input changed: {filename}")
+    config_path = export_root / "inputs/study_config.json"
     config = json.loads(config_path.read_text())
-    recipe = next(row for row in config["corrected_nll_ablation_recipes"] if row["model_id"] == model_id)
-    model_config = {**config["corrected_nll_ablation_defaults"], **recipe}
+    model_config = run_manifest["comparator"]
     validate_model(model_config, model_id)
-    forecast_file = f"outputs/checkpoint_{model_id}_conditional_gaussian_log_sigma_v2.csv"
+    forecast_path = run_root / "forecasts.csv"
+    truth_path = export_root / "inputs" / Path(config["data_file"]).name
     start, end = config["evaluation_period"]["start"], config["evaluation_period"]["end"]
-    truth = [row for row in rows(source_root / config["data_file"])
+    truth = [row for row in rows(truth_path)
              if row["location_name"] == "Texas" and start <= row["date"] <= end]
     available = {row["date"] for row in truth}
-    forecasts = [row for row in rows(source_root / forecast_file)
-                 if row["model_id"] == model_id and row["location"] == "48"
+    forecasts = [row for row in rows(forecast_path)
+                 if row["model_id"] == forecast_model_id and row["location"] == "48"
                  and row["target_end_date"] in available
                  and float(row["output_type_id"]) in QUANTILES]
+    intervals = [row for row in rows(run_root / "forecast_intervals.csv")
+                 if row["model_id"] == forecast_model_id and row["location"] == "48"
+                 and row["target_end_date"] in available]
     references = {row["reference_date"] for row in forecasts}
-    origins = [row for row in rows(source_root / "outputs/asof_anchor_audit.csv")
-               if row["reference_date"] in references]
-    if not truth or not forecasts or {row["reference_date"] for row in origins} != references:
-        raise ValueError("Missing Texas forecasts, observations, or origin audit rows")
-    location = next(row for row in rows(source_root / config["location_file"]) if row["location_name"] == "Texas")
+    origins = list(rows(run_root / "date_coverage.csv"))
+    if (not truth or not forecasts or not intervals or len(origins) != completion["origins"]
+            or not references <= {row["reference_date"] for row in origins}):
+        raise ValueError("Missing Texas forecasts, observations, or origin coverage rows")
+    location = next(row for row in rows(export_root / "inputs/locations.csv") if row["location_name"] == "Texas")
     if location["location"] != "48":
         raise ValueError("Unexpected Texas location code")
     data_dir.mkdir(parents=True, exist_ok=True)
     manifest = []
     for kind, original, selected in [
-        ("forecast", forecast_file, forecasts),
-        ("truth", config["data_file"], truth),
-        ("origins", "outputs/asof_anchor_audit.csv", origins),
+        ("forecast", forecast_path, forecasts),
+        ("intervals", run_root / "forecast_intervals.csv", intervals),
+        ("truth", truth_path, truth),
+        ("origins", run_root / "date_coverage.csv", origins),
     ]:
         snapshot = data_dir / f"{kind}-source.csv"
         with snapshot.open("w", newline="") as stream:
             writer = csv.DictWriter(stream, fieldnames=list(selected[0]), lineterminator="\n")
             writer.writeheader()
             writer.writerows(selected)
-        manifest.append({"kind": kind, "source_path": original,
-                         "source_sha256": sha256(source_root / original),
+        manifest.append({"kind": kind, "source_path": str(original.relative_to(source_root)),
+                         "source_sha256": sha256(original),
                          "snapshot": snapshot.name, "snapshot_sha256": sha256(snapshot), "rows": len(selected)})
     write_json(data_dir / "sources.json", {
         "source_project": "joint_twostage_distribution_study", "files": manifest,
         "config_sha256": sha256(config_path), "model_config": model_config,
-        "runtime": {**config["runtime"], **model_config.get("runtime_overrides", {})},
-        "evaluation_period": config["evaluation_period"], "as_of_data": config["as_of_data"],
-        "location": location, "production_lineup": config["production_model_lineup"],
+        "runtime": run_manifest["runtime"], "run_manifest": run_manifest, "completion": completion,
+        "run_manifest_sha256": sha256(run_root / "manifest.json"),
+        "completion_sha256": sha256(run_root / "completion.json"),
+        "evaluation_period": config["evaluation_period"],
+        "as_of_data": {"enabled": False, "note": run_manifest["revision_policy"]},
+        "location": location,
     })
 
 
@@ -104,6 +125,9 @@ def chart_data(data_dir=DATA, model_id=MODEL, slide=19, model_label="MIGHTE-Base
             raise ValueError("Source row count changed")
     model = provenance["model_config"]
     validate_model(model, model_id)
+    forecast_model_id = provenance["run_manifest"]["model_id"]
+    if forecast_model_id != model_id + "_revised_visualization":
+        raise ValueError("Expected the revised-history visualization run")
     observed = []
     for row in sources["truth"]:
         value = float(row["total_hosp"])
@@ -117,17 +141,22 @@ def chart_data(data_dir=DATA, model_id=MODEL, slide=19, model_label="MIGHTE-Base
     truth_dates = {point["date"] for point in observed}
     origin_dates = {}
     for row in sources["origins"]:
-        if row["has_exact_vintage"] != "True":
-            raise ValueError("Forecast origin lacks an exact archived vintage")
+        if row["status"] != "complete" or row["reference_date"] in origin_dates:
+            raise ValueError("Incomplete or duplicate forecast origin")
         anchor, reference = date.fromisoformat(row["anchor_date"]), date.fromisoformat(row["reference_date"])
         if (reference - anchor).days != 7:
             raise ValueError("Unexpected reference-date convention")
         origin_dates[row["reference_date"]] = row["anchor_date"]
+    references = sorted(origin_dates)
+    if (len(references) != provenance["completion"]["origins"]
+            or any((date.fromisoformat(b) - date.fromisoformat(a)).days != 7
+                   for a, b in zip(references, references[1:]))):
+        raise ValueError("Missing weekly forecast origin")
     grouped = {}
     for row in sources["forecast"]:
         horizon, quantile, value = int(row["horizon"]), float(row["output_type_id"]), float(row["value"])
         target, reference = date.fromisoformat(row["target_end_date"]), date.fromisoformat(row["reference_date"])
-        if (row["model_id"] != model_id or row["location"] != "48" or row["target"] != "wk inc flu hosp"
+        if (row["model_id"] != forecast_model_id or row["location"] != "48" or row["target"] != "wk inc flu hosp"
                 or row["output_type"] != "quantile" or horizon not in range(4) or quantile not in QUANTILES
                 or not math.isfinite(value) or value < 0 or target != reference + timedelta(weeks=horizon)
                 or row["target_end_date"] not in truth_dates or row["reference_date"] not in origin_dates):
@@ -142,8 +171,11 @@ def chart_data(data_dir=DATA, model_id=MODEL, slide=19, model_label="MIGHTE-Base
     series = []
     for horizon in range(4):
         points = [point for (h, stamp), point in sorted(grouped.items()) if h == horizon]
-        if not points:
-            raise ValueError("Missing forecast horizon")
+        expected_dates = [(date.fromisoformat(reference) + timedelta(weeks=horizon)).isoformat()
+                          for reference in references]
+        expected_dates = [stamp for stamp in expected_dates if stamp in truth_dates]
+        if not points or [point["date"] for point in points] != expected_dates:
+            raise ValueError("Missing weekly forecast in the observed target window")
         for point in points:
             if not set(QUANTILES.values()) <= point.keys():
                 raise ValueError("Incomplete forecast interval")
@@ -151,12 +183,28 @@ def chart_data(data_dir=DATA, model_id=MODEL, slide=19, model_label="MIGHTE-Base
             if values != sorted(values):
                 raise ValueError("Crossed forecast quantiles")
         series.append({"horizon": horizon, "points": points})
+    # The wide export provides 50%, 80%, and 95% intervals. The plotted 90%
+    # bounds come directly from q05/q95 in forecasts.csv, not that export.
+    interval_keys = set()
+    for row in sources["intervals"]:
+        key = (int(row["horizon"]), row["target_end_date"])
+        if key not in grouped or key in interval_keys or row["model_id"] != forecast_model_id or row["location"] != "48":
+            raise ValueError("Unexpected interval export row")
+        interval_keys.add(key)
+        point = grouped[key]
+        if row["reference_date"] != point["reference_date"]:
+            raise ValueError("Interval export reference date differs")
+        for field, source_field in [("q25", "lower_50"), ("median", "median"), ("q75", "upper_50")]:
+            if not math.isclose(point[field], float(row[source_field]), rel_tol=1e-12, abs_tol=1e-12):
+                raise ValueError("Quantiles differ from the supplied interval export")
+    if interval_keys != grouped.keys():
+        raise ValueError("Missing interval export rows")
     maximum = max([point["value"] for point in observed] + [point["q95"] for group in series for point in group["points"]])
-    return {"slide": slide, "location": "Texas", "model_id": model_id,
+    return {"slide": slide, "location": "Texas", "model_id": forecast_model_id,
             "model_label": model_label, "season_bags": provenance["runtime"]["num_bags"],
             "start": observed[0]["date"], "end": observed[-1]["date"],
             # Match the axes on the hospitalization-only and wastewater-lag slides.
-            "axis_max": max(12000, math.ceil(maximum / 2000) * 2000), "tick_step": 2000,
+            "axis_max": max(14000, math.ceil(maximum / 2000) * 2000), "tick_step": 2000,
             "horizon_convention": "target_end_date = reference_date + 7 * horizon days; data cutoff is reference_date minus 7 days",
             "intervals": {"50": [0.25, 0.75], "90": [0.05, 0.95]}, "observed": observed, "series": series}
 
