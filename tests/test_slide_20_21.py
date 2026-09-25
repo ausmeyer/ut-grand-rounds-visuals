@@ -114,7 +114,8 @@ class WastewaterForecastTests(unittest.TestCase):
         self.assertFalse(ww["as_of_data"]["enabled"])
         self.assertTrue(ww["completion"]["complete"])
         self.assertEqual(ww["completion"]["origins"], 82)
-        self.assertTrue(all("outputs/visualization_rolling_revised/" in f["source_path"] for f in ww["files"]))
+        self.assertTrue(all("outputs/visualization_rolling_revised/" in f["source_path"]
+                            for f in ww["files"] if f["kind"] != "baseline"))
         for key in ["paired_seed_offset", "fit_config_profile", "fit_algorithm", "scale_parameterization", "feature_recipe"]:
             self.assertEqual(base["model_config"][key], ww["model_config"][key])
         self.assertEqual(ww["model_config"]["external_covariates"]["columns"], FORECAST.WASTEWATER_COLUMNS)

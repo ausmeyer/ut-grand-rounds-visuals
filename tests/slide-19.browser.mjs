@@ -25,12 +25,19 @@ try {
   await context.route(/^https?:/,route=>{errors.push(`Unexpected request: ${route.request().url()}`);return route.abort();});
   const page=await context.newPage();
   page.on('pageerror',error=>errors.push(error.message));
-  const settled=state=>page.waitForFunction(state=>document.body.dataset.state===String(state)&&Array.from(document.querySelectorAll('.forecast-layer')).every((el,i)=>getComputedStyle(el).opacity===(i===state-1?'1':'0')),state);
+  const settled=async state=>{
+    await page.waitForFunction(state=>document.body.dataset.state===String(state)&&Array.from(document.querySelectorAll('.forecast-layer')).every((el,i)=>getComputedStyle(el).opacity===(i===state-1?'1':'0')),state);
+    assert.equal(await page.locator('#rwis').textContent(),`rWIS: ${data.scores[state-1].rwis.toFixed(2)}`);
+    assert.match(await page.locator('#score-desc').textContent(),new RegExp(`${data.scores[state-1].n} matched weeks for horizon ${state-1}`));
+  };
   let truthPath,axesMarkup;
   for(const state of [1,2,3,4]) {
     await page.goto(`${url}#state=${state}`);
     await settled(state);
     assert.equal(await page.locator('#state-select').inputValue(),String(state));
+    assert.equal(await page.locator('#legend text').count(),5);
+    assert.equal(await page.locator('#rwis').getAttribute('text-anchor'),'end');
+    assert.equal(await page.locator('#rwis').getAttribute('x'),'1158');
     assert.equal(await page.locator('#back-button').isDisabled(),state===1);
     assert.equal(await page.locator('#next-button').isDisabled(),state===4);
     for(const horizon of [0,1,2,3]) {
@@ -92,5 +99,5 @@ try {
   await page.goto(`${url}#state=invalid`);
   await settled(1);
   assert.deepEqual(errors,[]);
-  console.log(`Slide ${slide}: all four horizons, every plotted quantile and observation, continuous weekly coverage, shared axes, label layout, navigation, fades, reduced motion, and offline rendering passed. Screenshots: ${artifacts}`);
+  console.log(`Slide ${slide}: all four horizons, dynamic Texas rWIS, every plotted quantile and observation, continuous weekly coverage, shared axes, label layout, navigation, fades, reduced motion, and offline rendering passed. Screenshots: ${artifacts}`);
 } finally {await browser.close();}

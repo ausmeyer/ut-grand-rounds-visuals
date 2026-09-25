@@ -74,7 +74,8 @@ class TexasForecastTests(unittest.TestCase):
         self.assertFalse(provenance["as_of_data"]["enabled"])
         self.assertTrue(provenance["completion"]["complete"])
         self.assertEqual(provenance["completion"]["origins"], 82)
-        self.assertTrue(all("outputs/visualization_rolling_revised/" in f["source_path"] for f in provenance["files"]))
+        self.assertTrue(all("outputs/visualization_rolling_revised/" in f["source_path"]
+                            for f in provenance["files"] if f["kind"] != "baseline"))
         self.assertEqual({row["location"] for row in self.forecasts}, {"48"})
         self.assertEqual({row["model_id"] for row in self.forecasts}, {BUILD.MODEL + "_revised_visualization"})
 

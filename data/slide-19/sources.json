@@ -10,6 +10,22 @@
       "rows": 1590
     },
     {
+      "kind": "scoring",
+      "source_path": "outputs/visualization_rolling_revised/no_covariates/forecasts.csv",
+      "source_sha256": "47e93479d8dc27d0c2437055a0ade49a781ea8c384ab0fc430a09aaf25455af3",
+      "snapshot": "scoring-source.csv",
+      "snapshot_sha256": "3776e02f89fb8eb2f38cc6ac86fe95f66104d785e899c964ac35010aedd80129",
+      "rows": 7314
+    },
+    {
+      "kind": "baseline",
+      "source_path": "outputs/benchmark_forecasts.csv",
+      "source_sha256": "1918c29c0f46a5dbe4545bf00e9c3178c03066c2a0a5509dc80f3dfe1216d66a",
+      "snapshot": "baseline-source.csv",
+      "snapshot_sha256": "dcaae531364ce048573217273ef27d3e41ae7651ec49de6d01d44525c9c835ee",
+      "rows": 4462
+    },
+    {
       "kind": "intervals",
       "source_path": "outputs/visualization_rolling_revised/no_covariates/forecast_intervals.csv",
       "source_sha256": "1fa0cb8dfe3065d36f411d919806df73e254ccc809bac5ee01e166a69714146f",

@@ -9,6 +9,8 @@ import json
 import math
 from pathlib import Path
 
+from forecast_scoring import BASELINE, LEVELS, distributions, horizon_scores
+
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "slide-19"
 MODEL = "distributional_gaussian_nll_joint_base_spatial_no_donors"
@@ -70,16 +72,23 @@ def import_sources(source_root, data_dir=DATA, model_id=MODEL):
     truth = [row for row in rows(truth_path)
              if row["location_name"] == "Texas" and start <= row["date"] <= end]
     available = {row["date"] for row in truth}
-    forecasts = [row for row in rows(forecast_path)
+    scoring = [row for row in rows(forecast_path)
                  if row["model_id"] == forecast_model_id and row["location"] == "48"
                  and row["target_end_date"] in available
-                 and float(row["output_type_id"]) in QUANTILES]
+                 and float(row["output_type_id"]) in LEVELS]
+    forecasts = [row for row in scoring if float(row["output_type_id"]) in QUANTILES]
+    forecast_keys = {(row["reference_date"], row["target_end_date"], row["horizon"]) for row in scoring}
+    baseline_path = source_root / "outputs/benchmark_forecasts.csv"
+    baseline = [row for row in rows(baseline_path)
+                if row["model_id"] == BASELINE and row["location"] == "48"
+                and row["target"] == "wk inc flu hosp" and row["output_type"] == "quantile"
+                and (row["reference_date"], row["target_end_date"], row["horizon"]) in forecast_keys]
     intervals = [row for row in rows(run_root / "forecast_intervals.csv")
                  if row["model_id"] == forecast_model_id and row["location"] == "48"
                  and row["target_end_date"] in available]
     references = {row["reference_date"] for row in forecasts}
     origins = list(rows(run_root / "date_coverage.csv"))
-    if (not truth or not forecasts or not intervals or len(origins) != completion["origins"]
+    if (not truth or not forecasts or not intervals or not baseline or len(origins) != completion["origins"]
             or not references <= {row["reference_date"] for row in origins}):
         raise ValueError("Missing Texas forecasts, observations, or origin coverage rows")
     location = next(row for row in rows(export_root / "inputs/locations.csv") if row["location_name"] == "Texas")
@@ -89,6 +98,8 @@ def import_sources(source_root, data_dir=DATA, model_id=MODEL):
     manifest = []
     for kind, original, selected in [
         ("forecast", forecast_path, forecasts),
+        ("scoring", forecast_path, scoring),
+        ("baseline", baseline_path, baseline),
         ("intervals", run_root / "forecast_intervals.csv", intervals),
         ("truth", truth_path, truth),
         ("origins", run_root / "date_coverage.csv", origins),
@@ -199,6 +210,15 @@ def chart_data(data_dir=DATA, model_id=MODEL, slide=19, model_label="MIGHTE-Base
                 raise ValueError("Quantiles differ from the supplied interval export")
     if interval_keys != grouped.keys():
         raise ValueError("Missing interval export rows")
+    truth = {point["date"]: point["value"] for point in observed}
+    scored_model = distributions(sources["scoring"], forecast_model_id, truth)
+    scored_baseline = distributions(sources["baseline"], BASELINE, truth)
+    if set(scored_model) != {(h, p["reference_date"], stamp) for (h, stamp), p in grouped.items()}:
+        raise ValueError("Scoring and plotted forecast keys differ")
+    for (horizon, reference, target), values in scored_model.items():
+        if any(values[q] != grouped[(horizon, target)][field] for q, field in QUANTILES.items()):
+            raise ValueError("Scoring and plotted forecast quantiles differ")
+    scores = horizon_scores(scored_model, scored_baseline, truth)
     maximum = max([point["value"] for point in observed] + [point["q95"] for group in series for point in group["points"]])
     return {"slide": slide, "location": "Texas", "model_id": forecast_model_id,
             "model_label": model_label, "season_bags": provenance["runtime"]["num_bags"],
@@ -206,7 +226,9 @@ def chart_data(data_dir=DATA, model_id=MODEL, slide=19, model_label="MIGHTE-Base
             # Match the axes on the hospitalization-only and wastewater-lag slides.
             "axis_max": max(14000, math.ceil(maximum / 2000) * 2000), "tick_step": 2000,
             "horizon_convention": "target_end_date = reference_date + 7 * horizon days; data cutoff is reference_date minus 7 days",
-            "intervals": {"50": [0.25, 0.75], "90": [0.05, 0.95]}, "observed": observed, "series": series}
+            "intervals": {"50": [0.25, 0.75], "90": [0.05, 0.95]}, "observed": observed, "series": series,
+            "scores": scores, "score_baseline": BASELINE,
+            "score_method": "Reich Lab-style raw-count rWIS on matched Texas weeks, using all 23 quantiles"}
 
 
 def render(data):

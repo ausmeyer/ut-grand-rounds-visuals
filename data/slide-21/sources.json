@@ -10,6 +10,22 @@
       "rows": 1590
     },
     {
+      "kind": "scoring",
+      "source_path": "outputs/visualization_rolling_revised/wastewater_lags/forecasts.csv",
+      "source_sha256": "d87c2dec128573f8e9835a9d9fc9560e4e137b380c47908173e2dc34d33207e6",
+      "snapshot": "scoring-source.csv",
+      "snapshot_sha256": "a9da66a91b07e1180b4e274eea3c5ad6aa94ada90432fe5a4044900ef60666be",
+      "rows": 7314
+    },
+    {
+      "kind": "baseline",
+      "source_path": "outputs/benchmark_forecasts.csv",
+      "source_sha256": "1918c29c0f46a5dbe4545bf00e9c3178c03066c2a0a5509dc80f3dfe1216d66a",
+      "snapshot": "baseline-source.csv",
+      "snapshot_sha256": "dcaae531364ce048573217273ef27d3e41ae7651ec49de6d01d44525c9c835ee",
+      "rows": 4462
+    },
+    {
       "kind": "intervals",
       "source_path": "outputs/visualization_rolling_revised/wastewater_lags/forecast_intervals.csv",
       "source_sha256": "9831ace5fad33628028d09ba0b236c17809efdfdd86c39cb9aafdc229536eeb1",

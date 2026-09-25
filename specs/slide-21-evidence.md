@@ -36,9 +36,9 @@ is interpreted with the model's anchor/reference convention; it does not
 override the source's own `available_date` restriction.
 
 This is the paired 20-bag ablation, not the later 100-bag production lineup
-that combines wastewater and NSSP. No model fitting, scoring, tuning,
-interpolation, or new forecast generation occurs here. No performance-gain
-claim is made from a visual comparison.
+that combines wastewater and NSSP. No model fitting, tuning, interpolation,
+or new forecast generation occurs here. The saved forecasts are scored as
+described below; no general performance-gain claim is made from this example.
 
 The same frozen Texas truth as slide 19 is retained, October 5, 2024 to
 April 25, 2026. The completed run has 82 weekly origins, 53 locations, four
@@ -56,6 +56,17 @@ The plotted 90% bounds are taken from the exact 0.05 and 0.95 quantiles in the
 companion long `forecasts.csv`. The median and 50% bounds are verified against
 the wide export. The largest plotted 95th percentile is 12,765.73, inside the
 shared 14,000 axis limit.
+
+## Texas-only relative WIS
+
+The fifth, right-aligned legend entry displays rWIS for the selected horizon.
+It uses all 23 quantiles from this exact run against submitted FluSight-baseline
+forecasts on the same 50/49/48/47 Texas weeks used for slide 19. The plotted
+curves retain every week. See the shared [scoring design and verification](slide-19-evidence.md#texas-only-rwis-design)
+for the raw-count WIS definition, matched-key scope, score values, independent
+checks, and retrospective interpretation. Full scoring quantiles and baseline
+rows are retained in `scoring-source.csv` and `baseline-source.csv`, with hashes
+in `sources.json`. The readout changes with every horizon control and direct URL.
 
 ## Rebuild and checks
 

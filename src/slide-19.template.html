@@ -26,6 +26,7 @@
     #chart { display: block; width: 1182px; height: 458px; }
     svg text { fill: var(--ink); font-size: 17px; }
     .tick { fill: var(--muted); font-size: 16px; }
+    #rwis { fill: var(--teal); font-weight: 750; }
     .forecast-layer { opacity: 0; visibility: hidden; }
     .forecast-layer.active { opacity: 1; visibility: visible; }
     body[data-ready] .forecast-layer { transition: opacity 450ms ease, visibility 450ms; }
@@ -51,9 +52,10 @@
           <line x1="304" x2="341" y1="20" y2="20" stroke="#0a6670" stroke-width="2.5" stroke-dasharray="6 3"/>
           <text x="352" y="26">Forecast median</text>
           <rect x="571" y="11" width="30" height="18" fill="#0a6670" fill-opacity=".4"/>
-          <text x="612" y="26">50% prediction interval</text>
-          <rect x="879" y="11" width="30" height="18" fill="#0a6670" fill-opacity=".16"/>
-          <text x="920" y="26">90% prediction interval</text>
+          <text x="612" y="26">50% PI</text>
+          <rect x="787" y="11" width="30" height="18" fill="#0a6670" fill-opacity=".16"/>
+          <text x="828" y="26">90% PI</text>
+          <g id="score"><title id="score-desc"></title><text id="rwis" x="1158" y="26" text-anchor="end"></text></g>
         </g>
       </svg>
     </section>
@@ -125,6 +127,10 @@
     }
     function render() {
       const state = fromHash(), horizon = state - 1;
+      const score = data.scores[horizon];
+      document.getElementById("rwis").textContent = `rWIS: ${score.rwis.toFixed(2)}`;
+      const scoreDescription = `Texas-only relative WIS: ${score.rwis.toFixed(4)} versus ${data.score_baseline}, using all 23 quantiles on ${score.n} matched weeks for horizon ${horizon}. Values below 1 favor this model. Scoring uses the frozen revised-history forecasts shown here.`;
+      document.getElementById("score-desc").textContent = scoreDescription;
       document.body.dataset.state = String(state);
       select.value = String(state); back.disabled = state === 1; next.disabled = state === 4;
       for (const layer of document.querySelectorAll(".forecast-layer")) {
@@ -132,7 +138,7 @@
         layer.classList.toggle("active", active);
         layer.setAttribute("aria-hidden", String(!active));
       }
-      document.getElementById("chart-desc").textContent = `Texas weekly influenza admissions from ${data.start} through ${data.end}. Black: observed admissions. Teal dashed: the saved forecast median at horizon ${horizon}. Darker band: 50% prediction interval, 25th to 75th percentiles. Lighter band: 90% prediction interval, 5th to 95th percentiles. Forecasts are aligned to their target weeks; horizon 0 is the reference week, one week beyond the data cutoff. All views share the same observations and axes. ${data.model_label}, ${data.season_bags} season bags. Weekly rolling refits use the frozen revised study history; no forecast values are interpolated.`;
+      document.getElementById("chart-desc").textContent = `Texas weekly influenza admissions from ${data.start} through ${data.end}. Black: observed admissions. Teal dashed: the saved forecast median at horizon ${horizon}. Darker band: 50% prediction interval, 25th to 75th percentiles. Lighter band: 90% prediction interval, 5th to 95th percentiles. Forecasts are aligned to their target weeks; horizon 0 is the reference week, one week beyond the data cutoff. All views share the same observations and axes. ${data.model_label}, ${data.season_bags} season bags. Weekly rolling refits use the frozen revised study history; no forecast values are interpolated. ${scoreDescription} Relative WIS is ${score.rwis.toFixed(2)}.`;
     }
     function go(state) { location.hash = `state=${Math.max(1, Math.min(4, state))}`; }
     select.addEventListener("change", () => go(Number(select.value)));
