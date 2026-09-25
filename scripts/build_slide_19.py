@@ -4,12 +4,14 @@
 import argparse
 import csv
 from datetime import date, timedelta
+import gzip
 import hashlib
+import io
 import json
 import math
 from pathlib import Path
 
-from forecast_scoring import BASELINE, LEVELS, distributions, horizon_scores
+from forecast_scoring import BASELINE, LEVELS, LOCATIONS, distributions, horizon_scores
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "slide-19"
@@ -39,7 +41,8 @@ def sha256(path):
 
 
 def rows(path):
-    with path.open(newline="", encoding="utf-8-sig") as stream:
+    opener = gzip.open if path.suffix == ".gz" else open
+    with opener(path, "rt", newline="", encoding="utf-8-sig") as stream:
         yield from csv.DictReader(stream)
 
 
@@ -69,20 +72,26 @@ def import_sources(source_root, data_dir=DATA, model_id=MODEL):
     forecast_path = run_root / "forecasts.csv"
     truth_path = export_root / "inputs" / Path(config["data_file"]).name
     start, end = config["evaluation_period"]["start"], config["evaluation_period"]["end"]
-    truth = [row for row in rows(truth_path)
-             if row["location_name"] == "Texas" and start <= row["date"] <= end]
+    location_rows = list(rows(export_root / "inputs/locations.csv"))
+    codes = {row["location_name"]: row["location"] for row in location_rows if row["location"] in LOCATIONS}
+    if set(codes.values()) != LOCATIONS:
+        raise ValueError("Expected 50 states and DC in the location manifest")
+    scoring_truth = [{**row, "location": codes[row["location_name"]]} for row in rows(truth_path)
+                     if row["location_name"] in codes and start <= row["date"] <= end]
+    truth = [{key: row[key] for key in ["date", "location_name", "total_hosp"]}
+             for row in scoring_truth if row["location"] == "48"]
     available = {row["date"] for row in truth}
     scoring = [row for row in rows(forecast_path)
-                 if row["model_id"] == forecast_model_id and row["location"] == "48"
+                 if row["model_id"] == forecast_model_id and row["location"] in LOCATIONS
                  and row["target_end_date"] in available
                  and float(row["output_type_id"]) in LEVELS]
-    forecasts = [row for row in scoring if float(row["output_type_id"]) in QUANTILES]
-    forecast_keys = {(row["reference_date"], row["target_end_date"], row["horizon"]) for row in scoring}
+    forecasts = [row for row in scoring if row["location"] == "48" and float(row["output_type_id"]) in QUANTILES]
+    forecast_keys = {(row["reference_date"], row["target_end_date"], row["horizon"], row["location"]) for row in scoring}
     baseline_path = source_root / "outputs/benchmark_forecasts.csv"
     baseline = [row for row in rows(baseline_path)
-                if row["model_id"] == BASELINE and row["location"] == "48"
+                if row["model_id"] == BASELINE and row["location"] in LOCATIONS
                 and row["target"] == "wk inc flu hosp" and row["output_type"] == "quantile"
-                and (row["reference_date"], row["target_end_date"], row["horizon"]) in forecast_keys]
+                and (row["reference_date"], row["target_end_date"], row["horizon"], row["location"]) in forecast_keys]
     intervals = [row for row in rows(run_root / "forecast_intervals.csv")
                  if row["model_id"] == forecast_model_id and row["location"] == "48"
                  and row["target_end_date"] in available]
@@ -100,12 +109,16 @@ def import_sources(source_root, data_dir=DATA, model_id=MODEL):
         ("forecast", forecast_path, forecasts),
         ("scoring", forecast_path, scoring),
         ("baseline", baseline_path, baseline),
+        ("scoring-truth", truth_path, scoring_truth),
         ("intervals", run_root / "forecast_intervals.csv", intervals),
         ("truth", truth_path, truth),
         ("origins", run_root / "date_coverage.csv", origins),
     ]:
-        snapshot = data_dir / f"{kind}-source.csv"
-        with snapshot.open("w", newline="") as stream:
+        compressed = kind in {"scoring", "baseline"}
+        snapshot = data_dir / (f"{kind}-source.csv" + (".gz" if compressed else ""))
+        stream = (io.TextIOWrapper(gzip.GzipFile(filename=snapshot, mode="wb", mtime=0), newline="")
+                  if compressed else snapshot.open("w", newline=""))
+        with stream:
             writer = csv.DictWriter(stream, fieldnames=list(selected[0]), lineterminator="\n")
             writer.writeheader()
             writer.writerows(selected)
@@ -210,15 +223,25 @@ def chart_data(data_dir=DATA, model_id=MODEL, slide=19, model_label="MIGHTE-Base
                 raise ValueError("Quantiles differ from the supplied interval export")
     if interval_keys != grouped.keys():
         raise ValueError("Missing interval export rows")
-    truth = {point["date"]: point["value"] for point in observed}
-    scored_model = distributions(sources["scoring"], forecast_model_id, truth)
-    scored_baseline = distributions(sources["baseline"], BASELINE, truth)
-    if set(scored_model) != {(h, p["reference_date"], stamp) for (h, stamp), p in grouped.items()}:
-        raise ValueError("Scoring and plotted forecast keys differ")
-    for (horizon, reference, target), values in scored_model.items():
-        if any(values[q] != grouped[(horizon, target)][field] for q, field in QUANTILES.items()):
+    score_truth = {}
+    for row in sources["scoring-truth"]:
+        key, value = (row["location"], row["date"]), float(row["total_hosp"])
+        if key in score_truth or row["location"] not in LOCATIONS or not math.isfinite(value) or value < 0:
+            raise ValueError("Invalid state/DC scoring observation")
+        score_truth[key] = value
+    if set(score_truth) != {(location, stamp) for location in LOCATIONS for stamp in truth_dates}:
+        raise ValueError("Incomplete state/DC scoring observations")
+    if any(score_truth[("48", p["date"])] != p["value"] for p in observed):
+        raise ValueError("Scoring and plotted Texas observations differ")
+    scored_model = distributions(sources["scoring"], forecast_model_id, score_truth)
+    scored_baseline = distributions(sources["baseline"], BASELINE, score_truth)
+    if set(scored_model) != {(h, p["reference_date"], stamp, location)
+                             for (h, stamp), p in grouped.items() for location in LOCATIONS}:
+        raise ValueError("Scoring locations do not share the plotted forecast calendar")
+    for (horizon, reference, target, location), values in scored_model.items():
+        if location == "48" and any(values[q] != grouped[(horizon, target)][field] for q, field in QUANTILES.items()):
             raise ValueError("Scoring and plotted forecast quantiles differ")
-    scores = horizon_scores(scored_model, scored_baseline, truth)
+    scores = horizon_scores(scored_model, scored_baseline, score_truth)
     maximum = max([point["value"] for point in observed] + [point["q95"] for group in series for point in group["points"]])
     return {"slide": slide, "location": "Texas", "model_id": forecast_model_id,
             "model_label": model_label, "season_bags": provenance["runtime"]["num_bags"],
@@ -228,7 +251,7 @@ def chart_data(data_dir=DATA, model_id=MODEL, slide=19, model_label="MIGHTE-Base
             "horizon_convention": "target_end_date = reference_date + 7 * horizon days; data cutoff is reference_date minus 7 days",
             "intervals": {"50": [0.25, 0.75], "90": [0.05, 0.95]}, "observed": observed, "series": series,
             "scores": scores, "score_baseline": BASELINE,
-            "score_method": "Reich Lab-style raw-count rWIS on matched Texas weeks, using all 23 quantiles"}
+            "score_method": "Reich Lab-style raw-count rWIS across the 50 states and DC, excluding national and Puerto Rico; all 23 quantiles on matched location-weeks"}
 
 
 def render(data):

@@ -129,7 +129,7 @@
       const state = fromHash(), horizon = state - 1;
       const score = data.scores[horizon];
       document.getElementById("rwis").textContent = `rWIS: ${score.rwis.toFixed(2)}`;
-      const scoreDescription = `Texas-only relative WIS: ${score.rwis.toFixed(4)} versus ${data.score_baseline}, using all 23 quantiles on ${score.n} matched weeks for horizon ${horizon}. Values below 1 favor this model. Scoring uses the frozen revised-history forecasts shown here.`;
+      const scoreDescription = `Relative WIS: ${score.rwis.toFixed(4)} versus ${data.score_baseline}, using all 23 quantiles across the 50 states and DC on ${score.n} matched location-weeks for horizon ${horizon}. Values below 1 favor this model.`;
       document.getElementById("score-desc").textContent = scoreDescription;
       document.body.dataset.state = String(state);
       select.value = String(state); back.disabled = state === 1; next.disabled = state === 4;

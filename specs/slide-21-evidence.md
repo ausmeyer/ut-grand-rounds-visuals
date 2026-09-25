@@ -57,15 +57,16 @@ companion long `forecasts.csv`. The median and 50% bounds are verified against
 the wide export. The largest plotted 95th percentile is 12,765.73, inside the
 shared 14,000 axis limit.
 
-## Texas-only relative WIS
+## State/DC relative WIS
 
 The fifth, right-aligned legend entry displays rWIS for the selected horizon.
-It uses all 23 quantiles from this exact run against submitted FluSight-baseline
-forecasts on the same 50/49/48/47 Texas weeks used for slide 19. The plotted
-curves retain every week. See the shared [scoring design and verification](slide-19-evidence.md#texas-only-rwis-design)
+It uses all 23 quantiles from this exact run across the 50 states and DC,
+excluding national and Puerto Rico, against submitted FluSight-baseline
+forecasts on the same 2,550/2,499/2,448/2,397 location-weeks used for slide 19.
+The plotted Texas curves retain every week. See the shared [scoring design and verification](slide-19-evidence.md#statedc-rwis-design)
 for the raw-count WIS definition, matched-key scope, score values, independent
 checks, and retrospective interpretation. Full scoring quantiles and baseline
-rows are retained in `scoring-source.csv` and `baseline-source.csv`, with hashes
+rows are retained in `scoring-source.csv.gz` and `baseline-source.csv.gz`, with hashes
 in `sources.json`. The readout changes with every horizon control and direct URL.
 
 ## Rebuild and checks

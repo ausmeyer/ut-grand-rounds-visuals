@@ -13,17 +13,25 @@
       "kind": "scoring",
       "source_path": "outputs/visualization_rolling_revised/wastewater_lags/forecasts.csv",
       "source_sha256": "d87c2dec128573f8e9835a9d9fc9560e4e137b380c47908173e2dc34d33207e6",
-      "snapshot": "scoring-source.csv",
-      "snapshot_sha256": "a9da66a91b07e1180b4e274eea3c5ad6aa94ada90432fe5a4044900ef60666be",
-      "rows": 7314
+      "snapshot": "scoring-source.csv.gz",
+      "snapshot_sha256": "cee2f006913226aaf4e42281da38e549c458ffed6e6ced9ee87f3048b0f8ef5d",
+      "rows": 373014
     },
     {
       "kind": "baseline",
       "source_path": "outputs/benchmark_forecasts.csv",
       "source_sha256": "1918c29c0f46a5dbe4545bf00e9c3178c03066c2a0a5509dc80f3dfe1216d66a",
-      "snapshot": "baseline-source.csv",
-      "snapshot_sha256": "dcaae531364ce048573217273ef27d3e41ae7651ec49de6d01d44525c9c835ee",
-      "rows": 4462
+      "snapshot": "baseline-source.csv.gz",
+      "snapshot_sha256": "88c918d6960e7f69611d6bf0f4ccd37faf7aca429dd482e81ac3f6875939fb48",
+      "rows": 227562
+    },
+    {
+      "kind": "scoring-truth",
+      "source_path": "outputs/visualization_rolling_revised/inputs/imputed_and_stitched_hosp_2026-04-25.csv",
+      "source_sha256": "58ff14790fc5fa0c3dd5c9daf34ff6219dc07cce0f1ab35e6e88bd4b4c0f226c",
+      "snapshot": "scoring-truth-source.csv",
+      "snapshot_sha256": "8660da0bb33e4e84da97ce0a3cff61cd06ebe2e3bf2f5f4da0e3528c676056fb",
+      "rows": 4182
     },
     {
       "kind": "intervals",

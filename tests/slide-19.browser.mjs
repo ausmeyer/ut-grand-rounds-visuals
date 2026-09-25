@@ -28,7 +28,7 @@ try {
   const settled=async state=>{
     await page.waitForFunction(state=>document.body.dataset.state===String(state)&&Array.from(document.querySelectorAll('.forecast-layer')).every((el,i)=>getComputedStyle(el).opacity===(i===state-1?'1':'0')),state);
     assert.equal(await page.locator('#rwis').textContent(),`rWIS: ${data.scores[state-1].rwis.toFixed(2)}`);
-    assert.match(await page.locator('#score-desc').textContent(),new RegExp(`${data.scores[state-1].n} matched weeks for horizon ${state-1}`));
+    assert.match(await page.locator('#score-desc').textContent(),new RegExp(`${data.scores[state-1].n} matched location-weeks for horizon ${state-1}`));
   };
   let truthPath,axesMarkup;
   for(const state of [1,2,3,4]) {
@@ -99,5 +99,5 @@ try {
   await page.goto(`${url}#state=invalid`);
   await settled(1);
   assert.deepEqual(errors,[]);
-  console.log(`Slide ${slide}: all four horizons, dynamic Texas rWIS, every plotted quantile and observation, continuous weekly coverage, shared axes, label layout, navigation, fades, reduced motion, and offline rendering passed. Screenshots: ${artifacts}`);
+  console.log(`Slide ${slide}: all four horizons, dynamic state/DC rWIS, every plotted quantile and observation, continuous weekly coverage, shared axes, label layout, navigation, fades, reduced motion, and offline rendering passed. Screenshots: ${artifacts}`);
 } finally {await browser.close();}
