@@ -48,19 +48,13 @@ video.addEventListener('seeked', highlight);
 video.addEventListener('loadedmetadata', () => { if (video.paused) video.currentTime = START; }, { once: true });
 if (!embedded) { addEventListener('resize', fit); fit(); }
 
-// Slides.com (reveal.js) posts slide:start / slide:stop to iframes on the visible slide.
-let told = false;
+// Slides.com (reveal.js) posts slide:start / slide:stop to iframes on the visible slide. The deck preloads
+// this frame a few slides ahead, so slide:start arrives on entry; after a direct jump from far away it can
+// arrive before the page loads (the frame cannot tell it is on screen), and the Start button covers that.
 addEventListener('message', e => {
-  if (e.data === 'slide:start') { told = true; playFrom(START); }
-  else if (e.data === 'slide:stop') { told = true; video.pause(); }
+  if (e.data === 'slide:start') playFrom(START);
+  else if (e.data === 'slide:stop') video.pause();
 });
-// When the deck jumps straight to this slide, slide:start can be sent before this page has loaded,
-// so also start once the frame is actually on screen (upcoming slides sit off-screen).
-if (embedded) new IntersectionObserver((entries, io) => {
-  if (!entries.some(e => e.isIntersecting)) return;
-  io.disconnect();
-  setTimeout(() => { if (!told) playFrom(START); }, 300);
-}).observe(document.querySelector('.stage'));
 
 // After a button click the keyboard focus is inside this frame; hand clicker keys back to the deck.
 const deckKeys = { PageDown: 'next', PageUp: 'prev', ' ': 'next', n: 'next', N: 'next', p: 'prev', P: 'prev',
