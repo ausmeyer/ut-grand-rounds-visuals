@@ -2,30 +2,46 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Clay patient journey · deck player</title>
 <!-- Full-slide (1280x720) player for the Slides.com deck: waits on the frame just before the film begins
-     moving until Start is clicked, jumps to each surveillance system, and passes clicker keys back to the deck. -->
+     moving, plays from Start (current position) or Restart, scrubs with a slider, jumps to each surveillance
+     system, and passes clicker keys back to the deck. -->
 <style>
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#fbfaf6} /* opaque: hides the deck's static copy underneath */
-body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#203a3f}
 .stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;margin:-360px 0 0 -640px;transform-origin:center}
-.film{position:absolute;left:64px;top:12px;width:1152px;height:648px;border-radius:14px;overflow:hidden;background:#ded5c6;box-shadow:0 12px 42px rgba(41,57,55,.11)}
+.film{position:absolute;left:80px;top:8px;width:1120px;height:630px;border-radius:14px;overflow:hidden;background:#ded5c6;box-shadow:0 12px 42px rgba(41,57,55,.11)}
 video{display:block;width:100%;height:100%;object-fit:cover}
-nav{position:absolute;left:0;top:670px;width:1280px;height:38px;display:flex;justify-content:center;gap:7px}
-button{display:flex;align-items:center;gap:7px;height:38px;padding:0 11px;box-sizing:border-box;border:1px solid #d7ddd4;border-radius:10px;background:#fffcf5;color:#203a3f;font-family:inherit;font-size:13px;font-weight:600;line-height:1;white-space:nowrap;cursor:pointer;transition:background-color .2s,border-color .2s}
+.transport{position:absolute;left:80px;top:644px;width:1120px;height:32px;display:flex;align-items:center;gap:10px}
+nav{position:absolute;left:0;top:681px;width:1280px;height:32px;display:flex;justify-content:center;gap:7px}
+button{display:flex;align-items:center;gap:7px;height:32px;padding:0 11px;box-sizing:border-box;border:1px solid #d7ddd4;border-radius:10px;background:#fffcf5;color:#203a3f;font-family:inherit;font-size:13px;font-weight:600;line-height:1;white-space:nowrap;cursor:pointer;transition:background-color .2s,border-color .2s}
 button span{font-size:10.5px;font-weight:650;color:#69847c}
 button small{font-size:11px;font-weight:500;color:#6f7d79}
 button:hover,button.active{border-color:#246d70;background:#e3eee6}
 button:focus{outline:none}
+.time{width:34px;font-size:12px;font-weight:650;color:#4d6361;font-variant-numeric:tabular-nums;text-align:center}
+.scrub{position:relative;flex:1;height:32px}
+.scrub i{position:absolute;top:11px;width:2px;height:10px;margin-left:-1px;border-radius:1px;background:#a9bcb6;pointer-events:none}
+input[type=range]{-webkit-appearance:none;appearance:none;position:absolute;left:0;top:0;width:100%;height:32px;margin:0;background:transparent;cursor:pointer}
+input[type=range]:focus{outline:none}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(to right,#246d70 var(--p,0%),#d7ddd4 var(--p,0%))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-5px;border-radius:50%;border:2px solid #246d70;background:#fffcf5;box-shadow:0 1px 3px rgba(41,57,55,.25)}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:#d7ddd4}
+input[type=range]::-moz-range-progress{height:6px;border-radius:3px;background:#246d70}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;border:2px solid #246d70;background:#fffcf5}
 </style></head><body><div class="stage">
 <div class="film"><video id="film" muted playsinline preload="auto" aria-label="Following influenza through U.S. surveillance" poster="poster.png?v=2b57690518cb" src="surveillance_claymation.mp4?v=2b57690518cb"></video></div>
-<nav aria-label="Jump to a surveillance system"><button type="button" data-start="5.8">▶ Start</button><button type="button" data-start="14"><span>01</span>ILINet<small>0:14</small></button><button type="button" data-start="30"><span>02</span>NSSP<small>0:30</small></button><button type="button" data-start="50"><span>03</span>FluSurv-NET<small>0:50</small></button><button type="button" data-start="58"><span>04</span>NHSN<small>0:58</small></button><button type="button" data-start="74"><span>05</span>ICLS<small>1:14</small></button><button type="button" data-start="82"><span>06</span>NREVSS<small>1:22</small></button><button type="button" data-start="104"><span>07</span>NCHS<small>1:44</small></button><button type="button" data-start="112"><span>08</span>Pediatric deaths<small>1:52</small></button></nav>
+<div class="transport"><button type="button" id="start">▶ Start</button><button type="button" id="restart">↺ Restart</button><span class="time" id="now">0:06</span><div class="scrub" id="ticks"><input type="range" id="scrub" min="0" max="132" step="0.1" value="5.8" aria-label="Position in the film"></div><span class="time" id="total">2:12</span></div>
+<nav aria-label="Jump to a surveillance system"><button type="button" data-start="14"><span>01</span>ILINet<small>0:14</small></button><button type="button" data-start="30"><span>02</span>NSSP<small>0:30</small></button><button type="button" data-start="50"><span>03</span>FluSurv-NET<small>0:50</small></button><button type="button" data-start="58"><span>04</span>NHSN<small>0:58</small></button><button type="button" data-start="74"><span>05</span>ICLS<small>1:14</small></button><button type="button" data-start="82"><span>06</span>NREVSS<small>1:22</small></button><button type="button" data-start="104"><span>07</span>NCHS<small>1:44</small></button><button type="button" data-start="112"><span>08</span>Pediatric deaths<small>1:52</small></button></nav>
 </div><script>
 const video = document.querySelector('#film');
-const buttons = [...document.querySelectorAll('[data-start]')];
+const scrub = document.querySelector('#scrub');
+const chapters = [...document.querySelectorAll('[data-start]')];
 const START = 5.8;             // the film holds a still frame for its first 6 s
 const OVERVIEW = 124;          // closing community overview: no chapter highlighted
-const starts = buttons.map(b => Number(b.dataset.start));
+const starts = chapters.map(b => Number(b.dataset.start));
 const embedded = window.parent !== window;
+let scrubbing = false, resumeAfterScrub = false;
 
+const clock = t => `${Math.floor(t / 60)}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
 function playFrom(t) {
   const go = () => { video.currentTime = t; video.play().catch(() => {}); };
   if (video.readyState > 0) go(); else video.addEventListener('loadedmetadata', go, { once: true });
@@ -34,22 +50,51 @@ function cueStart() {  // hold the frame at START, paused, until Start is clicke
   const go = () => { video.pause(); video.currentTime = START; };
   if (video.readyState > 0) go(); else video.addEventListener('loadedmetadata', go, { once: true });
 }
-function highlight() {
-  const t = video.currentTime;
+function paint() {  // slider, clock, and chapter highlight follow the film (or the slider while dragging)
+  const t = scrubbing ? Number(scrub.value) : video.currentTime;
+  if (!scrubbing) scrub.value = t;
+  scrub.style.setProperty('--p', `${(100 * t) / Number(scrub.max)}%`);
+  document.querySelector('#now').textContent = clock(t);
   let k = -1;
   starts.forEach((s, i) => { if (t >= s - 0.05) k = i; });
   if (t >= OVERVIEW - 0.05) k = -1;
-  buttons.forEach((b, i) => b.classList.toggle('active', i === k));
+  chapters.forEach((b, i) => b.classList.toggle('active', i === k));
 }
+function tick() { paint(); if (!video.paused) requestAnimationFrame(tick); }
 function fit() {  // standalone viewing only; in the deck the frame is always 1280x720
   const s = Math.min(innerWidth / 1280, innerHeight / 720);
   if (s > 0) document.querySelector('.stage').style.transform = `scale(${s})`;
 }
 
-buttons.forEach(b => b.addEventListener('click', () => { playFrom(Number(b.dataset.start)); b.blur(); }));
-video.addEventListener('timeupdate', highlight);
-video.addEventListener('seeked', highlight);
-video.addEventListener('loadedmetadata', () => { if (video.paused) video.currentTime = START; }, { once: true });
+document.querySelector('#start').addEventListener('click', e => {
+  if (video.ended || video.currentTime >= video.duration - 0.1) video.currentTime = START;
+  video.play().catch(() => {});
+  e.currentTarget.blur();
+});
+document.querySelector('#restart').addEventListener('click', e => { playFrom(START); e.currentTarget.blur(); });
+chapters.forEach(b => b.addEventListener('click', () => { playFrom(Number(b.dataset.start)); b.blur(); }));
+
+scrub.addEventListener('pointerdown', () => { scrubbing = true; resumeAfterScrub = !video.paused; video.pause(); });
+scrub.addEventListener('input', () => { video.currentTime = Number(scrub.value); paint(); });
+scrub.addEventListener('change', () => {
+  scrubbing = false; scrub.blur();
+  if (resumeAfterScrub) video.play().catch(() => {});
+});
+
+video.addEventListener('play', () => requestAnimationFrame(tick));
+video.addEventListener('timeupdate', paint);
+video.addEventListener('seeked', paint);
+video.addEventListener('loadedmetadata', () => {
+  scrub.max = video.duration;
+  document.querySelector('#total').textContent = clock(video.duration);
+  starts.forEach(s => {  // chapter marks on the slider track (the thumb centre travels 8px..width-8px)
+    const mark = document.createElement('i');
+    mark.style.left = `calc(8px + (100% - 16px) * ${s / video.duration})`;
+    document.querySelector('#ticks').appendChild(mark);
+  });
+  if (video.paused) video.currentTime = START;
+  paint();
+}, { once: true });
 if (!embedded) { addEventListener('resize', fit); fit(); }
 
 // Slides.com (reveal.js) posts slide:start / slide:stop to iframes on the visible slide:
@@ -59,7 +104,7 @@ addEventListener('message', e => {
   else if (e.data === 'slide:stop') video.pause();
 });
 
-// After a button click the keyboard focus is inside this frame; hand clicker keys back to the deck.
+// After a click the keyboard focus is inside this frame; hand clicker keys back to the deck.
 const deckKeys = { PageDown: 'next', PageUp: 'prev', ' ': 'next', n: 'next', N: 'next', p: 'prev', P: 'prev',
   ArrowRight: 'right', ArrowLeft: 'left', ArrowDown: 'down', ArrowUp: 'up',
   b: 'togglePause', B: 'togglePause', '.': 'togglePause', o: 'toggleOverview', O: 'toggleOverview', Escape: 'toggleOverview' };
