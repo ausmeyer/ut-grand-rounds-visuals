@@ -78,9 +78,10 @@
         <text id="takeaway" x="917" y="438" text-anchor="middle" font-size="20" font-weight="600"></text>
       </svg>
       <div class="controls">
-        <button id="one" aria-pressed="true">1 · One scenario</button>
-        <button id="samples" aria-pressed="false">2 · Sample scenarios</button>
-        <button id="average" aria-pressed="false">3 · Average outcomes</button>
+        <button id="landing" aria-pressed="true">1 · Start</button>
+        <button id="one" aria-pressed="false">2 · One scenario</button>
+        <button id="samples" aria-pressed="false">3 · Sample scenarios</button>
+        <button id="average" aria-pressed="false">4 · Average outcomes</button>
         <span id="control-hint">Arrow keys to advance</span>
         <button id="reset" aria-label="Reset demonstration" title="Reset">↺</button>
       </div>
@@ -99,7 +100,7 @@
     const DX = j => 680 + j / 28 * 474;
     const DY = r => 356 - r / DATA.decision_y_max * 282;
     const reducedMotion = matchMedia('(prefers-reduced-motion:reduce)').matches;
-    let stage = 1, animation = 0, awaitingAnimation = false;
+    let stage = 1, animation = 0;
     function element(tag,attrs,parent,text) {
       const el=document.createElementNS(NS,tag);
       for(const [key,value] of Object.entries(attrs)) el.setAttribute(key,value);
@@ -147,12 +148,12 @@
         const selected=i===active;
         ep[i].setAttribute('stroke',selected?'#647b7d':'#a4b0b0');
         ep[i].setAttribute('stroke-width',selected?2.4:1.4);
-        ep[i].setAttribute('opacity',selected?1:stage===3?.45:.7);
+        ep[i].setAttribute('opacity',selected?1:stage===4?.45:.7);
         pr[i].setAttribute('stroke','#0a6670'); pr[i].setAttribute('stroke-width',selected?2.4:1.4);
-        pr[i].setAttribute('opacity',selected?1:stage===3?.24:.32);
+        pr[i].setAttribute('opacity',selected?1:stage===4?.24:.32);
         dc[i].setAttribute('stroke',selected?'#0a6670':'#9ba9a9');
         dc[i].setAttribute('stroke-width',selected?2.5:1.5);
-        dc[i].setAttribute('opacity',selected?1:stage===3?.32:.66);
+        dc[i].setAttribute('opacity',selected?1:stage===4?.32:.66);
       });
       $('season-label').textContent=active>=0?examples[active].season:'';
     }
@@ -172,10 +173,9 @@
       $('active-point').setAttribute('cx',DX(index)); $('active-point').setAttribute('cy',DY(total));
     }
     function animate(duration,tick,done=()=>{}) {
-      let start;
+      const start=performance.now();
       function frame(now) {
-        start??=now;
-        const p=Math.min(1,(now-start)/duration); tick(p);
+        const p=Math.max(0,Math.min(1,(now-start)/duration)); tick(p);
         if(p<1) animation=requestAnimationFrame(frame); else { done(); announce(); }
       }
       animation=requestAnimationFrame(frame);
@@ -183,6 +183,7 @@
     function announce() {
       $('chart-desc').textContent=[
         '',
+        'One original simulated epidemic and protection curve. Advance to compare vaccination dates for this scenario.',
         'One original simulated epidemic and protection curve. Vaccination dates change the shaded remaining burden and trace one date-comparison curve.',
         'Ten sampled scenarios are shown. Each epidemic and vaccine-protection pair generates its own curve of total burden remaining by vaccination date.',
         'The bold teal curve averages total remaining burden across all 5,000 original simulations. The marked minimum chooses one vaccination week before the season. Faint curves show only ten examples, not the full distribution.'
@@ -191,46 +192,41 @@
     }
     function setStage(value,play=true) {
       cancelAnimationFrame(animation); stage=value; document.body.dataset.state=value;
-      awaitingAnimation=!play&&!reducedMotion&&(value===1||value===2);
-      $('control-hint').textContent=awaitingAnimation?'Advance to play animation':'Arrow keys to advance';
       history.replaceState(null,'',`#state=${value}`);
-      ['one','samples','average'].forEach((id,i)=>$(id).setAttribute('aria-pressed',value===i+1));
-      $('step-copy').textContent=['','One possible epidemic and protection curve','The same comparison across sampled scenarios','Choose the date with the lowest average burden'][value];
-      $('sample-count').textContent=value===1?'1 of 5,000 scenarios shown':'10 of 5,000 scenarios shown';
-      $('curve-label').textContent=['','One scenario','Ten example scenarios','Average of all 5,000 scenarios'][value];
-      $('curve-label').style.fill=value===3?'#0a6670':'#647278';
-      $('curve-label').setAttribute('font-weight',value===3?650:400);
-      $('curve-key').setAttribute('stroke',value===3?'#0a6670':'#647b7d');
-      $('curve-key').setAttribute('stroke-width',value===3?4:2);
-      $('takeaway').textContent=value===3?'One week chosen before the season':value===2?'Each pairing gives a different curve':'Each date gives one point';
-      for(const id of ['residual-line','residual-area','vaccination-marker','dose-label','active-decision','active-point']) visible(id,value===1);
-      visible('mean-curve',value===3); visible('minimum',value===3);
-      if(value===1) {
+      ['landing','one','samples','average'].forEach((id,i)=>$(id).setAttribute('aria-pressed',value===i+1));
+      $('step-copy').textContent=['','Start with one epidemic and protection curve','One possible epidemic and protection curve','The same comparison across sampled scenarios','Choose the date with the lowest average burden'][value];
+      $('sample-count').textContent=value<=2?'1 of 5,000 scenarios shown':'10 of 5,000 scenarios shown';
+      $('curve-label').textContent=['','','One scenario','Ten example scenarios','Average of all 5,000 scenarios'][value];
+      $('curve-label').style.fill=value===4?'#0a6670':'#647278';
+      $('curve-label').setAttribute('font-weight',value===4?650:400);
+      $('curve-key').setAttribute('stroke',value===4?'#0a6670':'#647b7d');
+      $('curve-key').setAttribute('stroke-width',value===4?4:2);
+      visible('curve-key',value>1);
+      $('takeaway').textContent=['','','Each date gives one point','Each pairing gives a different curve','One week chosen before the season'][value];
+      for(const id of ['residual-line','residual-area','vaccination-marker','dose-label','active-decision','active-point']) visible(id,value===2);
+      visible('mean-curve',value===4); visible('minimum',value===4);
+      if(value<=2) {
         samples(1,0); dc[0].style.display='none'; renderDate(8);
-        if(play&&!reducedMotion) animate(3800,p=>renderDate(p*28,true),()=>animate(700,p=>renderDate(28-20*p),()=>renderDate(8)));
-      } else if(value===2&&play&&!reducedMotion) {
+        if(value===2&&play&&!reducedMotion) animate(3800,p=>renderDate(p*28,true),()=>animate(700,p=>renderDate(28-20*p),()=>renderDate(8)));
+      } else if(value===3&&play&&!reducedMotion) {
         samples(1,0);
         $('sample-count').textContent='1 of 5,000 scenarios shown';
         animate(5000,p=>{const count=Math.min(10,1+Math.floor(p*10));samples(count,count-1);$('sample-count').textContent=`${count} of 5,000 scenarios shown`;},()=>samples(10));
       } else samples(10);
       announce();
     }
-    function advance() { setStage(awaitingAnimation?stage:Math.min(3,stage+1)); }
-    ['one','samples','average'].forEach((id,i)=>$(id).addEventListener('click',()=>setStage(i+1)));
+    ['landing','one','samples','average'].forEach((id,i)=>$(id).addEventListener('click',()=>setStage(i+1)));
     $('reset').addEventListener('click',()=>setStage(1,false));
     document.addEventListener('keydown',event=>{
-      if(event.repeat||(event.target.tagName==='BUTTON'&&event.key===' ')) return;
+      if(event.target.tagName==='BUTTON'&&event.key===' ') return;
       if(['ArrowRight','PageDown',' ','ArrowLeft','PageUp','Home'].includes(event.key)) {
-        event.preventDefault();
-        if(event.key==='Home') setStage(1,false);
-        else if(['ArrowLeft','PageUp'].includes(event.key)) setStage(Math.max(1,stage-1));
-        else advance();
+        event.preventDefault(); setStage(event.key==='Home'?1:['ArrowLeft','PageUp'].includes(event.key)?Math.max(1,stage-1):Math.min(4,stage+1));
       }
     });
     function fit() { document.documentElement.style.setProperty('--scale',Math.min(innerWidth/1280,innerHeight/720)); }
     addEventListener('resize',fit); fit();
     const hash=new URLSearchParams(location.hash.slice(1));
-    setStage(Math.max(1,Math.min(3,Number(hash.get('state'))||1)),false);
+    setStage(Math.max(1,Math.min(4,Number(hash.get('state'))||1)),false);
   </script>
 </body>
 </html>

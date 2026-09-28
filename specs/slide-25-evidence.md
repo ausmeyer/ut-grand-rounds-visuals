@@ -2,8 +2,9 @@
 
 Standalone slide 25 follows the single-scenario illustration on slide 24.
 Its title is “We compare vaccination dates across many plausible seasons and
-waning scenarios.” The three views show one pair, ten sampled pairs, and the
-mean remaining burden across all 5,000 original primary-analysis simulations.
+waning scenarios.” A static landing view precedes three builds showing one
+pair, ten sampled pairs, and the mean remaining burden across all 5,000
+original primary-analysis simulations.
 
 ## Files and build
 
@@ -79,34 +80,34 @@ plots use calendar position and weeks since vaccination, respectively.
 
 ## Presenter behavior
 
-`#state=1`, `#state=2`, and `#state=3` open the three resting views. Clicking
-“One scenario” traces the date comparison and returns to an example date.
-“Sample scenarios” reveals the ten paired inputs and outputs over five seconds.
-“Average outcomes” immediately overlays the mean from all 5,000 simulations
-and its minimum. The exact week label is reserved for the following slide.
+The four states are:
 
-Arrow keys, Page Up/Down, and Space control the builds. On page load, the
-initial view stays still and says “Advance to play animation.” The first
-forward advance plays that view's animation; the next advances to the next
-view. This also applies when opening directly at `#state=2`. The numbered
-buttons remain direct choices that play the selected view. Reset and Home
-restore the first resting view and rearm its animation. Held-key repeats are
-ignored. Reduced-motion preferences skip animation and advance directly.
-No week slider is included because the preceding slide already provides
-date exploration.
+1. **Start** (`#state=1`): one epidemic/protection pair, held still, with an
+   empty date-comparison plot.
+2. **One scenario** (`#state=2`): entering this state traces the date comparison
+   and returns to an example date.
+3. **Sample scenarios** (`#state=3`): entering this state reveals the ten paired
+   inputs and outputs over five seconds.
+4. **Average outcomes** (`#state=4`): the mean from all 5,000 simulations and
+   its minimum appear immediately. The exact week label is reserved for the
+   following slide.
 
-When integrating the slide, route forward navigation through `advance()`;
-it plays any pending opening animation before selecting the next view.
-The initial-advance sequence, second advance, direct numbered choices,
-direct state-2 load, Reset, and Home were verified in the browser.
+Right arrow, Page Down, or Space advances one state. Left arrow and Page Up
+move back. Reset and Home return to the static landing state. The numbered
+buttons select their states directly. Loading any hash opens a resting view;
+animations play on transitions into states 2 and 3. Reduced-motion preferences
+show their completed views. No week slider is included because the preceding
+slide already provides date exploration.
 
-Playback timing starts with the first animation frame. Using a preceding
-`performance.now()` reading could produce negative progress on that frame,
-an invalid date index, and a playback error. The regression check
-`node --test tests/slide-25-animation.test.mjs` reproduces that clock ordering
-and verifies progress from zero through completion in both source and build.
+For integration, use ordinary state transitions through `setStage(value)`.
+The original three states are now numbered 2–4. There is no pending-animation
+flag or separate first-advance action.
 
-Local browser checks passed for all three rendered views at 1280 × 720, both
+The regression check `node --test tests/slide-25-animation.test.mjs` verifies
+that animation progress stays in [0, 1], including when a frame timestamp
+precedes the timer's starting value.
+
+Local browser checks cover the four states, both
 animation completions, arrow-key navigation, interruption of an animation by
 the next build, and reset. The rendered mean path contains 29 points and its
 minimum marker agrees with point 12 (week 47). All ten input/output paths are

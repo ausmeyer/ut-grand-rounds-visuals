@@ -4,7 +4,7 @@ import {readFile} from 'node:fs/promises';
 import {runInNewContext} from 'node:vm';
 
 for(const file of ['src/slide-25.html','docs/slide-25.html']) {
-  test(`${file}: playback uses the first frame as its time origin`,async()=>{
+  test(`${file}: playback progress stays between zero and one`,async()=>{
     const html=await readFile(new URL(`../${file}`,import.meta.url),'utf8');
     const animate=html.match(/    function animate\([\s\S]*?(?=    function announce\()/)[0];
     const frames=[], progress=[];
@@ -20,7 +20,7 @@ for(const file of ['src/slide-25.html','docs/slide-25.html']) {
     // A browser's frame timestamp can precede performance.now() at startup.
     frames.shift()(100);
     assert.equal(progress[0],0);
-    frames.shift()(150);
+    frames.shift()(155);
     assert.equal(progress[1],.5);
     assert.equal(completed,0);
     frames.shift()(250);
