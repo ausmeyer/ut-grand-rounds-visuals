@@ -99,7 +99,7 @@
     const DX = j => 680 + j / 28 * 474;
     const DY = r => 356 - r / DATA.decision_y_max * 282;
     const reducedMotion = matchMedia('(prefers-reduced-motion:reduce)').matches;
-    let stage = 1, animation = 0;
+    let stage = 1, animation = 0, awaitingAnimation = false;
     function element(tag,attrs,parent,text) {
       const el=document.createElementNS(NS,tag);
       for(const [key,value] of Object.entries(attrs)) el.setAttribute(key,value);
@@ -190,6 +190,8 @@
     }
     function setStage(value,play=true) {
       cancelAnimationFrame(animation); stage=value; document.body.dataset.state=value;
+      awaitingAnimation=!play&&!reducedMotion&&(value===1||value===2);
+      $('control-hint').textContent=awaitingAnimation?'Advance to play animation':'Arrow keys to advance';
       history.replaceState(null,'',`#state=${value}`);
       ['one','samples','average'].forEach((id,i)=>$(id).setAttribute('aria-pressed',value===i+1));
       $('step-copy').textContent=['','One possible epidemic and protection curve','The same comparison across sampled scenarios','Choose the date with the lowest average burden'][value];
@@ -212,12 +214,16 @@
       } else samples(10);
       announce();
     }
+    function advance() { setStage(awaitingAnimation?stage:Math.min(3,stage+1)); }
     ['one','samples','average'].forEach((id,i)=>$(id).addEventListener('click',()=>setStage(i+1)));
     $('reset').addEventListener('click',()=>setStage(1,false));
     document.addEventListener('keydown',event=>{
-      if(event.target.tagName==='BUTTON'&&event.key===' ') return;
+      if(event.repeat||(event.target.tagName==='BUTTON'&&event.key===' ')) return;
       if(['ArrowRight','PageDown',' ','ArrowLeft','PageUp','Home'].includes(event.key)) {
-        event.preventDefault(); setStage(event.key==='Home'?1:['ArrowLeft','PageUp'].includes(event.key)?Math.max(1,stage-1):Math.min(3,stage+1));
+        event.preventDefault();
+        if(event.key==='Home') setStage(1,false);
+        else if(['ArrowLeft','PageUp'].includes(event.key)) setStage(Math.max(1,stage-1));
+        else advance();
       }
     });
     function fit() { document.documentElement.style.setProperty('--scale',Math.min(innerWidth/1280,innerHeight/720)); }

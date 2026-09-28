@@ -85,9 +85,20 @@ plots use calendar position and weeks since vaccination, respectively.
 “Average outcomes” immediately overlays the mean from all 5,000 simulations
 and its minimum. The exact week label is reserved for the following slide.
 
-Arrow keys, Page Up/Down, and Space advance the builds. Reset restores the
-first resting view. Reduced-motion preferences skip animation. No week slider
-is included because the preceding slide already provides date exploration.
+Arrow keys, Page Up/Down, and Space control the builds. On page load, the
+initial view stays still and says “Advance to play animation.” The first
+forward advance plays that view's animation; the next advances to the next
+view. This also applies when opening directly at `#state=2`. The numbered
+buttons remain direct choices that play the selected view. Reset and Home
+restore the first resting view and rearm its animation. Held-key repeats are
+ignored. Reduced-motion preferences skip animation and advance directly.
+No week slider is included because the preceding slide already provides
+date exploration.
+
+When integrating the slide, route forward navigation through `advance()`;
+it plays any pending opening animation before selecting the next view.
+The initial-advance sequence, second advance, direct numbered choices,
+direct state-2 load, Reset, and Home were verified in the browser.
 
 Local browser checks passed for all three rendered views at 1280 × 720, both
 animation completions, arrow-key navigation, interruption of an animation by
