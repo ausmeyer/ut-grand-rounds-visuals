@@ -93,6 +93,7 @@
     const $ = id => document.getElementById(id);
     const NS = 'http://www.w3.org/2000/svg';
     const examples = DATA.scenarios;
+    const scenarioBestIndex = examples[0].remaining.indexOf(Math.min(...examples[0].remaining));
     const BX = t => 64 + (t + .5) / 40 * 360;
     const BY = b => 196 - b / DATA.burden_y_max * 130;
     const PX = t => 64 + t / 36 * 360;
@@ -184,7 +185,7 @@
       $('chart-desc').textContent=[
         '',
         'One original simulated epidemic and protection curve. Advance to compare vaccination dates for this scenario.',
-        'One original simulated epidemic and protection curve. Vaccination dates change the shaded remaining burden and trace one date-comparison curve.',
+        'One original simulated epidemic and protection curve. Vaccination dates change the shaded remaining burden and trace one date-comparison curve. The animation ends at the minimum for this scenario.',
         'Ten sampled scenarios are shown. Each epidemic and vaccine-protection pair generates its own curve of total burden remaining by vaccination date.',
         'The bold teal curve averages total remaining burden across all 5,000 original simulations. The marked minimum chooses one vaccination week before the season. Faint curves show only ten examples, not the full distribution.'
       ][stage];
@@ -206,8 +207,8 @@
       for(const id of ['residual-line','residual-area','vaccination-marker','dose-label','active-decision','active-point']) visible(id,value===2);
       visible('mean-curve',value===4); visible('minimum',value===4);
       if(value<=2) {
-        samples(1,0); dc[0].style.display='none'; renderDate(8);
-        if(value===2&&play&&!reducedMotion) animate(3800,p=>renderDate(p*28,true),()=>animate(700,p=>renderDate(28-20*p),()=>renderDate(8)));
+        samples(1,0); dc[0].style.display='none'; renderDate(scenarioBestIndex);
+        if(value===2&&play&&!reducedMotion) animate(3800,p=>renderDate(p*28,true),()=>animate(700,p=>renderDate(28-(28-scenarioBestIndex)*p),()=>renderDate(scenarioBestIndex)));
       } else if(value===3&&play&&!reducedMotion) {
         samples(1,0);
         $('sample-count').textContent='1 of 5,000 scenarios shown';

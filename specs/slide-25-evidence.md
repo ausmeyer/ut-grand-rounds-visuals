@@ -85,7 +85,9 @@ The four states are:
 1. **Start** (`#state=1`): one epidemic/protection pair, held still, with an
    empty date-comparison plot.
 2. **One scenario** (`#state=2`): entering this state traces the date comparison
-   and returns to an example date.
+   and settles at that scenario's minimum remaining burden. The date is
+   calculated from its own curve (week 47 for the displayed scenario),
+   including in the resting and reduced-motion views.
 3. **Sample scenarios** (`#state=3`): entering this state reveals the ten paired
    inputs and outputs over five seconds.
 4. **Average outcomes** (`#state=4`): the mean from all 5,000 simulations and
@@ -105,7 +107,9 @@ flag or separate first-advance action.
 
 The regression check `node --test tests/slide-25-animation.test.mjs` verifies
 that animation progress stays in [0, 1], including when a frame timestamp
-precedes the timer's starting value.
+precedes the timer's starting value. It also checks that animated, resting,
+and reduced-motion stage 2 views finish at the displayed scenario's minimum,
+independently of the pooled mean's minimum.
 
 Local browser checks cover the four states, both
 animation completions, arrow-key navigation, interruption of an animation by
