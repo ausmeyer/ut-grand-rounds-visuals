@@ -72,6 +72,7 @@ python3 scripts/build_slide_19.py
 python3 scripts/build_slide_20.py
 python3 scripts/build_slide_21.py
 python3 scripts/build_slide_24.py
+python3 scripts/build_slide_25.py
 ```
 
 Standalone **slide 24** is the Section III vaccination-timing demonstration.
@@ -82,6 +83,13 @@ vaccination-week slider. The published slide is
 Its editable source is `src/slide-24.html`. The [source and handoff notes](specs/slide-24-evidence.md)
 record its data, calculation checks, and numbering. Its filename follows the
 standalone outline, not the Slides.com deck's physical slide positions.
+
+Standalone **slide 25** compares vaccination dates across plausible seasons
+and waning scenarios. [Open the slide](https://ausmeyer.github.io/ut-grand-rounds-visuals/slide-25.html)
+or edit `src/slide-25.html`. Ten sampled scenarios illustrate the uncertainty;
+the final mean uses all 5,000 original primary-analysis simulations.
+[Source and handoff notes](specs/slide-25-evidence.md) describe the extraction,
+numerical checks, and three presenter-controlled views.
 
 `build_surveillance_section.py` reads the already-downloaded CSV files from
 `../data/processed/` and embeds compact chart data directly into the published
