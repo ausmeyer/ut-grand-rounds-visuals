@@ -100,6 +100,12 @@ it plays any pending opening animation before selecting the next view.
 The initial-advance sequence, second advance, direct numbered choices,
 direct state-2 load, Reset, and Home were verified in the browser.
 
+Playback timing starts with the first animation frame. Using a preceding
+`performance.now()` reading could produce negative progress on that frame,
+an invalid date index, and a playback error. The regression check
+`node --test tests/slide-25-animation.test.mjs` reproduces that clock ordering
+and verifies progress from zero through completion in both source and build.
+
 Local browser checks passed for all three rendered views at 1280 × 720, both
 animation completions, arrow-key navigation, interruption of an animation by
 the next build, and reset. The rendered mean path contains 29 points and its

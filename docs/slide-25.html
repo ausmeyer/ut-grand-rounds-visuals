@@ -172,8 +172,9 @@
       $('active-point').setAttribute('cx',DX(index)); $('active-point').setAttribute('cy',DY(total));
     }
     function animate(duration,tick,done=()=>{}) {
-      const start=performance.now();
+      let start;
       function frame(now) {
+        start??=now;
         const p=Math.min(1,(now-start)/duration); tick(p);
         if(p<1) animation=requestAnimationFrame(frame); else { done(); announce(); }
       }
