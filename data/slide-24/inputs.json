@@ -1,0 +1,236 @@
+{
+  "slide": 24,
+  "section_slide": 2,
+  "season": "2017/18",
+  "location": "United States",
+  "kind": "One historical fitted season and one illustrative protection setting, not the pooled manuscript result",
+  "parameters": {
+    "initial_ve": 0.5677509714861295,
+    "beta_wane_per_28d": 0.14854546674470043,
+    "immune_lag_weeks": 2,
+    "selection": "Marginal medians of the saved primary all-age initial VE and waning draws; fixed two-week lag"
+  },
+  "weeks": [
+    {
+      "week": 36,
+      "date": "2017-09-03",
+      "burden": 0.010343537461441014
+    },
+    {
+      "week": 37,
+      "date": "2017-09-10",
+      "burden": 0.0108356091046746
+    },
+    {
+      "week": 38,
+      "date": "2017-09-17",
+      "burden": 0.011366924458504395
+    },
+    {
+      "week": 39,
+      "date": "2017-09-24",
+      "burden": 0.011858755106569141
+    },
+    {
+      "week": 40,
+      "date": "2017-10-01",
+      "burden": 0.012251568808829187
+    },
+    {
+      "week": 41,
+      "date": "2017-10-08",
+      "burden": 0.01273289588610378
+    },
+    {
+      "week": 42,
+      "date": "2017-10-15",
+      "burden": 0.013594590826595709
+    },
+    {
+      "week": 43,
+      "date": "2017-10-22",
+      "burden": 0.015094596524422013
+    },
+    {
+      "week": 44,
+      "date": "2017-10-29",
+      "burden": 0.01696306928934022
+    },
+    {
+      "week": 45,
+      "date": "2017-11-05",
+      "burden": 0.018575963574610246
+    },
+    {
+      "week": 46,
+      "date": "2017-11-12",
+      "burden": 0.019407981907737553
+    },
+    {
+      "week": 47,
+      "date": "2017-11-19",
+      "burden": 0.020310624075741517
+    },
+    {
+      "week": 48,
+      "date": "2017-11-26",
+      "burden": 0.022727622347174476
+    },
+    {
+      "week": 49,
+      "date": "2017-12-03",
+      "burden": 0.0282777730983456
+    },
+    {
+      "week": 50,
+      "date": "2017-12-10",
+      "burden": 0.03685482171766893
+    },
+    {
+      "week": 51,
+      "date": "2017-12-17",
+      "burden": 0.04619446309953996
+    },
+    {
+      "week": 52,
+      "date": "2017-12-24",
+      "burden": 0.05234481850840344
+    },
+    {
+      "week": 1,
+      "date": "2017-12-31",
+      "burden": 0.05568189990479436
+    },
+    {
+      "week": 2,
+      "date": "2018-01-07",
+      "burden": 0.05901234057270211
+    },
+    {
+      "week": 3,
+      "date": "2018-01-14",
+      "burden": 0.06478097103481939
+    },
+    {
+      "week": 4,
+      "date": "2018-01-21",
+      "burden": 0.07119751194618812
+    },
+    {
+      "week": 5,
+      "date": "2018-01-28",
+      "burden": 0.07423400075333285
+    },
+    {
+      "week": 6,
+      "date": "2018-02-04",
+      "burden": 0.07061497842432798
+    },
+    {
+      "week": 7,
+      "date": "2018-02-11",
+      "burden": 0.061510537429708516
+    },
+    {
+      "week": 8,
+      "date": "2018-02-18",
+      "burden": 0.05034168863126508
+    },
+    {
+      "week": 9,
+      "date": "2018-02-25",
+      "burden": 0.04009626084488289
+    },
+    {
+      "week": 10,
+      "date": "2018-03-04",
+      "burden": 0.03230515355593698
+    },
+    {
+      "week": 11,
+      "date": "2018-03-11",
+      "burden": 0.027077632474957394
+    },
+    {
+      "week": 12,
+      "date": "2018-03-18",
+      "burden": 0.0238632806120469
+    },
+    {
+      "week": 13,
+      "date": "2018-03-25",
+      "burden": 0.021730153657234765
+    },
+    {
+      "week": 14,
+      "date": "2018-04-01",
+      "burden": 0.019874676176526683
+    },
+    {
+      "week": 15,
+      "date": "2018-04-08",
+      "burden": 0.017861638932547226
+    },
+    {
+      "week": 16,
+      "date": "2018-04-15",
+      "burden": 0.01593289265486462
+    },
+    {
+      "week": 17,
+      "date": "2018-04-22",
+      "burden": 0.01440711892214885
+    },
+    {
+      "week": 18,
+      "date": "2018-04-29",
+      "burden": 0.013422033814881683
+    },
+    {
+      "week": 19,
+      "date": "2018-05-06",
+      "burden": 0.012775390121284608
+    },
+    {
+      "week": 20,
+      "date": "2018-05-13",
+      "burden": 0.01223615085932442
+    },
+    {
+      "week": 21,
+      "date": "2018-05-20",
+      "burden": 0.011637465474342915
+    },
+    {
+      "week": 22,
+      "date": "2018-05-27",
+      "burden": 0.011008738112830962
+    }
+  ],
+  "sources": [
+    {
+      "path": "outputs/primary/figure_source_data/figure_s3_national_surveillance_densities_source_data.csv",
+      "sha256": "3e768b1e1a49540bb4b7af9f5e7614487dd9693f64130e0bb59ee16b0edf3128"
+    },
+    {
+      "path": "outputs/primary/tables/gam_primary_ve_waning_draws.csv",
+      "sha256": "9e54eae63f2ffe1cad53e57abc4c74bed823d57ed5c797b7a65acb6be3133630"
+    },
+    {
+      "path": "R/decision_engine.R",
+      "sha256": "16b2d16341f395691ebbab28efc3002f77e71787c0a6cba5256d368d5b0d1ab0"
+    },
+    {
+      "path": "R/calendar.R",
+      "sha256": "0d5cd7ad71443ae9ff72e902571d0ece6f0986ac179dfa2137c38334d7e8eeb1"
+    }
+  ],
+  "curve_selection": "measure=ILI; season=2017/18; source_week_present=TRUE; sorted by elapsed_week",
+  "numbering": {
+    "verified": "2026-09-28",
+    "deck_id": 3683922,
+    "preceding_slide_count": 47,
+    "preceding_slide_id": "77acc8adaf65",
+    "preceding_slide_title": "Poll question #3 results"
+  }
+}

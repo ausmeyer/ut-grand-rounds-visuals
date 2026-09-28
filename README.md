@@ -10,7 +10,7 @@ branch.
 docs/       Published HTML files used by Slides.com iframes
 specs/      Design and behavior specifications
 data/       Source data for the visuals
-src/        HTML source templates
+src/        Editable HTML sources
 scripts/    Reproducible build scripts
 ```
 
@@ -71,7 +71,17 @@ python3 scripts/build_slide_18.py
 python3 scripts/build_slide_19.py
 python3 scripts/build_slide_20.py
 python3 scripts/build_slide_21.py
+python3 scripts/build_slide_24.py
 ```
+
+Standalone **slide 24** is the Section III vaccination-timing demonstration.
+It follows Poll #3, which supplies the section's opening question. Open
+`docs/slide-24.html` for the complete slide, with three narrative views and a
+vaccination-week slider. The published slide is
+[slide-24.html](https://ausmeyer.github.io/ut-grand-rounds-visuals/slide-24.html).
+Its editable source is `src/slide-24.html`. The [source and handoff notes](specs/slide-24-evidence.md)
+record its data, calculation checks, and numbering. Its filename follows the
+standalone outline, not the Slides.com deck's physical slide positions.
 
 `build_surveillance_section.py` reads the already-downloaded CSV files from
 `../data/processed/` and embeds compact chart data directly into the published

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Slide 24 · Vaccination timing and remaining burden</title>
+  <style>
+    :root { --paper:#fbfaf6; --ink:#14242b; --muted:#647278; --teal:#0a6670; --line:#d5dad6; --red:#933a4b; }
+    * { box-sizing:border-box; }
+    html,body { width:100%; height:100%; margin:0; overflow:hidden; }
+    body { background:var(--paper); color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+    .slide { position:absolute; width:1280px; height:720px; left:50%; top:50%; transform:translate(-50%,-50%) scale(var(--scale,1)); transform-origin:center; }
+    h1 { position:absolute; left:50px; top:72px; width:1180px; margin:0; font-family:Montserrat,Inter,ui-sans-serif,system-ui,sans-serif; font-size:37px; line-height:1.2; font-weight:550; letter-spacing:-.8px; }
+    .visual { position:absolute; left:20px; top:160px; width:1240px; height:540px; }
+    .topbar { height:38px; padding:0 16px; display:flex; align-items:center; justify-content:space-between; }
+    #step-copy { font-size:19px; font-weight:650; }
+    .example { font-size:15px; color:var(--muted); }
+    .frame { height:440px; margin:8px 16px 0; border:1px solid var(--line); border-radius:14px; background:white; box-shadow:0 8px 24px rgb(28 49 50 / 7%); }
+    svg { display:block; width:100%; height:100%; overflow:visible; }
+    svg text { fill:var(--ink); font-family:inherit; }
+    .axis { font-size:14px; fill:var(--muted); }
+    .plot-label { font-size:16px; font-weight:650; }
+    .grid { stroke:#e8ece9; stroke-width:1; }
+    .baseline { stroke:#9ba5a6; stroke-width:2; stroke-dasharray:5 5; fill:none; }
+    .remaining { stroke:var(--teal); stroke-width:2.6; fill:none; stroke-linejoin:round; }
+    .vaccination { stroke:var(--red); stroke-width:2; }
+    .controls { height:54px; padding:8px 17px 0; display:flex; align-items:center; gap:16px; }
+    .slider-label { min-width:120px; font-size:14px; font-weight:650; }
+    input[type=range] { accent-color:var(--red); cursor:pointer; width:540px; margin:0 7px 0 0; }
+    button { border:1px solid #b9c3c0; border-radius:8px; background:white; color:var(--ink); height:34px; font:inherit; font-size:13px; font-weight:650; cursor:pointer; padding:0 15px; white-space:nowrap; }
+    button:hover { border-color:var(--teal); }
+    button[aria-pressed=true] { color:var(--teal); border-color:var(--teal); background:#edf6f4; }
+    button:focus-visible,input:focus-visible { outline:3px solid #82bcc1; outline-offset:3px; }
+    #reset { padding:0 10px; font-size:19px; margin-left:auto; }
+    #decision-panel { opacity:0; transition:opacity .3s; }
+    .compare #decision-panel { opacity:1; }
+    #best-note { opacity:0; }
+    .at-best #best-note { opacity:1; }
+    .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+    @media(prefers-reduced-motion:reduce) { #decision-panel { transition:none; } }
+  </style>
+</head>
+<body>
+  <main class="slide" aria-label="Slide 24. The best date minimizes the burden left unprotected">
+    <h1>The best date minimizes the burden left unprotected</h1>
+    <section class="visual" aria-label="Vaccination timing demonstration">
+      <header class="topbar"><span id="step-copy"></span><span class="example">2017/18 U.S. season · one illustrative protection curve</span></header>
+      <div class="frame">
+        <svg viewBox="0 0 1208 440" role="img" aria-labelledby="chart-title chart-desc">
+          <title id="chart-title">Vaccination timing and the total outpatient burden remaining</title>
+          <desc id="chart-desc"></desc>
+          <defs><clipPath id="main-clip"><rect x="66" y="178" width="758" height="207"/></clipPath></defs>
+          <text class="plot-label" x="66" y="28">Vaccine protection</text>
+          <g id="protection-grid"></g>
+          <rect id="lag-band" y="44" height="90" fill="#933a4b" opacity=".065"/>
+          <path id="protection-curve" fill="none" stroke="#0a6670" stroke-width="2.5"/>
+          <line id="vax-line-top" class="vaccination" y1="40" y2="136"/>
+          <text id="lag-label" y="157" font-size="13" style="fill:var(--red)">2-week response lag</text>
+          <text class="plot-label" x="66" y="193">Weekly share of seasonal outpatient burden</text>
+          <g id="burden-grid"></g>
+          <g clip-path="url(#main-clip)">
+            <path id="remaining-area" fill="#b8d9d5" opacity=".82"/>
+            <path id="baseline-curve" class="baseline"/>
+            <path id="remaining-curve" class="remaining"/>
+            <line id="vax-line-main" class="vaccination" y1="205" y2="385"/>
+          </g>
+          <g id="month-axis"></g>
+          <line x1="66" x2="824" y1="385" y2="385" stroke="#bac4c0"/>
+          <line x1="66" x2="87" y1="428" y2="428" class="baseline"/><text class="axis" x="95" y="432">Before protection</text>
+          <rect x="252" y="422" width="22" height="12" fill="#b8d9d5"/><line x1="252" x2="274" y1="422" y2="422" stroke="#0a6670" stroke-width="2"/><text class="axis" x="282" y="432">Burden remaining</text>
+          <text class="axis" x="824" y="432" text-anchor="end">Week of the season</text>
+          <line x1="854" x2="854" y1="24" y2="414" stroke="#e0e5e1"/>
+          <text x="888" y="35" font-size="14" style="fill:var(--red)" font-weight="650">VACCINATION WEEK</text>
+          <text id="date-label" x="888" y="72" font-size="30" font-weight="650"></text>
+          <text id="week-label" x="888" y="96" class="axis"></text>
+          <text id="area-value" x="888" y="158" font-size="54" font-weight="600" fill="#0a6670" style="fill:var(--teal)"></text>
+          <text x="888" y="185" font-size="17">of seasonal burden remains</text>
+          <text x="888" y="207" class="axis">Shaded area · before protection = 100%</text>
+          <g id="decision-panel" aria-hidden="true">
+            <text class="plot-label" x="888" y="250">Total burden remaining</text>
+            <g id="decision-grid"></g>
+            <path id="decision-curve" fill="none" stroke="#778c8d" stroke-width="2.2" pathLength="1" stroke-dasharray="1"/>
+            <circle id="decision-point" r="5" fill="#933a4b" stroke="white" stroke-width="1.6"/>
+            <text class="axis" x="1022" y="405" text-anchor="middle">Vaccination date</text>
+            <text id="best-note" x="1022" y="430" text-anchor="middle" font-size="15" font-weight="650" style="fill:var(--teal)">Smallest area in this example</text>
+          </g>
+          <g id="prompt-copy"><text x="888" y="276" font-size="18" font-weight="600">The same epidemic.</text><text x="888" y="303" font-size="18">A different vaccination date.</text><text x="888" y="347" font-size="16" style="fill:var(--muted)">Compare the shaded areas.</text></g>
+        </svg>
+      </div>
+      <div class="controls">
+        <label class="slider-label" for="week-slider">Vaccination week</label><input id="week-slider" type="range" min="0" max="28" step="1" aria-label="Vaccination week">
+        <button id="early" aria-pressed="true">1 · September</button><button id="late" aria-pressed="false">2 · February</button><button id="compare" aria-pressed="false">3 · Find minimum</button><button id="reset" aria-label="Reset demonstration" title="Reset">↺</button>
+      </div>
+      <output id="status" class="sr-only" aria-live="polite"></output>
+    </section>
+  </main>
+  <script>
+    const DATA = /*__SLIDE_DATA__*/;
+    const $ = id => document.getElementById(id);
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const X = i => 66 + (i + .5) / 39 * 758;
+    const PY = q => 134 - q / .6 * 90;
+    const BY = b => 385 - b / .07 * 180;
+    const DX = i => 905 + i / 28 * 263;
+    const DY = r => 373 - (r - .6) / .4 * 102;
+    const reducedMotion = matchMedia('(prefers-reduced-motion:reduce)').matches;
+    let stage = 1, current = DATA.early_index, animation = 0, sweeping = false, traced = 0;
+    function element(tag, attrs, parent, text) {
+      const el = document.createElementNS(svgNS, tag);
+      for (const [key, value] of Object.entries(attrs)) el.setAttribute(key, value);
+      if (text !== undefined) el.textContent = text;
+      parent.appendChild(el); return el;
+    }
+    function linePath(values, y) {
+      const pts = [[X(-.5), y(values[0])], ...values.map((v,i) => [X(i),y(v)]), [X(38.5),y(values[38])]];
+      return pts.map(([x,y],i) => `${i?'L':'M'}${x.toFixed(3)},${y.toFixed(3)}`).join(' ');
+    }
+    for (const q of [0,.3,.6]) {
+      element('line',{x1:66,x2:824,y1:PY(q),y2:PY(q),class:'grid'},$('protection-grid'));
+      element('text',{x:56,y:PY(q)+5,'text-anchor':'end',class:'axis'},$('protection-grid'),`${q*100}%`);
+    }
+    for (const b of [0,.02,.04,.06]) {
+      element('line',{x1:66,x2:824,y1:BY(b),y2:BY(b),class:'grid'},$('burden-grid'));
+      element('text',{x:56,y:BY(b)+5,'text-anchor':'end',class:'axis'},$('burden-grid'),`${Math.round(b*100)}%`);
+    }
+    for (const [i,m] of [[0,'Sep'],[4,'Oct'],[8.4,'Nov'],[12.7,'Dec'],[17.1,'Jan'],[21.6,'Feb'],[25.6,'Mar'],[30,'Apr'],[34.3,'May']]) {
+      element('text',{x:X(i),y:406,'text-anchor':'middle',class:'axis'},$('month-axis'),m);
+    }
+    for (const r of [.6,.8,1]) {
+      element('line',{x1:905,x2:1168,y1:DY(r),y2:DY(r),class:'grid'},$('decision-grid'));
+      element('text',{x:896,y:DY(r)+4,'text-anchor':'end','font-size':12,fill:'#647278'},$('decision-grid'),`${r*100}%`);
+    }
+    for (const [i,m] of [[0,'Sep'],[9,'Nov'],[18,'Jan'],[27,'Mar']]) element('text',{x:DX(i),y:390,'text-anchor':'middle','font-size':12,fill:'#647278'},$('decision-grid'),m);
+    $('baseline-curve').setAttribute('d',linePath(DATA.baseline,BY));
+    const totalPath = DATA.candidates.map((c,i)=>`${i?'L':'M'}${DX(i)},${DY(c.remaining)}`).join(' ');
+    $('decision-curve').setAttribute('d',totalPath);
+    function render(index) {
+      current=index;
+      const low=Math.floor(index), high=Math.min(28,low+1), t=index-low;
+      const a=DATA.candidates[low], b=DATA.candidates[high];
+      const mix=key=>a[key].map((v,i)=>v+(b[key][i]-v)*t);
+      const protection=mix('protection'), residual=mix('residual');
+      const total=residual.reduce((a,b)=>a+b,0), shown=DATA.candidates[Math.round(index)];
+      const path=linePath(residual,BY);
+      $('remaining-curve').setAttribute('d',path);
+      $('remaining-area').setAttribute('d',`${path} L824,385 L66,385 Z`);
+      const ppoints=[[X(-.5),PY(protection[0])]];
+      protection.forEach((q,i)=>{
+        if(q>0 && (i===0 || protection[i-1]===0)) ppoints.push([X(i),PY(0)]);
+        ppoints.push([X(i),PY(q)]);
+      });
+      ppoints.push([X(38.5),PY(protection[38])]);
+      $('protection-curve').setAttribute('d',ppoints.map(([x,y],i)=>`${i?'L':'M'}${x},${y}`).join(' '));
+      for (const id of ['vax-line-top','vax-line-main']) for (const attr of ['x1','x2']) $(id).setAttribute(attr,X(index));
+      $('lag-band').setAttribute('x',X(index)); $('lag-band').setAttribute('width',X(index+2)-X(index));
+      $('lag-label').setAttribute('x',X(index)+6);
+      $('date-label').textContent=shown.date_label;
+      $('week-label').textContent=`MMWR week ${shown.week}`;
+      $('area-value').textContent=`${(total*100).toFixed(1)}%`;
+      $('decision-point').setAttribute('cx',DX(index)); $('decision-point').setAttribute('cy',DY(total));
+      if(sweeping) traced=Math.max(traced,index/28);
+      $('decision-curve').setAttribute('stroke-dashoffset',sweeping?1-traced:0);
+      $('week-slider').value=Math.round(index);
+      $('week-slider').setAttribute('aria-valuetext',`${shown.date_label}, week ${shown.week}, ${(total*100).toFixed(1)} percent of burden remains`);
+      document.body.classList.toggle('at-best',stage===3&&!sweeping&&Math.abs(index-DATA.best_index)<.01);
+      $('chart-desc').textContent=`${DATA.season} national outpatient ILI curve. Vaccination in ${shown.date_label}; two-week response lag, then waning. The shaded area is ${(total*100).toFixed(1)} percent of the original seasonal burden. This is one illustrative scenario, not an individual infection probability.`;
+    }
+    function stop() { cancelAnimationFrame(animation); sweeping=false; }
+    function announce() { $('status').textContent=$('chart-desc').textContent; }
+    function move(target,duration=850,done=()=>{}) {
+      const from=current, start=performance.now();
+      if(reducedMotion){ render(target); done(); return; }
+      const tick=now=>{
+        const t=Math.min(1,(now-start)/duration), eased=t*t*(3-2*t);
+        render(from+(target-from)*eased);
+        if(t<1) animation=requestAnimationFrame(tick); else {done(); announce();}
+      };
+      animation=requestAnimationFrame(tick);
+    }
+    function setStage(value,animate=true) {
+      stop(); stage=value;
+      document.body.classList.toggle('compare',value===3);
+      $('decision-panel').setAttribute('aria-hidden',value!==3);
+      $('prompt-copy').style.display=value===3?'none':'';
+      ['early','late','compare'].forEach((id,i)=>$(id).setAttribute('aria-pressed',value===i+1));
+      $('step-copy').textContent=['','An early dose can wane before the winter peak','A late dose leaves earlier illness unprotected','The smallest shaded area identifies the best date'][value];
+      history.replaceState(null,'',`#state=${value}`);
+      const target=value===1?DATA.early_index:value===2?DATA.late_index:DATA.best_index;
+      if(value===3&&animate&&!reducedMotion){
+        sweeping=true; traced=0; render(0);
+        move(28,4800,()=>move(DATA.best_index,650,()=>{sweeping=false;render(DATA.best_index);}));
+      } else if(animate) move(target); else render(target);
+      announce();
+    }
+    $('week-slider').addEventListener('input',event=>{
+      stop(); stage=0; document.body.classList.add('compare'); $('decision-panel').setAttribute('aria-hidden','false'); $('prompt-copy').style.display='none';
+      ['early','late','compare'].forEach(id=>$(id).setAttribute('aria-pressed','false'));
+      $('step-copy').textContent='Move the vaccination week and compare the shaded area';
+      render(Number(event.target.value)); history.replaceState(null,'',`#week=${DATA.candidates[Math.round(current)].week}`); announce();
+    });
+    ['early','late','compare'].forEach((id,i)=>$(id).addEventListener('click',()=>setStage(i+1)));
+    $('reset').addEventListener('click',()=>setStage(1,false));
+    document.addEventListener('keydown',event=>{
+      if(event.target.tagName==='INPUT'||(event.target.tagName==='BUTTON'&&event.key===' ')) return;
+      if(['ArrowRight','PageDown',' ','ArrowLeft','PageUp','Home'].includes(event.key)){
+        event.preventDefault();
+        setStage(event.key==='Home'?1:['ArrowLeft','PageUp'].includes(event.key)?Math.max(1,stage-1):Math.min(3,stage+1));
+      }
+    });
+    function fit(){document.documentElement.style.setProperty('--scale',Math.min(innerWidth/1280,innerHeight/720));}
+    addEventListener('resize',fit); fit();
+    const hash=new URLSearchParams(location.hash.slice(1));
+    setStage(Math.max(1,Math.min(3,Number(hash.get('state'))||1)),false);
+    if(hash.has('week')){const i=DATA.candidates.findIndex(c=>c.week===Number(hash.get('week')));if(i>=0){$('week-slider').value=i;$('week-slider').dispatchEvent(new Event('input'));}}
+  </script>
+</body>
+</html>
