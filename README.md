@@ -73,6 +73,7 @@ python3 scripts/build_slide_20.py
 python3 scripts/build_slide_21.py
 python3 scripts/build_slide_24.py
 python3 scripts/build_slide_25.py
+python3 scripts/build_slide_26.py
 ```
 
 Standalone **slide 24** is the Section III vaccination-timing demonstration.
@@ -90,6 +91,13 @@ or edit `src/slide-25.html`. Ten sampled scenarios illustrate the uncertainty;
 the final mean uses all 5,000 original primary-analysis simulations.
 [Source and handoff notes](specs/slide-25-evidence.md) describe the extraction,
 numerical checks, and three presenter-controlled views.
+
+Standalone **slide 26** presents the primary national, all-age timing result.
+[Open the slide](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-26.html#state=1)
+or edit `src/slide-26.html`. Three states show the guidance window, reveal the
+saved mean-regret curve, and highlight the nearly equivalent weeks 47–48.
+[Source and handoff notes](specs/slide-26-evidence.md) record the standardized
+encounter units, source fingerprints, controls, and numerical checks.
 
 `build_surveillance_section.py` reads the already-downloaded CSV files from
 `../data/processed/` and embeds compact chart data directly into the published
