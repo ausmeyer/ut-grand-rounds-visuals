@@ -3,8 +3,8 @@
 This is the main result after slide 25's decision-model explanation. One large
 national, all-age curve shows the mean burden left avoidable because of timing.
 The title remains separate from the visualization for Slides.com integration.
-The standalone slide uses the established 1280 × 720 canvas and 1240 × 540
-visualization area. Its editable source is `src/slide-26.html`.
+The standalone slide uses the established 1280 × 720 canvas with a taller
+plot filling the space below the title. Its editable source is `src/slide-26.html`.
 
 ## Sources and build
 
@@ -63,7 +63,7 @@ the nearly equivalent results at weeks 47–48; this is not an uncertainty
 interval or the distribution of individually optimal dates. The scene shows
 the mean curve without simulation-variation ribbons. The result uses the
 primary waning model. Sensitivity to other waning models is reserved for
-slide 28. The subtitle and the state-3 summary above the chart are omitted.
+slide 28. The subtitle and the state-1 and state-3 prompts above the chart are omitted.
 
 ## Presenter states and handoff
 

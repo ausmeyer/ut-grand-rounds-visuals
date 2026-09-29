@@ -12,11 +12,11 @@
     body { background:var(--paper); color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
     .slide { position:absolute; width:1280px; height:720px; left:50%; top:50%; transform:translate(-50%,-50%) scale(var(--scale,1)); transform-origin:center; }
     h1 { position:absolute; left:50px; top:48px; width:1180px; margin:0; font-family:Montserrat,Inter,ui-sans-serif,system-ui,sans-serif; font-size:36px; line-height:1.22; font-weight:550; letter-spacing:-.8px; }
-    .visual { position:absolute; left:20px; top:163px; width:1240px; height:537px; }
-    .topbar { height:36px; padding:0 29px; display:flex; align-items:center; justify-content:space-between; }
+    .visual { position:absolute; left:20px; top:113px; width:1240px; height:587px; }
+    .topbar { height:26px; padding:0 29px; display:flex; align-items:center; justify-content:space-between; }
     #step-copy { font-size:18px; font-weight:650; }
     .scope { font-size:14px; color:var(--muted); }
-    svg { display:block; width:1208px; height:440px; margin:9px 16px 0; overflow:visible; }
+    svg { display:block; width:1208px; height:500px; margin:9px 16px 0; overflow:visible; }
     svg text { fill:var(--ink); font-family:inherit; }
     .axis { font-size:14px; fill:var(--muted); }
     .grid { stroke:#dfe4df; stroke-width:1; }
@@ -36,15 +36,15 @@
     <h1>The primary model favors weeks 47–48</h1>
     <section class="visual" aria-label="National vaccination timing result">
       <header class="topbar"><span id="step-copy"></span><span class="scope">National · All ages</span></header>
-      <svg viewBox="0 0 1208 440" role="img" aria-labelledby="chart-title chart-desc">
+      <svg viewBox="0 0 1208 500" role="img" aria-labelledby="chart-title chart-desc">
         <title id="chart-title">Mean burden left avoidable because of vaccination timing</title>
         <desc id="chart-desc"></desc>
-        <defs><clipPath id="curve-clip"><rect id="trace-window" x="76" y="92" width="1086" height="282"/></clipPath></defs>
+        <defs><clipPath id="curve-clip"><rect id="trace-window" x="76" y="92" width="1086" height="342"/></clipPath></defs>
         <text x="76" y="23" font-size="21" font-weight="650">Burden left avoidable because of timing</text>
         <text class="axis" x="76" y="46">Seasonal ILI visits per 10,000 outpatient encounters each week</text>
-        <rect id="guidance-band" y="100" height="265" fill="#e9ebe5"/>
+        <rect id="guidance-band" y="100" height="325" fill="#e9ebe5"/>
         <text id="guidance-label" y="87" text-anchor="middle" font-size="15" style="fill:var(--muted)">September–October guidance</text>
-        <g id="window-band"><rect id="best-band" y="100" height="265" fill="#dceee9"/></g>
+        <g id="window-band"><rect id="best-band" y="100" height="325" fill="#dceee9"/></g>
         <g id="y-axis"></g>
         <g id="x-axis"></g>
         <g id="result">
@@ -53,8 +53,8 @@
         <g id="highlights">
           <g id="comparison">
             <path id="comparison-leader" fill="none" stroke="#87958f" stroke-width="1.2"/>
-            <text id="comparison-week" y="279" text-anchor="end" font-size="16" style="fill:var(--muted)">Week 44</text>
-            <text id="comparison-value" y="313" text-anchor="end" font-size="32" font-weight="650"></text>
+            <text id="comparison-week" y="339" text-anchor="end" font-size="16" style="fill:var(--muted)">Week 44</text>
+            <text id="comparison-value" y="373" text-anchor="end" font-size="32" font-weight="650"></text>
             <circle id="comparison-point" r="4.8" fill="#933a4b" stroke="#fbfaf6" stroke-width="1.7" data-week="44"/>
           </g>
           <path id="window-leader" fill="none" stroke="#70938e" stroke-width="1.3"/>
@@ -64,11 +64,11 @@
           <text x="695" y="241" font-size="17" style="fill:var(--muted)">at either date</text>
           <g id="window-points"></g>
         </g>
-        <text class="axis" x="619" y="417" text-anchor="middle">Vaccination date · approximate calendar</text>
-        <text class="axis" x="76" y="438">Lower is better</text>
+        <text class="axis" x="619" y="477" text-anchor="middle">Vaccination date · approximate calendar</text>
+        <text class="axis" x="76" y="498">Lower is better</text>
         <g id="curve-key">
-          <line x1="911" x2="941" y1="436" y2="436" stroke="#0a6670" stroke-width="3.6"/>
-          <text class="axis" x="951" y="440">Mean of 5,000 scenarios</text>
+          <line x1="911" x2="941" y1="496" y2="496" stroke="#0a6670" stroke-width="3.6"/>
+          <text class="axis" x="951" y="500">Mean of 5,000 scenarios</text>
         </g>
       </svg>
       <div class="controls">
@@ -86,7 +86,7 @@
     const $ = id => document.getElementById(id);
     const NS = 'http://www.w3.org/2000/svg';
     const X = j => 76 + j / 28 * 1086;
-    const Y = r => 365 - r / DATA.y_max * 265;
+    const Y = r => 425 - r / DATA.y_max * 325;
     const index = week => DATA.candidate_weeks.indexOf(week);
     const reducedMotion = matchMedia('(prefers-reduced-motion:reduce)').matches;
     let stage = 1, animation = 0;
@@ -102,7 +102,7 @@
       element('text',{x:60,y:Y(value)+5,'text-anchor':'end',class:'axis'},$('y-axis'),value.toLocaleString('en-US'));
     }
     for(const [week,month] of [[36,'Sep'],[40,'Oct'],[44,'Nov'],[48,'Dec'],[1,'Jan'],[5,'Feb'],[9,'Mar']])
-      element('text',{x:X(index(week)),y:391,'text-anchor':'middle',class:'axis'},$('x-axis'),month);
+      element('text',{x:X(index(week)),y:451,'text-anchor':'middle',class:'axis'},$('x-axis'),month);
     $('guidance-band').setAttribute('x',X(0));
     $('guidance-band').setAttribute('width',X(8.5)-X(0));
     $('guidance-label').setAttribute('x',(X(0)+X(8.5))/2);
@@ -114,7 +114,7 @@
     $('comparison-point').setAttribute('cx',cx); $('comparison-point').setAttribute('cy',cy);
     $('comparison-week').setAttribute('x',cx-17); $('comparison-value').setAttribute('x',cx-17);
     $('comparison-value').textContent=Math.round(DATA.mean_visits[comparison]);
-    $('comparison-leader').setAttribute('d',`M${cx-7},306 L${cx},306 V${cy-8}`);
+    $('comparison-leader').setAttribute('d',`M${cx-7},366 L${cx},366 V${cy-8}`);
     const mx=(X(low)+X(high))/2, my=Y(DATA.mean_visits[DATA.best_index]);
     $('window-leader').setAttribute('d',`M584,177 H${mx} V${my-10}`);
     $('window-value').textContent=`≈${Math.round(DATA.mean_visits[DATA.best_index])}`;
@@ -126,7 +126,7 @@
       cancelAnimationFrame(animation); stage=value; document.body.dataset.state=value;
       history.replaceState(null,'',`#state=${value}`);
       ['start','curve','window'].forEach((id,i)=>$(id).setAttribute('aria-pressed',value===i+1));
-      $('step-copy').textContent=['','Where does the preferred timing fall?','Average across 5,000 possible scenarios',''][value];
+      $('step-copy').textContent=['','','Average across 5,000 possible scenarios',''][value];
       visible('result',value>=2); visible('curve-key',value>=2);
       visible('window-band',value===3); visible('highlights',value===3);
       $('trace-window').setAttribute('width',1086);
