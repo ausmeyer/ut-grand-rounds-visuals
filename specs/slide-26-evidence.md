@@ -61,9 +61,9 @@ smoothed, or normalized for this slide.
 Week 47 is the numerical minimum. The teal band and two points emphasize
 the nearly equivalent results at weeks 47–48; this is not an uncertainty
 interval or the distribution of individually optimal dates. The scene shows
-the mean curve without simulation-variation ribbons. The qualifier “Under the
-primary waning model” remains visible. Sensitivity to other waning models is
-reserved for slide 28.
+the mean curve without simulation-variation ribbons. The result uses the
+primary waning model. Sensitivity to other waning models is reserved for
+slide 28. The subtitle and the state-3 summary above the chart are omitted.
 
 ## Presenter states and handoff
 
