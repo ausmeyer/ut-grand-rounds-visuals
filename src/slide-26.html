@@ -57,8 +57,8 @@
           </g>
           <g id="comparison">
             <path id="comparison-leader" fill="none" stroke="#87958f" stroke-width="1.2"/>
-            <text id="comparison-week" y="374" text-anchor="end" font-size="16" style="fill:var(--muted)">Week 44</text>
-            <text id="comparison-value" y="408" text-anchor="end" font-size="32" font-weight="650"></text>
+            <text id="comparison-week" y="354" text-anchor="end" font-size="16" style="fill:var(--muted)">Week 44</text>
+            <text id="comparison-value" y="388" text-anchor="end" font-size="32" font-weight="650"></text>
             <circle id="comparison-point" r="4.8" fill="#933a4b" stroke="#fbfaf6" stroke-width="1.7" data-week="44"/>
           </g>
           <path id="window-leader" fill="none" stroke="#70938e" stroke-width="1.3"/>
@@ -114,7 +114,7 @@
     $('best-band').setAttribute('x',X(low-.5));
     $('best-band').setAttribute('width',X(high+.5)-X(low-.5));
     $('mean-curve').setAttribute('d',DATA.mean_visits.map((value,j)=>`${j?'L':'M'}${X(j).toFixed(3)},${Y(value).toFixed(3)}`).join(' '));
-    for(const [week,id,leaderY] of [[40,'early-comparison',311],[44,'comparison',401]]) {
+    for(const [week,id,leaderY] of [[40,'early-comparison',311],[44,'comparison',381]]) {
       const j=index(week), cx=X(j), cy=Y(DATA.mean_visits[j]);
       $(`${id}-point`).setAttribute('cx',cx); $(`${id}-point`).setAttribute('cy',cy);
       $(`${id}-week`).setAttribute('x',cx-17); $(`${id}-value`).setAttribute('x',cx-17);
