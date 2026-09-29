@@ -13,10 +13,8 @@
     .slide { position:absolute; width:1280px; height:720px; left:50%; top:50%; transform:translate(-50%,-50%) scale(var(--scale,1)); transform-origin:center; }
     h1 { position:absolute; left:50px; top:48px; width:1180px; margin:0; font-family:Montserrat,Inter,ui-sans-serif,system-ui,sans-serif; font-size:36px; line-height:1.22; font-weight:550; letter-spacing:-.8px; }
     .visual { position:absolute; left:20px; top:113px; width:1240px; height:587px; }
-    .topbar { height:26px; padding:0 29px; display:flex; align-items:center; justify-content:space-between; }
-    #step-copy { font-size:18px; font-weight:650; }
-    .scope { font-size:14px; color:var(--muted); }
-    svg { display:block; width:1208px; height:500px; margin:9px 16px 0; overflow:visible; }
+    .scope { position:absolute; top:9px; right:29px; font-size:14px; color:var(--muted); }
+    svg { display:block; width:1208px; height:535px; margin:0 16px; overflow:visible; }
     svg text { fill:var(--ink); font-family:inherit; }
     .axis { font-size:14px; fill:var(--muted); }
     .grid { stroke:#dfe4df; stroke-width:1; }
@@ -35,26 +33,32 @@
   <main class="slide" aria-label="Slide 26. The primary model favors weeks 47–48">
     <h1>The primary model favors weeks 47–48</h1>
     <section class="visual" aria-label="National vaccination timing result">
-      <header class="topbar"><span id="step-copy"></span><span class="scope">National · All ages</span></header>
-      <svg viewBox="0 0 1208 500" role="img" aria-labelledby="chart-title chart-desc">
+      <span class="scope">National · All ages</span>
+      <svg viewBox="0 0 1208 535" role="img" aria-labelledby="chart-title chart-desc">
         <title id="chart-title">Mean burden left avoidable because of vaccination timing</title>
         <desc id="chart-desc"></desc>
-        <defs><clipPath id="curve-clip"><rect id="trace-window" x="76" y="92" width="1086" height="342"/></clipPath></defs>
+        <defs><clipPath id="curve-clip"><rect id="trace-window" x="76" y="92" width="1086" height="377"/></clipPath></defs>
         <text x="76" y="23" font-size="21" font-weight="650">Burden left avoidable because of timing</text>
         <text class="axis" x="76" y="46">Seasonal ILI visits per 10,000 outpatient encounters each week</text>
-        <rect id="guidance-band" y="100" height="325" fill="#e9ebe5"/>
+        <rect id="guidance-band" y="100" height="360" fill="#e9ebe5"/>
         <text id="guidance-label" y="87" text-anchor="middle" font-size="15" style="fill:var(--muted)">September–October guidance</text>
-        <g id="window-band"><rect id="best-band" y="100" height="325" fill="#dceee9"/></g>
+        <g id="window-band"><rect id="best-band" y="100" height="360" fill="#dceee9"/></g>
         <g id="y-axis"></g>
         <g id="x-axis"></g>
         <g id="result">
           <path id="mean-curve" fill="none" stroke="#0a6670" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" clip-path="url(#curve-clip)"/>
         </g>
         <g id="highlights">
+          <g id="early-comparison">
+            <path id="early-comparison-leader" fill="none" stroke="#87958f" stroke-width="1.2"/>
+            <text id="early-comparison-week" y="284" text-anchor="end" font-size="16" style="fill:var(--muted)">Week 40</text>
+            <text id="early-comparison-value" y="318" text-anchor="end" font-size="32" font-weight="650"></text>
+            <circle id="early-comparison-point" r="4.8" fill="#933a4b" stroke="#fbfaf6" stroke-width="1.7" data-week="40"/>
+          </g>
           <g id="comparison">
             <path id="comparison-leader" fill="none" stroke="#87958f" stroke-width="1.2"/>
-            <text id="comparison-week" y="339" text-anchor="end" font-size="16" style="fill:var(--muted)">Week 44</text>
-            <text id="comparison-value" y="373" text-anchor="end" font-size="32" font-weight="650"></text>
+            <text id="comparison-week" y="374" text-anchor="end" font-size="16" style="fill:var(--muted)">Week 44</text>
+            <text id="comparison-value" y="408" text-anchor="end" font-size="32" font-weight="650"></text>
             <circle id="comparison-point" r="4.8" fill="#933a4b" stroke="#fbfaf6" stroke-width="1.7" data-week="44"/>
           </g>
           <path id="window-leader" fill="none" stroke="#70938e" stroke-width="1.3"/>
@@ -64,11 +68,11 @@
           <text x="695" y="241" font-size="17" style="fill:var(--muted)">at either date</text>
           <g id="window-points"></g>
         </g>
-        <text class="axis" x="619" y="477" text-anchor="middle">Vaccination date · approximate calendar</text>
-        <text class="axis" x="76" y="498">Lower is better</text>
+        <text class="axis" x="619" y="512" text-anchor="middle">Vaccination date · approximate calendar</text>
+        <text class="axis" x="76" y="533">Lower is better</text>
         <g id="curve-key">
-          <line x1="911" x2="941" y1="496" y2="496" stroke="#0a6670" stroke-width="3.6"/>
-          <text class="axis" x="951" y="500">Mean of 5,000 scenarios</text>
+          <line x1="911" x2="941" y1="531" y2="531" stroke="#0a6670" stroke-width="3.6"/>
+          <text class="axis" x="951" y="535">Mean of 5,000 scenarios</text>
         </g>
       </svg>
       <div class="controls">
@@ -86,7 +90,7 @@
     const $ = id => document.getElementById(id);
     const NS = 'http://www.w3.org/2000/svg';
     const X = j => 76 + j / 28 * 1086;
-    const Y = r => 425 - r / DATA.y_max * 325;
+    const Y = r => 460 - r / DATA.y_max * 360;
     const index = week => DATA.candidate_weeks.indexOf(week);
     const reducedMotion = matchMedia('(prefers-reduced-motion:reduce)').matches;
     let stage = 1, animation = 0;
@@ -102,7 +106,7 @@
       element('text',{x:60,y:Y(value)+5,'text-anchor':'end',class:'axis'},$('y-axis'),value.toLocaleString('en-US'));
     }
     for(const [week,month] of [[36,'Sep'],[40,'Oct'],[44,'Nov'],[48,'Dec'],[1,'Jan'],[5,'Feb'],[9,'Mar']])
-      element('text',{x:X(index(week)),y:451,'text-anchor':'middle',class:'axis'},$('x-axis'),month);
+      element('text',{x:X(index(week)),y:486,'text-anchor':'middle',class:'axis'},$('x-axis'),month);
     $('guidance-band').setAttribute('x',X(0));
     $('guidance-band').setAttribute('width',X(8.5)-X(0));
     $('guidance-label').setAttribute('x',(X(0)+X(8.5))/2);
@@ -110,11 +114,13 @@
     $('best-band').setAttribute('x',X(low-.5));
     $('best-band').setAttribute('width',X(high+.5)-X(low-.5));
     $('mean-curve').setAttribute('d',DATA.mean_visits.map((value,j)=>`${j?'L':'M'}${X(j).toFixed(3)},${Y(value).toFixed(3)}`).join(' '));
-    const comparison=index(44), cx=X(comparison), cy=Y(DATA.mean_visits[comparison]);
-    $('comparison-point').setAttribute('cx',cx); $('comparison-point').setAttribute('cy',cy);
-    $('comparison-week').setAttribute('x',cx-17); $('comparison-value').setAttribute('x',cx-17);
-    $('comparison-value').textContent=Math.round(DATA.mean_visits[comparison]);
-    $('comparison-leader').setAttribute('d',`M${cx-7},366 L${cx},366 V${cy-8}`);
+    for(const [week,id,leaderY] of [[40,'early-comparison',311],[44,'comparison',401]]) {
+      const j=index(week), cx=X(j), cy=Y(DATA.mean_visits[j]);
+      $(`${id}-point`).setAttribute('cx',cx); $(`${id}-point`).setAttribute('cy',cy);
+      $(`${id}-week`).setAttribute('x',cx-17); $(`${id}-value`).setAttribute('x',cx-17);
+      $(`${id}-value`).textContent=Math.round(DATA.mean_visits[j]);
+      $(`${id}-leader`).setAttribute('d',`M${cx-7},${leaderY} L${cx},${leaderY} V${cy-8}`);
+    }
     const mx=(X(low)+X(high))/2, my=Y(DATA.mean_visits[DATA.best_index]);
     $('window-leader').setAttribute('d',`M584,177 H${mx} V${my-10}`);
     $('window-value').textContent=`≈${Math.round(DATA.mean_visits[DATA.best_index])}`;
@@ -126,7 +132,6 @@
       cancelAnimationFrame(animation); stage=value; document.body.dataset.state=value;
       history.replaceState(null,'',`#state=${value}`);
       ['start','curve','window'].forEach((id,i)=>$(id).setAttribute('aria-pressed',value===i+1));
-      $('step-copy').textContent=['','','Average across 5,000 possible scenarios',''][value];
       visible('result',value>=2); visible('curve-key',value>=2);
       visible('window-band',value===3); visible('highlights',value===3);
       $('trace-window').setAttribute('width',1086);
@@ -143,7 +148,7 @@
         '',
         'Calendar of candidate vaccination dates. A gray band approximates the September–October guidance window. The curve is revealed on the next advance.',
         'Mean regret across 5,000 original primary-model simulations for the US all-age population. Values are seasonal standardized ILI visits in a system with 10,000 outpatient encounters each week. Regret compares each date with the best date in the same scenario.',
-        'Week 47 minimizes mean regret. Weeks 47 and 48 each leave about 55 avoidable ILI visits, compared with 189 at week 44, over a season with 10,000 outpatient encounters each week. The highlighted dates are not an uncertainty interval.'
+        'Week 47 minimizes mean regret. Weeks 47 and 48 each leave about 55 avoidable ILI visits, compared with 498 at week 40 and 189 at week 44, over a season with 10,000 outpatient encounters each week. The highlighted dates are not an uncertainty interval.'
       ][value];
       $('status').textContent=$('chart-desc').textContent;
     }

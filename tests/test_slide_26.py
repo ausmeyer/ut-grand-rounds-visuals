@@ -11,7 +11,7 @@ class Slide26Results(unittest.TestCase):
         self.assertEqual(data["candidate_weeks"], list(range(36, 53)) + list(range(1, 13)))
         self.assertEqual(len(data["mean_visits"]), 29)
         self.assertEqual(data["candidate_weeks"][min(range(29), key=data["mean_visits"].__getitem__)], 47)
-        for week, expected in [(44, 189.16985896908475), (47, 54.66781854260972), (48, 54.717128240967805)]:
+        for week, expected in [(40, 497.56658265807573), (44, 189.16985896908475), (47, 54.66781854260972), (48, 54.717128240967805)]:
             j = data["candidate_weeks"].index(week)
             self.assertAlmostEqual(data["mean_visits"][j], expected, places=10)
         self.assertEqual([round(data["mean_visits"][data["candidate_weeks"].index(w)]) for w in data["highlight_weeks"]], [55, 55])

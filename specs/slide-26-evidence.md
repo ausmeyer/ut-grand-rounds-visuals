@@ -54,16 +54,22 @@ smoothed, or normalized for this slide.
 
 | Vaccination week | Mean standardized avoidable ILI visits | Display |
 | --- | ---: | ---: |
+| 40 | 497.566582658 | 498 |
 | 44 | 189.169858969 | 189 |
 | 47 | 54.667818543 | ≈55 |
 | 48 | 54.717128241 | ≈55 |
+
+Week 40 matches the current manuscript's early-October comparison in its
+national timing Results and Discussion. Its value was checked against the
+US/all-age row of the saved primary regret table.
 
 Week 47 is the numerical minimum. The teal band and two points emphasize
 the nearly equivalent results at weeks 47–48; this is not an uncertainty
 interval or the distribution of individually optimal dates. The scene shows
 the mean curve without simulation-variation ribbons. The result uses the
 primary waning model. Sensitivity to other waning models is reserved for
-slide 28. The subtitle and the state-1 and state-3 prompts above the chart are omitted.
+slide 28. The subtitle and all state prompts above the chart are omitted;
+the plot fills the space previously reserved for that prompt row.
 
 ## Presenter states and handoff
 
@@ -72,7 +78,7 @@ slide 28. The subtitle and the state-1 and state-3 prompts above the chart are o
    over 2.2 seconds, then holds. The first forward advance from Start enters
    this state and plays the curve reveal.
 3. **Highlight the window** (`#state=3`): show the full curve, weeks 47–48
-   band and points, late-November/early-December label, and 189 versus ≈55
+   band and points, late-November/early-December label, and 498/189 versus ≈55
    comparison. Advancing during the reveal completes the curve immediately.
 
 Right arrow, Page Down, and Space advance one state. Left arrow and Page Up
