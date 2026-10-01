@@ -1,0 +1,70 @@
+{
+  "analysis": "gam_primary",
+  "population": "US, all ages",
+  "n_draws": 5000,
+  "waning_prior": "ray_2019",
+  "source_created_utc": "2026-09-05 20:41:15 UTC",
+  "metric": "mean_relative_regret",
+  "definition": "Mean across scenarios of (best protected burden - protected burden at the candidate week) / best protected burden; zero if best protected burden is nonpositive.",
+  "source_tolerance_rows_checked": [
+    0.01,
+    0.05,
+    0.1
+  ],
+  "source_fingerprints": [
+    {
+      "path": "outputs/primary/tables/gam_primary_near_optimal_curve.csv",
+      "sha256": "4a8211f0b61b6306589cd73a3bd21b5f2b1c5b8a34725e8da6d202471db99098"
+    },
+    {
+      "path": "outputs/primary/tables/gam_primary_analysis_manifest.json",
+      "sha256": "44ae965918f87e1be411fedfad00d52184d2b74212a2331ef4c624821e6d472a"
+    },
+    {
+      "path": "R/decision_engine.R",
+      "sha256": "16b2d16341f395691ebbab28efc3002f77e71787c0a6cba5256d368d5b0d1ab0"
+    },
+    {
+      "path": "manuscript/overleaf_repo/manuscript.tex",
+      "sha256": "9d80a3ee2d5012d941c92198f5ee3aa0d32a6722b891a438f66c31138ca730a0"
+    }
+  ],
+  "rows": [
+    {
+      "week": 40,
+      "mean_relative_regret": 0.21840529324902486,
+      "median_relative_regret": 0.1916294971917102,
+      "lower_50_relative_regret": 0.1134300059759322,
+      "upper_50_relative_regret": 0.29918828546327225,
+      "lower_95_relative_regret": 0.018504090571431434,
+      "upper_95_relative_regret": 0.5379560478158916
+    },
+    {
+      "week": 44,
+      "mean_relative_regret": 0.09208826598271533,
+      "median_relative_regret": 0.06526044469984217,
+      "lower_50_relative_regret": 0.026743295787202494,
+      "upper_50_relative_regret": 0.12696921230984276,
+      "lower_95_relative_regret": 9.620015276163562e-05,
+      "upper_95_relative_regret": 0.3383681582244589
+    },
+    {
+      "week": 47,
+      "mean_relative_regret": 0.027791182752895018,
+      "median_relative_regret": 0.010102973400285091,
+      "lower_50_relative_regret": 0.0012958984366476134,
+      "upper_50_relative_regret": 0.03236756287295139,
+      "lower_95_relative_regret": 0.0,
+      "upper_95_relative_regret": 0.16892385372789034
+    },
+    {
+      "week": 48,
+      "mean_relative_regret": 0.02257486040040622,
+      "median_relative_regret": 0.009391940955881636,
+      "lower_50_relative_regret": 0.0004790355932982,
+      "upper_50_relative_regret": 0.028165023332081367,
+      "lower_95_relative_regret": 0.0,
+      "upper_95_relative_regret": 0.1260582659845186
+    }
+  ]
+}

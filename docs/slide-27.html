@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Slide 27 · Timing changes how much protection we keep</title>
+  <style>
+    :root { --paper:#fbfaf6; --ink:#14242b; --muted:#647278; --teal:#0a6670; }
+    * { box-sizing:border-box; }
+    html,body { width:100%; height:100%; margin:0; overflow:hidden; }
+    body { background:var(--paper); color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+    .slide { position:absolute; width:1280px; height:720px; left:50%; top:50%; transform:translate(-50%,-50%) scale(var(--scale,1)); transform-origin:center; }
+    h1 { position:absolute; left:50px; top:48px; width:1180px; margin:0; font-family:Montserrat,Inter,ui-sans-serif,system-ui,sans-serif; font-size:36px; line-height:1.22; font-weight:550; letter-spacing:-.8px; }
+    .visual { position:absolute; left:20px; top:113px; width:1240px; height:587px; }
+    svg { display:block; width:1208px; height:535px; margin:0 16px; overflow:visible; }
+    svg text { fill:var(--ink); font-family:inherit; }
+    .axis { fill:var(--muted); font-size:16px; }
+    .grid { stroke:#dfe4df; stroke-width:1; }
+    .value { font-size:40px; font-weight:650; }
+    .controls { height:49px; padding:11px 29px 0; display:flex; align-items:center; gap:10px; }
+    button { border:1px solid #b9c3c0; border-radius:8px; background:white; color:var(--ink); height:34px; font:inherit; font-size:14px; font-weight:650; cursor:pointer; padding:0 17px; white-space:nowrap; }
+    button:hover { border-color:var(--teal); }
+    button[aria-pressed=true] { color:var(--teal); border-color:var(--teal); background:#edf6f4; }
+    button:focus-visible { outline:3px solid #82bcc1; outline-offset:3px; }
+    #reset { padding:0 10px; font-size:19px; margin-left:auto; }
+    #control-hint { color:var(--muted); font-size:13px; margin-left:9px; }
+    .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+  </style>
+</head>
+<body>
+  <main class="slide" aria-label="Slide 27. Timing changes how much protection we keep">
+    <h1>Timing changes how much protection we keep</h1>
+    <section class="visual" aria-label="Protection lost at three vaccination dates">
+      <svg viewBox="0 0 1208 535" role="img" aria-labelledby="chart-title chart-desc">
+        <title id="chart-title">Mean share of achievable modeled protection lost</title>
+        <desc id="chart-desc"></desc>
+        <text x="76" y="23" font-size="21" font-weight="650">Mean share of achievable modeled protection lost</text>
+        <text x="1195" y="23" text-anchor="end" font-size="14" style="fill:var(--muted)">National · All ages</text>
+        <g id="axis"></g>
+        <g id="dates"></g>
+        <g id="bars"></g>
+        <text x="619" y="510" text-anchor="middle" font-size="18" style="fill:var(--muted)">Relative to the best vaccination date in each scenario</text>
+      </svg>
+      <div class="controls">
+        <button id="start" aria-pressed="true">1 · Start</button>
+        <button id="week-40" aria-pressed="false">2 · Week 40</button>
+        <button id="week-44" aria-pressed="false">3 · Week 44</button>
+        <button id="week-48" aria-pressed="false">4 · Week 48</button>
+        <span id="control-hint">Arrow keys to advance</span>
+        <button id="reset" aria-label="Reset demonstration" title="Reset">↺</button>
+      </div>
+      <output id="status" class="sr-only" aria-live="polite"></output>
+    </section>
+  </main>
+  <script>
+    const DATA = {"analysis":"gam_primary","population":"US, all ages","n_draws":5000,"waning_prior":"ray_2019","source_created_utc":"2026-09-05 20:41:15 UTC","metric":"mean_relative_regret","definition":"Mean across scenarios of (best protected burden - protected burden at the candidate week) / best protected burden; zero if best protected burden is nonpositive.","source_tolerance_rows_checked":[0.01,0.05,0.1],"source_fingerprints":[{"path":"outputs/primary/tables/gam_primary_near_optimal_curve.csv","sha256":"4a8211f0b61b6306589cd73a3bd21b5f2b1c5b8a34725e8da6d202471db99098"},{"path":"outputs/primary/tables/gam_primary_analysis_manifest.json","sha256":"44ae965918f87e1be411fedfad00d52184d2b74212a2331ef4c624821e6d472a"},{"path":"R/decision_engine.R","sha256":"16b2d16341f395691ebbab28efc3002f77e71787c0a6cba5256d368d5b0d1ab0"},{"path":"manuscript/overleaf_repo/manuscript.tex","sha256":"9d80a3ee2d5012d941c92198f5ee3aa0d32a6722b891a438f66c31138ca730a0"}],"rows":[{"week":40,"mean_relative_regret":0.21840529324902486,"median_relative_regret":0.1916294971917102,"lower_50_relative_regret":0.1134300059759322,"upper_50_relative_regret":0.29918828546327225,"lower_95_relative_regret":0.018504090571431434,"upper_95_relative_regret":0.5379560478158916},{"week":44,"mean_relative_regret":0.09208826598271533,"median_relative_regret":0.06526044469984217,"lower_50_relative_regret":0.026743295787202494,"upper_50_relative_regret":0.12696921230984276,"lower_95_relative_regret":9.620015276163562e-05,"upper_95_relative_regret":0.3383681582244589},{"week":47,"mean_relative_regret":0.027791182752895018,"median_relative_regret":0.010102973400285091,"lower_50_relative_regret":0.0012958984366476134,"upper_50_relative_regret":0.03236756287295139,"lower_95_relative_regret":0.0,"upper_95_relative_regret":0.16892385372789034},{"week":48,"mean_relative_regret":0.02257486040040622,"median_relative_regret":0.009391940955881636,"lower_50_relative_regret":0.0004790355932982,"upper_50_relative_regret":0.028165023332081367,"lower_95_relative_regret":0.0,"upper_95_relative_regret":0.1260582659845186}],"bars":[{"week":40,"calendar_lines":["Early October"],"loss_percent":21.840529324902487},{"week":44,"calendar_lines":["Late October /","early November"],"loss_percent":9.208826598271532},{"week":48,"calendar_lines":["Late November /","early December"],"loss_percent":2.257486040040622}],"axis_max":25};
+    const $ = id => document.getElementById(id);
+    const NS = 'http://www.w3.org/2000/svg';
+    const X = value => 340 + value / DATA.axis_max * 770;
+    const buttons = ['start','week-40','week-44','week-48'];
+    const reducedMotion = matchMedia('(prefers-reduced-motion:reduce)').matches;
+    let stage = 1, animation = 0;
+    function element(tag,attrs,parent,text) {
+      const el=document.createElementNS(NS,tag);
+      for(const [key,value] of Object.entries(attrs)) el.setAttribute(key,value);
+      if(text!==undefined) el.textContent=text;
+      parent.appendChild(el); return el;
+    }
+    for(let value=0;value<=DATA.axis_max;value+=5) {
+      element('line',{x1:X(value),x2:X(value),y1:100,y2:460,class:'grid'},$('axis'));
+      element('text',{x:X(value),y:77,'text-anchor':'middle',class:'axis'},$('axis'),`${value}%`);
+    }
+    const bars=DATA.bars.map((row,i)=>{
+      const y=155+i*130, twoLines=row.calendar_lines.length===2;
+      row.calendar_lines.forEach((line,j)=>element('text',{
+        x:76,y:y+(twoLines?-14+j*27:-4),'font-size':22,'font-weight':550
+      },$('dates'),line));
+      element('text',{x:76,y:y+(twoLines?40:26),class:'axis'},$('dates'),`Week ${row.week}`);
+      const group=element('g',{'data-week':row.week},$('bars'));
+      const rect=element('rect',{x:X(0),y:y-28,width:0,height:56,rx:5,fill:i===2?'#0a6670':'#93a29d'},group);
+      const label=element('text',{x:X(row.loss_percent)+18,y:y+14,class:'value',style:i===2?'fill:var(--teal)':''},group,`${row.loss_percent.toFixed(1)}%`);
+      return {group,rect,label,width:X(row.loss_percent)-X(0)};
+    });
+    function setStage(value,play=true) {
+      const previous=stage;
+      cancelAnimationFrame(animation); stage=value; document.body.dataset.state=value;
+      history.replaceState(null,'',`#state=${value}`);
+      buttons.forEach((id,i)=>$(id).setAttribute('aria-pressed',value===i+1));
+      bars.forEach((bar,i)=>{
+        bar.group.style.display=i<value-1?'':'none';
+        bar.rect.setAttribute('width',bar.width); bar.label.style.opacity=1;
+      });
+      if(play&&value>previous&&value>1&&!reducedMotion) {
+        const bar=bars[value-2], start=performance.now();
+        bar.rect.setAttribute('width',0); bar.label.style.opacity=0;
+        function frame(now) {
+          const progress=Math.max(0,Math.min(1,(now-start)/800));
+          bar.rect.setAttribute('width',bar.width*(1-Math.pow(1-progress,3)));
+          bar.label.style.opacity=progress;
+          if(progress<1) animation=requestAnimationFrame(frame);
+        }
+        animation=requestAnimationFrame(frame);
+      }
+      const shown=DATA.bars.slice(0,value-1).map(row=>`Week ${row.week}: ${row.loss_percent.toFixed(1)}% lost.`).join(' ');
+      $('chart-desc').textContent='Mean share of achievable modeled protection lost relative to the best vaccination date in each scenario, across 5,000 national all-age primary-model simulations. '+(shown||'Dates and a common zero-to-25% scale are shown. Advance to reveal the comparisons.')+' These are timing losses, not vaccine effectiveness estimates.';
+      $('status').textContent=$('chart-desc').textContent;
+    }
+    buttons.forEach((id,i)=>$(id).addEventListener('click',()=>setStage(i+1)));
+    $('reset').addEventListener('click',()=>setStage(1,false));
+    document.addEventListener('keydown',event=>{
+      if(event.repeat||(event.target.tagName==='BUTTON'&&event.key===' ')) return;
+      if(['ArrowRight','PageDown',' ','ArrowLeft','PageUp','Home'].includes(event.key)) {
+        event.preventDefault(); setStage(event.key==='Home'?1:['ArrowLeft','PageUp'].includes(event.key)?Math.max(1,stage-1):Math.min(4,stage+1));
+      }
+    });
+    function fit() { document.documentElement.style.setProperty('--scale',Math.min(innerWidth/1280,innerHeight/720)); }
+    addEventListener('resize',fit); fit();
+    const hash=new URLSearchParams(location.hash.slice(1));
+    setStage(Math.max(1,Math.min(4,Math.floor(Number(hash.get('state'))||1))),false);
+  </script>
+</body>
+</html>
