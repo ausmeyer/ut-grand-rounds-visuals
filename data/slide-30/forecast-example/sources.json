@@ -1,0 +1,60 @@
+[
+  {
+    "name": "observed",
+    "file": "observed.csv.gz",
+    "commit": "b758798766336111d3ae0151a3bf4aea383d5d6c",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/b758798766336111d3ae0151a3bf4aea383d5d6c/target-data/target-hospital-admissions.csv",
+    "sha256": "dc1bcefffd8284e4d7c7ff3dfbae5fd0a9e8ddd2aa5d015275076001b24d2cb4"
+  },
+  {
+    "name": "baseline-2023",
+    "file": "baseline-2023.csv.gz",
+    "commit": "9d268a4fcdb5da79456367ba30e095ccb08b5764",
+    "released_at": "2023-11-15T17:24:14Z",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/9d268a4fcdb5da79456367ba30e095ccb08b5764/target-data/target-hospital-admissions.csv",
+    "sha256": "b1723efff4b8a4f845239198f32f13161ef41b942caadfac06e180ba7523cb9f"
+  },
+  {
+    "name": "baseline-2024",
+    "file": "baseline-2024.csv.gz",
+    "commit": "fe4e989a9bd7285ab68d5810183f3cdb441b5bc6",
+    "released_at": "2024-11-15T20:45:40Z",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/fe4e989a9bd7285ab68d5810183f3cdb441b5bc6/target-data/target-hospital-admissions.csv",
+    "sha256": "21d89770737ee23854019518d95f8ac57cf17cf3f314aa144b0585650f7c9c27"
+  },
+  {
+    "name": "baseline-2025",
+    "file": "baseline-2025.csv.gz",
+    "commit": "760e05212a651a77fbf87717e85155348c2e47b9",
+    "released_at": "2025-11-19T16:39:13Z",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/760e05212a651a77fbf87717e85155348c2e47b9/target-data/target-hospital-admissions.csv",
+    "sha256": "d88b9fe309997bb9a8d5bf603fee7536c0009cb277d376e497da3287ca1d096b"
+  },
+  {
+    "name": "forecast-2023",
+    "file": "forecast-2023-12-09.csv.gz",
+    "reference_date": "2023-12-09",
+    "commit": "eb9257a2ee7e31e8e2cd895ebfa1fd23e19dd544",
+    "released_at": "2023-12-07T05:10:44Z",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/eb9257a2ee7e31e8e2cd895ebfa1fd23e19dd544/model-output/FluSight-ensemble/2023-12-09-FluSight-ensemble.csv",
+    "sha256": "a794b44e454c0f0d3937972822ace0140b9b6401f26f8fef0c653967abd0c5dc"
+  },
+  {
+    "name": "forecast-2024",
+    "file": "forecast-2024-12-07.csv.gz",
+    "reference_date": "2024-12-07",
+    "commit": "c447978d6bf2e5168c587a041d28f2fdc2a2fb98",
+    "released_at": "2024-12-05T15:37:58Z",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/c447978d6bf2e5168c587a041d28f2fdc2a2fb98/model-output/FluSight-ensemble/2024-12-07-FluSight-ensemble.csv",
+    "sha256": "a826062c33b865d9db39acac987140bae665d46a5f656cd7ea5807a08bb31ae7"
+  },
+  {
+    "name": "forecast-2025",
+    "file": "forecast-2025-11-22.csv.gz",
+    "reference_date": "2025-11-22",
+    "commit": "49197bcc8f2e04ff59af5655904dc988afe34124",
+    "released_at": "2025-11-20T13:32:43Z",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/49197bcc8f2e04ff59af5655904dc988afe34124/model-output/FluSight-ensemble/2025-11-22-FluSight-ensemble.csv",
+    "sha256": "2d19a10cdd85f831de5a260de0b3d7f148e27924b6d5281fffa759a1d6b798cb"
+  }
+]

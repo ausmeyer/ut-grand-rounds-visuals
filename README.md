@@ -123,10 +123,13 @@ Standalone **slides 28–30** close the vaccine-timing section:
   each scenario's best vaccination date across all three plots. The examples
   arrive every 0.16 seconds in an eight-second reveal. Its fourth state aligns
   all 50 epidemic curves by maximum shared area and summarizes their shifted
-  optimal dates.
+  optimal dates. State 5 overlays observed national hospitalization curves
+  from 2023–24, 2024–25, and 2025–26 with their real archived FluSight ensemble
+  forecasts at an illustrative rising level. The comparison uses no peaks;
+  its link to optimal vaccination timing remains untested.
   [Evidence notes](specs/slide-30-evidence.md) define the future-study question.
 
-Slides 28–30 each have four states and a static Start,
+Slides 28–29 have four states; slide 30 has five. Each has a static Start,
 arrow navigation, and Reset. Build slide 30 alone with
 `python3 scripts/build_slide_30.py`. The editable sources are `src/slide-28.html` through `src/slide-30.html`.
 `build_closing_slides.py` embeds the frozen inputs without accessing the

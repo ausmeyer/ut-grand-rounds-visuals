@@ -33,7 +33,7 @@
 <body>
   <main class="slide" aria-label="Slide 30. When can forecasts improve the decision?">
     <h1>When can forecasts improve the decision?</h1>
-    <section class="visual" aria-label="Paired influenza and protection scenarios and their best vaccination dates">
+    <section class="visual" aria-label="Vaccination timing scenarios and an illustration of forecasts during the influenza rise">
       <svg viewBox="0 0 1208 535" role="img" aria-labelledby="chart-title chart-desc">
         <title id="chart-title">Each scenario has its own best vaccination date</title>
         <desc id="chart-desc"></desc>
@@ -83,12 +83,30 @@
             <text x="925" y="270" font-size="18">before the mean peak</text>
           </g>
         </g>
+        <g id="forecast-view" style="display:none">
+          <text class="plot-title" x="64" y="61">Can we anticipate this part of the rise?</text>
+          <line x1="64" x2="94" y1="94" y2="94" stroke="#647278" stroke-width="3"/>
+          <text x="104" y="99" class="axis">Observed</text>
+          <line x1="223" x2="253" y1="94" y2="94" stroke="#647278" stroke-width="2.5" stroke-dasharray="7 5"/>
+          <text x="263" y="99" class="axis">Ensemble median</text>
+          <rect x="442" y="87" width="30" height="14" fill="#647278" opacity=".14"/>
+          <text x="482" y="99" class="axis">90% prediction interval</text>
+          <text x="64" y="135" class="axis">Hospitalizations / early-November level</text>
+          <g id="forecast-grid"></g>
+          <g id="forecast-bands"></g>
+          <g id="forecast-observed"></g>
+          <g id="forecast-medians"></g>
+          <g id="forecast-axis"></g>
+          <text x="532" y="493" text-anchor="middle" class="axis">Weeks relative to the first reported week above 4× the early-November level</text>
+          <text x="64" y="526" font-size="15" style="fill:var(--muted)">Illustrative rising level · Link to optimal vaccination timing remains untested</text>
+        </g>
       </svg>
       <div class="controls">
         <button id="start" aria-pressed="true">1 · Start</button>
         <button id="one" aria-pressed="false">2 · One scenario</button>
         <button id="samples" aria-pressed="false">3 · Sample scenarios</button>
         <button id="align" aria-pressed="false">4 · Align seasons</button>
+        <button id="forecast" aria-pressed="false">5 · Forecast the rise</button>
         <span id="control-hint">Arrow keys to advance</span>
         <button id="reset" aria-label="Reset demonstration" title="Reset">↺</button>
       </div>
@@ -103,7 +121,7 @@
     const BY = burden => 250-burden/DATA.burden_y_max*138;
     const PY = protection => 477-protection/DATA.protection_y_max*106;
     const DX = t => 680+t/29*474, DY = regret => 477-regret/DATA.regret_y_max*365;
-    const buttons = ['start','one','samples','align'];
+    const buttons = ['start','one','samples','align','forecast'];
     const reducedMotion = matchMedia('(prefers-reduced-motion:reduce)').matches;
     let stage = 1, animation = 0;
     function element(tag,attrs,parent,text) {
@@ -167,6 +185,31 @@
     element('text',{x:AX(alignment.median_point[0])-10,y:171,'text-anchor':'end','font-size':15,fill:'#933a4b'},$('alignment-mean'),'Median date');
     $('median-weeks').textContent=`~${Math.round(-alignment.after.median)} weeks`;
     $('summary-count').textContent=`FOR THESE ${DATA.scenarios.length} SCENARIOS`;
+    const forecast=DATA.forecast_example;
+    const FX=t=>64+(t+4)/4*936, FY=v=>436-v/forecast.y_max*286;
+    for(const value of [0,2,4,6]) {
+      element('line',{x1:64,x2:1000,y1:FY(value),y2:FY(value),class:'grid'},$('forecast-grid'));
+      element('text',{x:53,y:FY(value)+5,'text-anchor':'end',class:'axis'},$('forecast-axis'),`${value}×`);
+    }
+    for(const week of [-4,-3,-2,-1,0]) element('text',{x:FX(week),y:464,'text-anchor':'middle',class:'axis'},$('forecast-axis'),week===0?'Aligned week':String(week));
+    element('line',{x1:FX(-2),x2:FX(-2),y1:150,y2:436,stroke:'#a4b0b0','stroke-dasharray':'3 5'},$('forecast-grid'));
+    element('path',{d:`M${FX(-2)} 144 V136 H${FX(0)} V144`,fill:'none',stroke:'#93a49f'},$('forecast-grid'));
+    element('text',{x:FX(-1),y:126,'text-anchor':'middle',class:'axis'},$('forecast-grid'),'2-week-ahead forecast');
+    element('text',{x:76,y:FY(4)-10,'font-size':14,style:'fill:var(--muted)'},$('forecast-grid'),'4× early-November level');
+    forecast.seasons.forEach((season,i)=>{
+      const color=['#0a6670','#526c98','#9a763a'][i];
+      const band=[...season.forecast.map(p=>[p.week,p.lower]),...season.forecast.map(p=>[p.week,p.upper]).reverse()];
+      element('path',{d:path(band,FX,FY)+' Z',fill:color,opacity:.09,'data-season':season.season},$('forecast-bands'));
+      element('path',{d:path(season.observed_points,FX,FY),class:'sample',stroke:color,'stroke-width':3,'data-season':season.season},$('forecast-observed'));
+      element('circle',{cx:FX(0),cy:FY(season.ratio),r:5.5,fill:'#933a4b',stroke:'#fbfaf6','stroke-width':1.5,'data-season':season.season,'data-date':season.target_date},$('forecast-observed'));
+      element('text',{x:FX(0)+15,y:FY(season.ratio)+5,'font-size':16,'font-weight':600,style:`fill:${color}`},$('forecast-observed'),season.season);
+      element('path',{d:path(season.forecast.map(p=>[p.week,p.median]),FX,FY),class:'sample',stroke:color,'stroke-width':2.5,'stroke-dasharray':'7 5','data-season':season.season},$('forecast-medians'));
+      element('circle',{cx:FX(0),cy:FY(season.forecast.at(-1).median),r:4,fill:'#fbfaf6',stroke:color,'stroke-width':2,'data-season':season.season},$('forecast-medians'));
+    });
+    function revealForecast(progress) {
+      for(const id of ['forecast-bands','forecast-medians']) $(id).style.opacity=progress;
+      $('forecast-view').dataset.progress=progress;
+    }
     function alignSeasons(progress) {
       alignmentGraphics.forEach((group,i)=>group.setAttribute('transform',`translate(${AX(progress*alignment.profiles[i].shift)-AX(0)} 0)`));
       $('alignment-view').dataset.progress=progress;
@@ -198,12 +241,13 @@
     }
     function setStage(value,play=true) {
       const previous=stage;
-      cancelAnimationFrame(animation); stage=Math.max(1,Math.min(4,Math.floor(value))); value=stage;
+      cancelAnimationFrame(animation); stage=Math.max(1,Math.min(5,Math.floor(value))); value=stage;
       document.body.dataset.state=value; history.replaceState(null,'',`#state=${value}`);
       buttons.forEach((id,i)=>$(id).setAttribute('aria-pressed',value===i+1));
-      $('scenario-view').style.display=value===4?'none':'';
+      $('scenario-view').style.display=value>=4?'none':'';
       $('alignment-view').style.display=value===4?'':'none';
-      $('chart-title').textContent=value===4?'Optimal dates after aligning epidemic curves':'Each scenario has its own best vaccination date';
+      $('forecast-view').style.display=value===5?'':'none';
+      $('chart-title').textContent=value===5?'Archived FluSight ensemble forecasts during the influenza rise':value===4?'Optimal dates after aligning epidemic curves':'Each scenario has its own best vaccination date';
       if(value===1) samples(1,0,false);
       else if(value===2) {
         samples(1,0);
@@ -219,18 +263,24 @@
             samples(graphics.length);
           });
         } else { samples(graphics.length); }
-      } else {
+      } else if(value===4) {
         $('sample-count').textContent=`${DATA.scenarios.length} illustrated scenarios`;
         if(play&&value>previous&&!reducedMotion) {
           alignSeasons(0); animate(1800,p=>alignSeasons(p*p*(3-2*p)));
         } else alignSeasons(1);
+      } else {
+        $('sample-count').textContent='US hospitalizations · 2023–24, 2024–25, 2025–26';
+        if(play&&value>previous&&!reducedMotion) {
+          revealForecast(0); animate(1000,revealForecast);
+        } else revealForecast(1);
       }
       const desc=[
         '',
         'One saved simulated epidemic and vaccine-protection pair. Advance to reveal its best vaccination date.',
         `The regret curve reaches its calculated minimum at week ${DATA.scenarios[0].best_week}. Red dots mark that same dose date on the epidemic and calendar-aligned protection curves. Protection begins after the saved immune-response delay.`,
         `${DATA.scenarios.length} saved scenarios appear in sequence, each with a calculated regret minimum and matching dose-date dots on its epidemic and protection curves. These scenario-specific optima motivate a future forecast study; they are not a validated forecast-informed decision rule.`,
-        `The ${DATA.scenarios.length} epidemic curves are normalized to equal total area and shifted to maximize shared area with a representative epidemic profile. The optimal dates move with their curves and are not used to choose the shifts. The median date is about ${Math.round(-alignment.after.median)} weeks before the aligned mean peak. These are descriptive results for the ${DATA.scenarios.length} displayed scenarios, not a validated decision rule.`
+        `The ${DATA.scenarios.length} epidemic curves are normalized to equal total area and shifted to maximize shared area with a representative epidemic profile. The optimal dates move with their curves and are not used to choose the shifts. The median date is about ${Math.round(-alignment.after.median)} weeks before the aligned mean peak. These are descriptive results for the ${DATA.scenarios.length} displayed scenarios, not a validated decision rule.`,
+        'Three observed US influenza hospitalization curves are aligned at the first reported week above four times their early-November level, using a baseline frozen before each forecast. Solid lines show later revised observations. Dashed lines and shaded 90% prediction intervals are actual archived FluSight ensemble forecasts with reference dates two weeks before the aligned week. The three red points mark illustrative comparison weeks, not optimal vaccination dates. All three forecast medians underestimate the observed rise. No peak is used for scaling or alignment. This hospitalization example does not establish a timing rule for the outpatient ILI vaccine model.'
       ][value];
       $('chart-desc').textContent=desc; $('status').textContent=desc;
     }
@@ -240,14 +290,14 @@
       if(event.repeat||(event.target.tagName==='BUTTON'&&event.key===' ')) return;
       if(['ArrowRight','PageDown',' ','ArrowLeft','PageUp','Home'].includes(event.key)) {
         event.preventDefault();
-        const next=event.key==='Home'?1:['ArrowLeft','PageUp'].includes(event.key)?Math.max(1,stage-1):Math.min(4,stage+1);
+        const next=event.key==='Home'?1:['ArrowLeft','PageUp'].includes(event.key)?Math.max(1,stage-1):Math.min(5,stage+1);
         if(next!==stage) setStage(next);
       }
     });
     function fit() { document.documentElement.style.setProperty('--scale',Math.min(innerWidth/1280,innerHeight/720)); }
     addEventListener('resize',fit); fit();
     const hash=new URLSearchParams(location.hash.slice(1));
-    setStage(Math.max(1,Math.min(4,Math.floor(Number(hash.get('state'))||1))),false);
+    setStage(Math.max(1,Math.min(5,Math.floor(Number(hash.get('state'))||1))),false);
   </script>
 </body>
 </html>

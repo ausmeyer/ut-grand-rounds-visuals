@@ -9,6 +9,7 @@ from bisect import bisect_right
 from pathlib import Path
 
 from build_slide_25 import protection, week_index
+from build_slide_30_forecast import build_forecast_example
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -146,6 +147,7 @@ def build():
     candidate_totals = len(scenarios)*len(original['candidate_weeks'])
     data = {**config, 'n_draws': original['n_draws'], 'scenarios': scenarios,
             'alignment': align_seasons(scenarios),
+            'forecast_example': build_forecast_example(),
             'burden_y_max': math.ceil(max(max(r['burden']) for r in original['scenarios'])*100)/100,
             'protection_y_max': .8,
             'regret_y_max': math.ceil(max(max(p[1] for p in s['decision_points']) for s in scenarios)*10)/10,

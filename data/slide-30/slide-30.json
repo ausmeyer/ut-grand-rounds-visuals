@@ -55912,6 +55912,258 @@
     "x_max": 20,
     "y_max": 0.07
   },
+  "forecast_example": {
+    "design": {
+      "location": "US",
+      "seasons": [
+        "2023\u201324",
+        "2024\u201325",
+        "2025\u201326"
+      ],
+      "baseline_rule": "Admissions for the second Saturday in November, from the latest archived target-data update on or before November 19 at 23:59:59 UTC.",
+      "baseline_freeze_month_day": "11-19",
+      "rise_multiple": 4,
+      "target_rule": "First reported week at or above four times the frozen early-November reference, using later observed data to locate this illustrative comparison week.",
+      "hub_horizon_at_comparison": 2,
+      "forecast_rule": "One archived FluSight-ensemble submission per season, reference date two weeks before the comparison week; no forecast-fit-based example selection.",
+      "forecast_selected_before_inspecting_values": true,
+      "scope": "Illustration of forecasts on the rising limb. The threshold is not estimated from the vaccine model and is not a validated vaccination cutoff.",
+      "observed_truth_commit": "b758798766336111d3ae0151a3bf4aea383d5d6c",
+      "plot_week_range": [
+        -4,
+        0
+      ],
+      "display_window_note": "The displayed window ends at the comparison week to show only the rise; no peak is displayed or used for scaling or alignment."
+    },
+    "seasons": [
+      {
+        "year": 2023,
+        "baseline_date": "2023-11-11",
+        "baseline": 2763.0,
+        "target_date": "2023-12-23",
+        "observed": 15755.0,
+        "ratio": 5.7021353601158165,
+        "reference_date": "2023-12-09",
+        "season": "2023\u201324",
+        "observed_points": [
+          [
+            -4,
+            1.5863192182410424
+          ],
+          [
+            -3,
+            2.157075642417662
+          ],
+          [
+            -2,
+            2.7090119435396307
+          ],
+          [
+            -1,
+            3.7256605139341294
+          ],
+          [
+            0,
+            5.7021353601158165
+          ]
+        ],
+        "forecast": [
+          {
+            "week": -2,
+            "date": "2023-12-09",
+            "horizon": 0,
+            "lower": 1.8758595729279768,
+            "median": 2.41042345276873,
+            "upper": 3.113644589214622,
+            "counts": {
+              "0.05": 5183.0,
+              "0.5": 6660.0,
+              "0.95": 8603.0
+            }
+          },
+          {
+            "week": -1,
+            "date": "2023-12-16",
+            "horizon": 1,
+            "lower": 1.9098655993731257,
+            "median": 2.7891444082519,
+            "upper": 3.9178058386497305,
+            "counts": {
+              "0.05": 5276.958651067946,
+              "0.5": 7706.406,
+              "0.95": 10824.897532189205
+            }
+          },
+          {
+            "week": 0,
+            "date": "2023-12-23",
+            "horizon": 2,
+            "lower": 1.9055958459464364,
+            "median": 3.0350763662685485,
+            "upper": 4.869344914947521,
+            "counts": {
+              "0.05": 5265.1613223500035,
+              "0.5": 8385.916,
+              "0.95": 13454.0
+            }
+          }
+        ],
+        "forecast_released_at": "2023-12-07T05:10:44Z"
+      },
+      {
+        "year": 2024,
+        "baseline_date": "2024-11-09",
+        "baseline": 2481.0,
+        "target_date": "2024-12-21",
+        "observed": 16127.0,
+        "ratio": 6.500201531640467,
+        "reference_date": "2024-12-07",
+        "season": "2024\u201325",
+        "observed_points": [
+          [
+            -4,
+            1.3216444981862152
+          ],
+          [
+            -3,
+            1.788391777509069
+          ],
+          [
+            -2,
+            2.6259572752922207
+          ],
+          [
+            -1,
+            3.8673921805723497
+          ],
+          [
+            0,
+            6.500201531640467
+          ]
+        ],
+        "forecast": [
+          {
+            "week": -2,
+            "date": "2024-12-07",
+            "horizon": 0,
+            "lower": 1.2539298669891172,
+            "median": 1.9266424828698105,
+            "upper": 2.7448609431680775,
+            "counts": {
+              "0.05": 3111.0,
+              "0.5": 4780.0,
+              "0.95": 6810.0
+            }
+          },
+          {
+            "week": -1,
+            "date": "2024-12-14",
+            "horizon": 1,
+            "lower": 1.4510278113663846,
+            "median": 2.3873438129786377,
+            "upper": 3.5618702136235387,
+            "counts": {
+              "0.05": 3600.0,
+              "0.5": 5923.0,
+              "0.95": 8837.0
+            }
+          },
+          {
+            "week": 0,
+            "date": "2024-12-21",
+            "horizon": 2,
+            "lower": 1.4856912535268036,
+            "median": 2.853688029020556,
+            "upper": 4.8460298266827895,
+            "counts": {
+              "0.05": 3686.0,
+              "0.5": 7080.0,
+              "0.95": 12023.0
+            }
+          }
+        ],
+        "forecast_released_at": "2024-12-05T15:37:58Z"
+      },
+      {
+        "year": 2025,
+        "baseline_date": "2025-11-08",
+        "baseline": 1672.0,
+        "target_date": "2025-12-06",
+        "observed": 7451.0,
+        "ratio": 4.45633971291866,
+        "reference_date": "2025-11-22",
+        "season": "2025\u201326",
+        "observed_points": [
+          [
+            -4,
+            1.06877990430622
+          ],
+          [
+            -3,
+            1.486244019138756
+          ],
+          [
+            -2,
+            2.1411483253588517
+          ],
+          [
+            -1,
+            3.1226076555023923
+          ],
+          [
+            0,
+            4.45633971291866
+          ]
+        ],
+        "forecast": [
+          {
+            "week": -2,
+            "date": "2025-11-22",
+            "horizon": 0,
+            "lower": 0.8636363636363636,
+            "median": 1.5568181818181819,
+            "upper": 2.3181818181818183,
+            "counts": {
+              "0.05": 1444.0,
+              "0.5": 2603.0,
+              "0.95": 3876.0
+            }
+          },
+          {
+            "week": -1,
+            "date": "2025-11-29",
+            "horizon": 1,
+            "lower": 0.9748803827751196,
+            "median": 1.9037081339712918,
+            "upper": 3.1543062200956937,
+            "counts": {
+              "0.05": 1630.0,
+              "0.5": 3183.0,
+              "0.95": 5274.0
+            }
+          },
+          {
+            "week": 0,
+            "date": "2025-12-06",
+            "horizon": 2,
+            "lower": 1.1160287081339713,
+            "median": 2.2673444976076556,
+            "upper": 4.644736842105263,
+            "counts": {
+              "0.05": 1866.0,
+              "0.5": 3791.0,
+              "0.95": 7766.0
+            }
+          }
+        ],
+        "forecast_released_at": "2025-11-20T13:32:43Z"
+      }
+    ],
+    "y_max": 7,
+    "interval": 0.9,
+    "quantile_rows_checked": 207,
+    "source_ledger": "data/slide-30/forecast-example/sources.json"
+  },
   "burden_y_max": 0.08,
   "protection_y_max": 0.8,
   "regret_y_max": 0.5,
