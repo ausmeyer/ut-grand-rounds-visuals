@@ -39,6 +39,7 @@
         <desc id="chart-desc"></desc>
         <text x="64" y="23" font-size="15" font-weight="650" style="fill:var(--teal)">NEXT STUDY</text>
         <text id="sample-count" x="1154" y="23" text-anchor="end" class="axis"></text>
+        <g id="scenario-view">
         <text class="plot-title" x="64" y="61">Possible influenza seasons</text>
         <text class="axis" x="64" y="84">Weekly outpatient ILI</text>
         <text id="season-label" class="axis" x="424" y="84" text-anchor="end"></text>
@@ -66,12 +67,43 @@
         <g id="decision-curves"></g>
         <g id="decision-markers"></g>
         <g id="decision-axis"></g>
+        </g>
+        <g id="alignment-view" style="display:none">
+          <text class="plot-title" x="64" y="61">Align seasons by maximum overlap</text>
+          <text class="axis" x="64" y="84">Each season scaled to the same total area; red dots move with their curves</text>
+          <line x1="64" x2="84" y1="106" y2="106" stroke="#a4b0b0" stroke-width="2"/>
+          <text x="92" y="111" class="axis">Seasons</text>
+          <line x1="176" x2="196" y1="106" y2="106" stroke="#0a6670" stroke-width="3"/>
+          <text x="204" y="111" class="axis">Aligned mean</text>
+          <circle cx="341" cy="106" r="4.5" fill="#933a4b"/>
+          <text x="353" y="111" class="axis">Optimal dates</text>
+          <g id="alignment-grid"></g>
+          <g id="alignment-band"></g>
+          <g id="aligned-profiles"></g>
+          <g id="alignment-mean"></g>
+          <g id="alignment-axis"></g>
+          <text x="462" y="501" text-anchor="middle" class="axis">Weeks from the aligned mean peak</text>
+          <g id="alignment-summary">
+            <text x="925" y="151" font-size="15" font-weight="650" style="fill:var(--muted)">FOR THESE 10 SCENARIOS</text>
+            <text x="925" y="190" font-size="18">Median optimal date</text>
+            <text id="median-weeks" x="925" y="240" font-size="42" font-weight="600" style="fill:var(--red)"></text>
+            <text x="925" y="270" font-size="18">before the mean peak</text>
+            <line x1="925" x2="1168" y1="303" y2="303" class="grid"/>
+            <text x="925" y="339" font-size="18" font-weight="600">Middle 50% of dates</text>
+            <text x="925" y="376" font-size="16" style="fill:var(--muted)">Before alignment</text>
+            <text id="spread-before" x="1168" y="376" text-anchor="end" font-size="19" font-weight="600"></text>
+            <text x="925" y="410" font-size="16" style="fill:var(--muted)">After alignment</text>
+            <text id="spread-after" x="1168" y="410" text-anchor="end" font-size="19" font-weight="600" style="fill:var(--red)"></text>
+            <text x="925" y="449" font-size="15" style="fill:var(--muted)">Some narrowing; outliers remain</text>
+          </g>
+        </g>
         <text id="takeaway" x="604" y="531" text-anchor="middle" font-size="22" font-weight="550"></text>
       </svg>
       <div class="controls">
         <button id="start" aria-pressed="true">1 · Start</button>
         <button id="one" aria-pressed="false">2 · One scenario</button>
         <button id="samples" aria-pressed="false">3 · Sample scenarios</button>
+        <button id="align" aria-pressed="false">4 · Align seasons</button>
         <span id="control-hint">Arrow keys to advance</span>
         <button id="reset" aria-label="Reset demonstration" title="Reset">↺</button>
       </div>
@@ -86,7 +118,7 @@
     const BY = burden => 250-burden/DATA.burden_y_max*138;
     const PY = protection => 477-protection/DATA.protection_y_max*106;
     const DX = t => 680+t/29*474, DY = regret => 477-regret/DATA.regret_y_max*365;
-    const buttons = ['start','one','samples'];
+    const buttons = ['start','one','samples','align'];
     const reducedMotion = matchMedia('(prefers-reduced-motion:reduce)').matches;
     let stage = 1, animation = 0;
     function element(tag,attrs,parent,text) {
@@ -130,6 +162,32 @@
       });
       return {curves,markers};
     });
+    const alignment=DATA.alignment;
+    const AX=t=>64+(t-alignment.x_min)/(alignment.x_max-alignment.x_min)*796;
+    const AY=v=>443-v/alignment.y_max*293;
+    for(const fraction of [0,.5,1]) element('line',{x1:64,x2:860,y1:AY(fraction*alignment.y_max),y2:AY(fraction*alignment.y_max),class:'grid'},$('alignment-grid'));
+    element('text',{x:64,y:137,class:'axis'},$('alignment-grid'),'Relative influenza activity');
+    for(let t=-24;t<=16;t+=8) element('text',{x:AX(t),y:469,'text-anchor':'middle',class:'axis'},$('alignment-axis'),t===0?'Peak':`${t>0?'+':''}${t}`);
+    element('line',{x1:AX(0),x2:AX(0),y1:150,y2:443,stroke:'#a4b0b0','stroke-dasharray':'3 5'},$('alignment-grid'));
+    element('rect',{x:AX(alignment.after.q1),y:150,width:AX(alignment.after.q3)-AX(alignment.after.q1),height:293,fill:'#933a4b',opacity:.08},$('alignment-band'));
+    const alignmentGraphics=alignment.profiles.map(profile=>{
+      const group=element('g',{'data-draw':profile.draw,'data-shift':profile.shift},$('aligned-profiles'));
+      element('path',{d:path(profile.points,AX,AY),class:'sample',stroke:'#a4b0b0','stroke-width':1.6,opacity:.65},group);
+      element('circle',{cx:AX(profile.optimal_time_before),cy:AY(profile.optimal_height),r:4.5,fill:'#933a4b',opacity:.72,stroke:'#fbfaf6','stroke-width':1},group);
+      return group;
+    });
+    element('path',{d:path(alignment.mean_points,AX,AY),class:'sample',stroke:'#0a6670','stroke-width':3.2},$('alignment-mean'));
+    element('line',{x1:AX(alignment.median_point[0]),x2:AX(alignment.median_point[0]),y1:150,y2:443,stroke:'#933a4b','stroke-width':1.5,'stroke-dasharray':'5 5'},$('alignment-mean'));
+    element('circle',{cx:AX(alignment.median_point[0]),cy:AY(alignment.median_point[1]),r:6.5,fill:'#933a4b',stroke:'#fbfaf6','stroke-width':2},$('alignment-mean'));
+    element('text',{x:AX(alignment.median_point[0])-10,y:171,'text-anchor':'end','font-size':15,fill:'#933a4b'},$('alignment-mean'),'Median date');
+    $('median-weeks').textContent=`~${Math.round(-alignment.after.median)} weeks`;
+    $('spread-before').textContent=`${alignment.before.iqr.toFixed(1)} wk`;
+    $('spread-after').textContent=`${alignment.after.iqr.toFixed(1)} wk`;
+    function alignSeasons(progress) {
+      alignmentGraphics.forEach((group,i)=>group.setAttribute('transform',`translate(${AX(progress*alignment.profiles[i].shift)-AX(0)} 0)`));
+      $('alignment-view').dataset.progress=progress;
+      for(const id of ['alignment-band','alignment-mean','alignment-summary']) $(id).style.display=progress===1?'':'none';
+    }
     function samples(count,active=-1,showDates=true) {
       graphics.forEach((graphic,i)=>{
         const selected=i===active;
@@ -159,10 +217,13 @@
     }
     function setStage(value,play=true) {
       const previous=stage;
-      cancelAnimationFrame(animation); stage=Math.max(1,Math.min(3,Math.floor(value))); value=stage;
+      cancelAnimationFrame(animation); stage=Math.max(1,Math.min(4,Math.floor(value))); value=stage;
       document.body.dataset.state=value; history.replaceState(null,'',`#state=${value}`);
       buttons.forEach((id,i)=>$(id).setAttribute('aria-pressed',value===i+1));
       $('takeaway').textContent='';
+      $('scenario-view').style.display=value===4?'none':'';
+      $('alignment-view').style.display=value===4?'':'none';
+      $('chart-title').textContent=value===4?'Optimal dates after aligning epidemic curves':'Each scenario has its own best vaccination date';
       if(value===1) samples(1,0,false);
       else if(value===2) {
         samples(1,0);
@@ -170,17 +231,25 @@
           const reveal=[graphics[0].curves[2],...graphics[0].markers]; reveal.forEach(el=>el.style.opacity=0);
           animate(600,p=>reveal.forEach(el=>el.style.opacity=p));
         }
-      } else if(play&&value>previous&&!reducedMotion) {
-        samples(1,0);
-        animate(8000,p=>{const count=Math.min(graphics.length,1+Math.floor(p*graphics.length)); samples(count,count-1);},()=>{
-          samples(graphics.length); $('takeaway').textContent=DATA.closing_question;
-        });
-      } else { samples(graphics.length); $('takeaway').textContent=DATA.closing_question; }
+      } else if(value===3) {
+        if(play&&value>previous&&!reducedMotion) {
+          samples(1,0);
+          animate(8000,p=>{const count=Math.min(graphics.length,1+Math.floor(p*graphics.length)); samples(count,count-1);},()=>{
+            samples(graphics.length); $('takeaway').textContent=DATA.closing_question;
+          });
+        } else { samples(graphics.length); $('takeaway').textContent=DATA.closing_question; }
+      } else {
+        $('sample-count').textContent='10 illustrated scenarios';
+        if(play&&value>previous&&!reducedMotion) {
+          alignSeasons(0); animate(1800,p=>alignSeasons(p*p*(3-2*p)));
+        } else alignSeasons(1);
+      }
       const desc=[
         '',
         'One saved simulated epidemic and vaccine-protection pair. Advance to reveal its best vaccination date.',
         `The regret curve reaches its calculated minimum at week ${DATA.scenarios[0].best_week}. Red dots mark that same dose date on the epidemic and calendar-aligned protection curves. Protection begins after the saved immune-response delay.`,
-        'Ten saved scenarios appear in sequence, each with a calculated regret minimum and matching dose-date dots on its epidemic and protection curves. These scenario-specific optima motivate a future forecast study; they are not a validated forecast-informed decision rule.'
+        'Ten saved scenarios appear in sequence, each with a calculated regret minimum and matching dose-date dots on its epidemic and protection curves. These scenario-specific optima motivate a future forecast study; they are not a validated forecast-informed decision rule.',
+        'The ten epidemic curves are normalized to equal total area and shifted to maximize shared area with a representative epidemic profile. The optimal dates move with their curves and are not used to choose the shifts. The median date is about nine weeks before the aligned mean peak; the middle half of dates spans 3.5 weeks before alignment and 1.9 weeks afterward. These are descriptive results for the ten displayed scenarios, not a validated decision rule.'
       ][value];
       $('chart-desc').textContent=desc; $('status').textContent=desc;
     }
@@ -190,14 +259,14 @@
       if(event.repeat||(event.target.tagName==='BUTTON'&&event.key===' ')) return;
       if(['ArrowRight','PageDown',' ','ArrowLeft','PageUp','Home'].includes(event.key)) {
         event.preventDefault();
-        const next=event.key==='Home'?1:['ArrowLeft','PageUp'].includes(event.key)?Math.max(1,stage-1):Math.min(3,stage+1);
+        const next=event.key==='Home'?1:['ArrowLeft','PageUp'].includes(event.key)?Math.max(1,stage-1):Math.min(4,stage+1);
         if(next!==stage) setStage(next);
       }
     });
     function fit() { document.documentElement.style.setProperty('--scale',Math.min(innerWidth/1280,innerHeight/720)); }
     addEventListener('resize',fit); fit();
     const hash=new URLSearchParams(location.hash.slice(1));
-    setStage(Math.max(1,Math.min(3,Math.floor(Number(hash.get('state'))||1))),false);
+    setStage(Math.max(1,Math.min(4,Math.floor(Number(hash.get('state'))||1))),false);
   </script>
 </body>
 </html>

@@ -120,10 +120,12 @@ Standalone **slides 28–30** close the vaccine-timing section:
   from this conceptual missed-vaccination branch.
 - [Slide 30](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-30.html#state=1)
   reuses slide 25's ten scenarios, adding synchronized red dots at each
-  scenario's best vaccination date across all three plots.
+  scenario's best vaccination date across all three plots. Its fourth state
+  aligns the epidemic curves by maximum shared area and summarizes the
+  shifted optimal dates for those ten examples.
   [Evidence notes](specs/slide-30-evidence.md) define the future-study question.
 
-Slides 28–29 have four states; slide 30 has three. Each has a static Start,
+Slides 28–30 each have four states and a static Start,
 arrow navigation, and Reset. Build slide 30 alone with
 `python3 scripts/build_slide_30.py`. The editable sources are `src/slide-28.html` through `src/slide-30.html`.
 `build_closing_slides.py` embeds the frozen inputs without accessing the
