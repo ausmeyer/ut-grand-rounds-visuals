@@ -119,7 +119,9 @@ the vertical axis therefore says “Relative influenza activity.”
    eight seconds.
 4. **Align seasons**: enlarge the epidemic plot, normalize each season to
    equal total area, and translate each curve and its dot together over
-   1.8 seconds. Then reveal the aligned mean, median date, and spread summary.
+   1.8 seconds. Then reveal the aligned mean and median date, with the
+   median-date summary centered vertically beside the plot. The spread
+   comparison remains in these notes rather than on the slide.
 
 Loading any state or navigating backward gives a completed static view;
 reduced motion also skips animation. The first arrow from Start enters state

@@ -76,18 +76,11 @@
           <g id="alignment-mean"></g>
           <g id="alignment-axis"></g>
           <text x="462" y="501" text-anchor="middle" class="axis">Weeks from the aligned mean peak</text>
-          <g id="alignment-summary">
+          <g id="alignment-summary" transform="translate(0 90)">
             <text x="925" y="151" font-size="15" font-weight="650" style="fill:var(--muted)">FOR THESE 10 SCENARIOS</text>
             <text x="925" y="190" font-size="18">Median optimal date</text>
             <text id="median-weeks" x="925" y="240" font-size="42" font-weight="600" style="fill:var(--red)"></text>
             <text x="925" y="270" font-size="18">before the mean peak</text>
-            <line x1="925" x2="1168" y1="303" y2="303" class="grid"/>
-            <text x="925" y="339" font-size="18" font-weight="600">Middle 50% of dates</text>
-            <text x="925" y="376" font-size="16" style="fill:var(--muted)">Before alignment</text>
-            <text id="spread-before" x="1168" y="376" text-anchor="end" font-size="19" font-weight="600"></text>
-            <text x="925" y="410" font-size="16" style="fill:var(--muted)">After alignment</text>
-            <text id="spread-after" x="1168" y="410" text-anchor="end" font-size="19" font-weight="600" style="fill:var(--red)"></text>
-            <text x="925" y="449" font-size="15" style="fill:var(--muted)">Some narrowing; outliers remain</text>
           </g>
         </g>
       </svg>
@@ -173,8 +166,6 @@
     element('circle',{cx:AX(alignment.median_point[0]),cy:AY(alignment.median_point[1]),r:6.5,fill:'#933a4b',stroke:'#fbfaf6','stroke-width':2},$('alignment-mean'));
     element('text',{x:AX(alignment.median_point[0])-10,y:171,'text-anchor':'end','font-size':15,fill:'#933a4b'},$('alignment-mean'),'Median date');
     $('median-weeks').textContent=`~${Math.round(-alignment.after.median)} weeks`;
-    $('spread-before').textContent=`${alignment.before.iqr.toFixed(1)} wk`;
-    $('spread-after').textContent=`${alignment.after.iqr.toFixed(1)} wk`;
     function alignSeasons(progress) {
       alignmentGraphics.forEach((group,i)=>group.setAttribute('transform',`translate(${AX(progress*alignment.profiles[i].shift)-AX(0)} 0)`));
       $('alignment-view').dataset.progress=progress;
@@ -237,7 +228,7 @@
         'One saved simulated epidemic and vaccine-protection pair. Advance to reveal its best vaccination date.',
         `The regret curve reaches its calculated minimum at week ${DATA.scenarios[0].best_week}. Red dots mark that same dose date on the epidemic and calendar-aligned protection curves. Protection begins after the saved immune-response delay.`,
         'Ten saved scenarios appear in sequence, each with a calculated regret minimum and matching dose-date dots on its epidemic and protection curves. These scenario-specific optima motivate a future forecast study; they are not a validated forecast-informed decision rule.',
-        'The ten epidemic curves are normalized to equal total area and shifted to maximize shared area with a representative epidemic profile. The optimal dates move with their curves and are not used to choose the shifts. The median date is about nine weeks before the aligned mean peak; the middle half of dates spans 3.5 weeks before alignment and 1.9 weeks afterward. These are descriptive results for the ten displayed scenarios, not a validated decision rule.'
+        'The ten epidemic curves are normalized to equal total area and shifted to maximize shared area with a representative epidemic profile. The optimal dates move with their curves and are not used to choose the shifts. The median date is about nine weeks before the aligned mean peak. These are descriptive results for the ten displayed scenarios, not a validated decision rule.'
       ][value];
       $('chart-desc').textContent=desc; $('status').textContent=desc;
     }
