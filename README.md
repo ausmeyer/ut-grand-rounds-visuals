@@ -268,14 +268,18 @@ the 1240 × 540 iframe, with their titles in Slides.com.
 ## Slide 4 claymation
 
 The finished animation and editable Blender project are in
-`docs/slide-04-claymation/`. The video is 2 minutes 12 seconds at 1920 × 1080
-and 24 fps. Only the opening title (first six seconds) and surveillance information
-cards appear over the animation; there are no bottom or later top banners.
-Clay signs use consistent black lettering, and the NSSP sign is raised above
-the ED entrance to remain visible behind the ambulance.
-The standalone player preserves the eight chapter shortcuts,
-video and Blender downloads, and expandable system descriptions and sources.
+`docs/slide-04-claymation/`. The video is 2 minutes 6 seconds at 1920 × 1080
+and 24 fps, with sound: an original instrumental plus recorded public-domain
+(CC0) sneezes and coughs. The patient walks from the first frame. The title shows
+for half a second; after that, only the eight surveillance information cards appear.
+Each card states what the system measures and what it shows, checked against CDC
+pages on October 1, 2026. The standalone player keeps the eight chapter shortcuts,
+the video and Blender downloads, and each card's text with its CDC source.
 
+- [Slides.com deck player](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-04-claymation/deck.html):
+  Play/Pause, Restart, sound on/off, a slider and eight chapter buttons. It
+  waits on the opening frame each time the slide opens and passes clicker keys
+  back to the deck.
 - [Standalone player](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-04-claymation/)
 - [Compact iframe player](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-04-claymation/embed.html)
 
@@ -298,8 +302,9 @@ The `.blend` download opens in Blender for editing. The original interactive
 `slide-04.html` remains available at its existing address.
 
 The published assets are the approved render from the local
-`../animations/slide-04-claymation-2026-09-23-v2/` project: `watch.html` is
+`../animations/slide-04-claymation-2026-10-01-v3/` project: `watch.html` is
 copied to `index.html`, alongside `surveillance_claymation.mp4`,
-`surveillance_claymation.blend`, and `poster.png`. Update those four files
-together after rendering a revision. Intermediate frames and older render
+`surveillance_claymation.blend`, `poster.png`, `deck.html` and `embed.html`.
+Update these files together after rendering a revision, and bump the `?v=` on
+the Slides.com slide's poster image and player iframe. Intermediate frames and older render
 versions are not included in this repository.
