@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Slide 29 · A later date only helps if vaccination still happens</title>
+  <style>
+    :root { --paper:#fbfaf6; --ink:#14242b; --muted:#647278; --teal:#0a6670; }
+    * { box-sizing:border-box; }
+    html,body { width:100%; height:100%; margin:0; overflow:hidden; }
+    body { background:var(--paper); color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+    .slide { position:absolute; width:1280px; height:720px; left:50%; top:50%; transform:translate(-50%,-50%) scale(var(--scale,1)); transform-origin:center; }
+    h1 { position:absolute; left:50px; top:48px; width:1180px; margin:0; font-family:Montserrat,Inter,ui-sans-serif,system-ui,sans-serif; font-size:36px; line-height:1.22; font-weight:550; letter-spacing:-.8px; }
+    .visual { position:absolute; left:20px; top:113px; width:1240px; height:587px; }
+    svg { display:block; width:1208px; height:535px; margin:0 16px; overflow:visible; }
+    svg text { fill:var(--ink); font-family:inherit; }
+    .muted { fill:var(--muted); }
+    .link { fill:none; stroke:#b8c5c0; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+    .controls { height:49px; padding:11px 29px 0; display:flex; align-items:center; gap:10px; }
+    button { border:1px solid #b9c3c0; border-radius:8px; background:white; color:var(--ink); height:34px; font:inherit; font-size:14px; font-weight:650; cursor:pointer; padding:0 17px; white-space:nowrap; }
+    button:hover { border-color:var(--teal); }
+    button[aria-pressed=true] { color:var(--teal); border-color:var(--teal); background:#edf6f4; }
+    button:focus-visible { outline:3px solid #82bcc1; outline-offset:3px; }
+    #reset { padding:0 10px; font-size:19px; margin-left:auto; }
+    #control-hint { color:var(--muted); font-size:13px; margin-left:9px; }
+    .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+  </style>
+</head>
+<body>
+  <main class="slide" aria-label="Slide 29. A later date only helps if vaccination still happens">
+    <h1>A later date only helps if vaccination still happens</h1>
+    <section class="visual" aria-label="Vaccination timing and the chance of receiving a dose">
+      <svg viewBox="0 0 1208 535" role="img" aria-labelledby="chart-title chart-desc">
+        <title id="chart-title">Vaccinate today or schedule a later dose</title>
+        <desc id="chart-desc"></desc>
+        <text x="82" y="30" font-size="21" font-weight="650">At today's visit</text>
+        <circle cx="161" cy="207" r="29" fill="none" stroke="#0a6670" stroke-width="4"/>
+        <path d="M105 290 V279 C105 244 217 244 217 279 V290" fill="none" stroke="#0a6670" stroke-width="4" stroke-linecap="round"/>
+        <text x="161" y="329" text-anchor="middle" font-size="21" font-weight="550">One patient</text>
+        <path d="M233 249 H267 Q284 249 284 232 V146 Q284 129 301 129 H336 M267 249 Q284 249 284 266 V327 Q284 344 301 344 H336" class="link"/>
+        <rect x="336" y="81" width="290" height="96" rx="12" fill="#f0f3ef" stroke="#b8c5c0" stroke-width="2"/>
+        <text x="481" y="137" text-anchor="middle" font-size="23" font-weight="600">Vaccinate today</text>
+        <rect x="336" y="296" width="290" height="96" rx="12" fill="#f0f3ef" stroke="#b8c5c0" stroke-width="2"/>
+        <text x="481" y="352" text-anchor="middle" font-size="23" font-weight="600">Schedule a later dose</text>
+        <g id="later-received" style="display:none">
+          <path d="M626 344 H695 Q715 344 715 324 V286 Q715 266 735 266 H853" class="link" style="stroke:var(--teal)"/>
+          <path d="M842 260 L853 266 L842 272" class="link" style="stroke:var(--teal)"/>
+          <rect x="864" y="224" width="280" height="84" rx="12" fill="#e9f3f0" stroke="#0a6670" stroke-width="2"/>
+          <path d="M889 264 L901 276 L923 252" class="link" style="stroke:var(--teal)"/>
+          <text x="1019" y="274" text-anchor="middle" font-size="23" font-weight="600" style="fill:var(--teal)">Dose received</text>
+          <text x="1004" y="205" text-anchor="middle" font-size="17" font-weight="550" class="muted">Assumed in the study</text>
+        </g>
+        <g id="later-missed" style="display:none">
+          <path d="M695 344 Q715 344 715 364 V372 Q715 392 735 392 H853" class="link" style="stroke:#933a4b"/>
+          <path d="M842 386 L853 392 L842 398" class="link" style="stroke:#933a4b"/>
+          <rect x="864" y="350" width="280" height="84" rx="12" fill="#f6eceb" stroke="#933a4b" stroke-width="2"/>
+          <text x="1004" y="400" text-anchor="middle" font-size="23" font-weight="600" style="fill:#933a4b">Vaccination missed</text>
+        </g>
+        <g id="today-received" style="display:none">
+          <path d="M626 129 H853 M842 123 L853 129 L842 135" class="link" style="stroke:var(--teal)"/>
+          <rect x="864" y="87" width="280" height="84" rx="12" fill="#e9f3f0" stroke="#0a6670" stroke-width="2"/>
+          <path d="M889 127 L901 139 L923 115" class="link" style="stroke:var(--teal)"/>
+          <text x="1019" y="137" text-anchor="middle" font-size="23" font-weight="600" style="fill:var(--teal)">Dose received</text>
+        </g>
+        <g id="takeaway" style="display:none">
+          <text x="604" y="486" text-anchor="middle" font-size="23" font-weight="550">Risk of missing the dose can change the decision.</text>
+          <text id="practice-note" x="604" y="519" text-anchor="middle" font-size="16" class="muted"></text>
+        </g>
+      </svg>
+      <div class="controls">
+        <button id="start" aria-pressed="true">1 · Start</button>
+        <button id="assumption" aria-pressed="false">2 · Study assumption</button>
+        <button id="missed" aria-pressed="false">3 · A missed dose</button>
+        <button id="practice" aria-pressed="false">4 · Clinical decision</button>
+        <span id="control-hint">Arrow keys to advance</span>
+        <button id="reset" aria-label="Reset demonstration" title="Reset">↺</button>
+      </div>
+      <output id="status" class="sr-only" aria-live="polite"></output>
+    </section>
+  </main>
+  <script>
+    const DATA = {"model_assumption":"The vaccine is received on the chosen date.","missed_dose_probability":null,"diagram_type":"Conceptual decision tree; branch spacing and colors do not encode probabilities or effect sizes.","practice_note":"September\u2013October for most one-dose recipients; avoid missed opportunities.","guidance_source":{"title":"CDC seasonal influenza vaccine administration","url":"https://www.cdc.gov/flu/hcp/vax-summary/seasonal-influenza-vaccines.html","checked":"2026-10-01"},"scope":"The manuscript compares receipt dates; this diagram introduces the separate possibility of not receiving a later dose. It does not estimate a clinical threshold."};
+    const $ = id => document.getElementById(id);
+    const buttons = ['start','assumption','missed','practice'];
+    const groups = ['later-received','later-missed','today-received'];
+    const reducedMotion = matchMedia('(prefers-reduced-motion:reduce)').matches;
+    let stage = 1, animation = 0;
+    $('practice-note').textContent=`CDC: ${DATA.practice_note}`;
+    function setStage(value,play=true) {
+      const previous=stage;
+      cancelAnimationFrame(animation); stage=value; document.body.dataset.state=value;
+      history.replaceState(null,'',`#state=${value}`);
+      buttons.forEach((id,i)=>$(id).setAttribute('aria-pressed',value===i+1));
+      groups.forEach((id,i)=>{$(id).style.display=i<value-1?'':'none'; $(id).style.opacity=1;});
+      $('takeaway').style.display=value===4?'':'none';
+      if(play&&value>previous&&value>1&&!reducedMotion) {
+        const group=$(groups[value-2]), start=performance.now(); group.style.opacity=0;
+        function frame(now) {
+          const progress=Math.max(0,Math.min(1,(now-start)/450)); group.style.opacity=progress;
+          if(progress<1) animation=requestAnimationFrame(frame);
+        }
+        animation=requestAnimationFrame(frame);
+      }
+      const descriptions=[
+        'At a visit, consider vaccination today or scheduling a later dose.',
+        `The model assumes: ${DATA.model_assumption}`,
+        'Scheduling a later dose also allows the possibility that vaccination is missed. No probability is assigned to either branch.',
+        `The risk of missing the dose can change the clinical decision. CDC: ${DATA.practice_note}`
+      ];
+      $('chart-desc').textContent=descriptions.slice(0,value).join(' ');
+      $('status').textContent=$('chart-desc').textContent;
+    }
+    buttons.forEach((id,i)=>$(id).addEventListener('click',()=>setStage(i+1)));
+    $('reset').addEventListener('click',()=>setStage(1,false));
+    document.addEventListener('keydown',event=>{
+      if(event.repeat||(event.target.tagName==='BUTTON'&&event.key===' ')) return;
+      if(['ArrowRight','PageDown',' ','ArrowLeft','PageUp','Home'].includes(event.key)) {
+        event.preventDefault(); setStage(event.key==='Home'?1:['ArrowLeft','PageUp'].includes(event.key)?Math.max(1,stage-1):Math.min(4,stage+1));
+      }
+    });
+    function fit() { document.documentElement.style.setProperty('--scale',Math.min(innerWidth/1280,innerHeight/720)); }
+    addEventListener('resize',fit); fit();
+    const hash=new URLSearchParams(location.hash.slice(1));
+    setStage(Math.max(1,Math.min(4,Math.floor(Number(hash.get('state'))||1))),false);
+  </script>
+</body>
+</html>

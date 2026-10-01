@@ -75,6 +75,7 @@ python3 scripts/build_slide_24.py
 python3 scripts/build_slide_25.py
 python3 scripts/build_slide_26.py
 python3 scripts/build_slide_27.py
+python3 scripts/build_closing_slides.py
 ```
 
 Standalone **slide 24** is the Section III vaccination-timing demonstration.
@@ -106,6 +107,25 @@ lost at weeks 40, 44, and 48: 21.8%, 9.2%, and 2.3%.
 or edit `src/slide-27.html`. Start is static; each subsequent advance reveals
 one bar. [Source and handoff notes](specs/slide-27-evidence.md) define the
 scenario-specific denominator and record the frozen manuscript results.
+
+Standalone **slides 28–30** close the vaccine-timing section:
+
+- [Slide 28](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-28.html#state=1)
+  compares protection under three waning models with selected weeks 47, 46,
+  and 40. [Evidence notes](specs/slide-28-evidence.md) document the saved draws
+  and independent calculation checks; the sustained model is hypothetical.
+- [Slide 29](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-29.html#state=1)
+  shows why receiving a later dose matters to the clinical decision.
+  [Evidence notes](specs/slide-29-evidence.md) distinguish the study assumption
+  from this conceptual missed-vaccination branch.
+- [Slide 30](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-30.html#state=1)
+  proposes evaluating forecast-informed timing, with an explicitly synthetic
+  example. [Evidence notes](specs/slide-30-evidence.md) define its scope.
+
+Each has four presenter states, a static Start, arrow navigation, and Reset.
+The editable sources are `src/slide-28.html` through `src/slide-30.html`.
+`build_closing_slides.py` embeds the frozen inputs without accessing the
+manuscript project or the network. Slides.com integration is separate.
 
 `build_surveillance_section.py` reads the already-downloaded CSV files from
 `../data/processed/` and embeds compact chart data directly into the published

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Slide 30 · When can forecasts improve the decision?</title>
+  <style>
+    :root { --paper:#fbfaf6; --ink:#14242b; --muted:#647278; --teal:#0a6670; }
+    * { box-sizing:border-box; }
+    html,body { width:100%; height:100%; margin:0; overflow:hidden; }
+    body { background:var(--paper); color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+    .slide { position:absolute; width:1280px; height:720px; left:50%; top:50%; transform:translate(-50%,-50%) scale(var(--scale,1)); transform-origin:center; }
+    h1 { position:absolute; left:50px; top:48px; width:1180px; margin:0; font-family:Montserrat,Inter,ui-sans-serif,system-ui,sans-serif; font-size:36px; line-height:1.22; font-weight:550; letter-spacing:-.8px; }
+    .visual { position:absolute; left:20px; top:113px; width:1240px; height:587px; }
+    svg { display:block; width:1208px; height:535px; margin:0 16px; overflow:visible; }
+    svg text { fill:var(--ink); font-family:inherit; }
+    .axis { fill:var(--muted); font-size:16px; }
+    .grid { stroke:#dfe4df; stroke-width:1; }
+    .link { fill:none; stroke:#93a49f; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    .controls { height:49px; padding:11px 29px 0; display:flex; align-items:center; gap:10px; }
+    button { border:1px solid #b9c3c0; border-radius:8px; background:white; color:var(--ink); height:34px; font:inherit; font-size:14px; font-weight:650; cursor:pointer; padding:0 17px; white-space:nowrap; }
+    button:hover { border-color:var(--teal); }
+    button[aria-pressed=true] { color:var(--teal); border-color:var(--teal); background:#edf6f4; }
+    button:focus-visible { outline:3px solid #82bcc1; outline-offset:3px; }
+    #reset { padding:0 10px; font-size:19px; margin-left:auto; }
+    #control-hint { color:var(--muted); font-size:13px; margin-left:9px; }
+    .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+  </style>
+</head>
+<body>
+  <main class="slide" aria-label="Slide 30. When can forecasts improve the decision?">
+    <h1>When can forecasts improve the decision?</h1>
+    <section class="visual" aria-label="A proposed study connecting surveillance, forecasts, and vaccination decisions">
+      <svg viewBox="0 0 1208 535" role="img" aria-labelledby="chart-title chart-desc">
+        <title id="chart-title">A future study of forecast-informed vaccination timing</title>
+        <desc id="chart-desc"></desc>
+        <text x="76" y="26" font-size="16" font-weight="650" style="fill:var(--teal)">NEXT STUDY</text>
+        <text x="1178" y="26" text-anchor="end" font-size="15" class="axis">Illustrative</text>
+        <text x="76" y="88" font-size="24" font-weight="650">Surveillance</text>
+        <text x="448" y="88" font-size="24" font-weight="650">Forecast</text>
+        <text x="925" y="88" font-size="24" font-weight="650">Decision</text>
+        <text x="76" y="118" class="axis">What is happening now?</text>
+        <text x="448" y="118" class="axis">What could happen next?</text>
+        <text x="925" y="118" class="axis">Candidate action to test</text>
+        <line x1="80" x2="345" y1="374" y2="374" class="grid"/>
+        <line x1="80" x2="80" y1="166" y2="374" class="grid"/>
+        <line x1="448" x2="807" y1="374" y2="374" class="grid"/>
+        <line x1="448" x2="448" y1="166" y2="374" class="grid"/>
+        <text x="80" y="400" class="axis">Earlier</text>
+        <text id="observed-now" x="295" y="400" text-anchor="middle" class="axis">Now</text>
+        <text x="448" y="400" class="axis">Now</text>
+        <text x="807" y="400" text-anchor="end" class="axis">Later this season</text>
+        <text transform="translate(51 280) rotate(-90)" text-anchor="middle" class="axis">Influenza activity</text>
+        <path d="M369 266 H418 M409 260 L418 266 L409 272 M838 266 H901 M892 260 L901 266 L892 272" class="link"/>
+        <g id="data-view" style="display:none">
+          <path id="observations" fill="none" stroke="#14242b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <g id="observed-points"></g>
+          <path id="new-observation" fill="none" stroke="#0a6670" stroke-width="4" stroke-linecap="round"/>
+          <circle id="new-point" r="6" fill="#0a6670"/>
+          <path id="forecast-fan" fill="#c8e1dd"/>
+          <path id="forecast-center" fill="none" stroke="#0a6670" stroke-width="3" stroke-linecap="round"/>
+          <circle id="forecast-anchor" cx="448" r="4" fill="#0a6670"/>
+        </g>
+        <g id="action-now">
+          <rect x="925" y="185" width="252" height="74" rx="10" fill="#fbfaf6" stroke="#c4ceca" stroke-width="2"/>
+          <text x="1051" y="231" text-anchor="middle" font-size="23" font-weight="600">Vaccinate now</text>
+        </g>
+        <g id="action-later">
+          <rect x="925" y="283" width="252" height="74" rx="10" fill="#fbfaf6" stroke="#c4ceca" stroke-width="2"/>
+          <text x="1051" y="329" text-anchor="middle" font-size="23" font-weight="600">Keep planned date</text>
+        </g>
+        <path d="M1051 387 V367 M1045 376 L1051 367 L1057 376" class="link"/>
+        <text x="1051" y="409" text-anchor="middle" font-size="17" class="axis">Chance of receiving</text>
+        <text x="1051" y="431" text-anchor="middle" font-size="17" class="axis">a later dose</text>
+        <g id="comparison" style="display:none">
+          <line x1="76" x2="1178" y1="453" y2="453" class="grid"/>
+          <text x="568" y="485" text-anchor="end" font-size="20">Fixed preseason rule</text>
+          <text x="604" y="485" text-anchor="middle" font-size="17" class="axis">vs</text>
+          <text x="640" y="485" font-size="20" style="fill:var(--teal)">Rule updated during the season</text>
+          <text x="604" y="522" text-anchor="middle" font-size="23" font-weight="550">Do updated decisions improve clinical outcomes?</text>
+        </g>
+      </svg>
+      <div class="controls">
+        <button id="start" aria-pressed="true">1 · Start</button>
+        <button id="plan" aria-pressed="false">2 · Initial plan</button>
+        <button id="update" aria-pressed="false">3 · New surveillance</button>
+        <button id="compare" aria-pressed="false">4 · Compare rules</button>
+        <span id="control-hint">Arrow keys to advance</span>
+        <button id="reset" aria-label="Reset demonstration" title="Reset">↺</button>
+      </div>
+      <output id="status" class="sr-only" aria-live="polite"></output>
+    </section>
+  </main>
+  <script>
+    const DATA = /*__SLIDE_DATA__*/;
+    const $ = id => document.getElementById(id);
+    const NS = 'http://www.w3.org/2000/svg';
+    const observedX = i => 80+i*43, forecastX = t => 448+t/16*359, Y = activity => 374-activity*208;
+    const buttons = ['start','plan','update','compare'];
+    const reducedMotion = matchMedia('(prefers-reduced-motion:reduce)').matches;
+    let stage = 1, animation = 0;
+    $('observations').setAttribute('d',DATA.initial.observations.map((value,i)=>`${i?'L':'M'}${observedX(i)},${Y(value)}`).join(' '));
+    DATA.initial.observations.forEach((value,i)=>{
+      const point=document.createElementNS(NS,'circle');
+      point.setAttribute('cx',observedX(i)); point.setAttribute('cy',Y(value)); point.setAttribute('r',4); point.setAttribute('fill','#14242b');
+      $('observed-points').appendChild(point);
+    });
+    function drawForecast(progress) {
+      const rows=DATA.initial.forecast.map((row,i)=>row.map((value,j)=>value+(DATA.updated.forecast[i][j]-value)*progress));
+      const path=(points,column)=>points.map((row,i)=>`${i?'L':'M'}${forecastX(row[0]).toFixed(2)},${Y(row[column]).toFixed(2)}`).join(' ');
+      $('forecast-fan').setAttribute('d',path(rows,3)+' '+path([...rows].reverse(),1).replace(/^M/,'L')+' Z');
+      $('forecast-center').setAttribute('d',path(rows,2));
+      $('forecast-anchor').setAttribute('cy',Y(rows[0][2]));
+      const last=DATA.initial.observations.at(-1), next=DATA.updated.observations.at(-1);
+      const x=observedX(5)+43*progress, y=Y(last+(next-last)*progress);
+      $('new-observation').setAttribute('d',`M${observedX(5)},${Y(last)} L${x},${y}`);
+      $('new-point').setAttribute('cx',x); $('new-point').setAttribute('cy',y);
+      $('observed-now').setAttribute('x',x);
+      for(const [id,active] of [['action-now',stage>=2&&progress>=.5],['action-later',stage>=2&&progress<.5]]) {
+        const group=$(id), rect=group.querySelector('rect'), label=group.querySelector('text');
+        rect.setAttribute('fill',active?'#e9f3f0':'#fbfaf6'); rect.setAttribute('stroke',active?'#0a6670':'#c4ceca');
+        label.style.fill=active?'#0a6670':'#647278';
+      }
+    }
+    function setStage(value,play=true) {
+      const previous=stage;
+      cancelAnimationFrame(animation); stage=value; document.body.dataset.state=value;
+      history.replaceState(null,'',`#state=${value}`);
+      buttons.forEach((id,i)=>$(id).setAttribute('aria-pressed',value===i+1));
+      $('data-view').style.display=value>1?'':'none'; $('data-view').style.opacity=1;
+      $('new-observation').style.display=value>=3?'':'none'; $('new-point').style.display=value>=3?'':'none';
+      $('comparison').style.display=value===4?'':'none'; $('comparison').style.opacity=1;
+      drawForecast(value>=3?1:0);
+      if(play&&value>previous&&value>1&&!reducedMotion) {
+        const start=performance.now(), duration=value===3?1000:500;
+        if(value===3) drawForecast(0);
+        else $(value===2?'data-view':'comparison').style.opacity=0;
+        function frame(now) {
+          const progress=Math.max(0,Math.min(1,(now-start)/duration));
+          if(value===3) drawForecast(progress*progress*(3-2*progress));
+          else $(value===2?'data-view':'comparison').style.opacity=progress;
+          if(progress<1) animation=requestAnimationFrame(frame);
+        }
+        animation=requestAnimationFrame(frame);
+      }
+      const descriptions=[
+        'Proposed next study. All observations, forecast trajectories, and candidate actions on this slide are illustrative. No decision rule has been validated.',
+        'An initial forecast of a later epidemic accompanies the candidate action to keep the planned vaccination date.',
+        'New rising surveillance shifts the example forecast earlier and changes the illustrative candidate action to vaccinate now. The chance of receiving a later dose is also an input.',
+        'Compare a fixed preseason rule with a rule updated during the season, and test whether updated decisions improve clinical outcomes.'
+      ];
+      $('chart-desc').textContent=descriptions.slice(0,value).join(' '); $('status').textContent=$('chart-desc').textContent;
+    }
+    buttons.forEach((id,i)=>$(id).addEventListener('click',()=>setStage(i+1)));
+    $('reset').addEventListener('click',()=>setStage(1,false));
+    document.addEventListener('keydown',event=>{
+      if(event.repeat||(event.target.tagName==='BUTTON'&&event.key===' ')) return;
+      if(['ArrowRight','PageDown',' ','ArrowLeft','PageUp','Home'].includes(event.key)) {
+        event.preventDefault(); setStage(event.key==='Home'?1:['ArrowLeft','PageUp'].includes(event.key)?Math.max(1,stage-1):Math.min(4,stage+1));
+      }
+    });
+    function fit() { document.documentElement.style.setProperty('--scale',Math.min(innerWidth/1280,innerHeight/720)); }
+    addEventListener('resize',fit); fit();
+    const hash=new URLSearchParams(location.hash.slice(1));
+    setStage(Math.max(1,Math.min(4,Math.floor(Number(hash.get('state'))||1))),false);
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "model_assumption": "The vaccine is received on the chosen date.",
+  "missed_dose_probability": null,
+  "diagram_type": "Conceptual decision tree; branch spacing and colors do not encode probabilities or effect sizes.",
+  "practice_note": "September\u2013October for most one-dose recipients; avoid missed opportunities.",
+  "guidance_source": {
+    "title": "CDC seasonal influenza vaccine administration",
+    "url": "https://www.cdc.gov/flu/hcp/vax-summary/seasonal-influenza-vaccines.html",
+    "checked": "2026-10-01"
+  },
+  "scope": "The manuscript compares receipt dates; this diagram introduces the separate possibility of not receiving a later dose. It does not estimate a clinical threshold."
+}
