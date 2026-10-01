@@ -45,7 +45,7 @@ manuscript files were changed.
 
 All three panels use calendar position. The original 52- or 53-week calendar
 is retained for each scenario, including its candidate-date coordinates.
-Month labels are approximate; the active week label gives the MMWR week.
+Month labels are approximate; the underlying dates use MMWR weeks.
 The epidemic dot is the actual burden value at the selected week. The
 regret dot is the actual zero minimum of that scenario's calculated curve.
 
@@ -114,9 +114,9 @@ the vertical axis therefore says “Relative influenza activity.”
 1. **Start**: one epidemic and its calendar-aligned protection curve, held
    still, with an empty regret plot and no red markers.
 2. **One scenario**: reveal the regret curve and its synchronized marker trio,
-   with the actual selected week 47 displayed.
+   at the actual selected week 47.
 3. **Sample scenarios**: reveal all ten pairs and their marker trios over
-   eight seconds. Finish with “Could forecasts help choose among these dates?”
+   eight seconds.
 4. **Align seasons**: enlarge the epidemic plot, normalize each season to
    equal total area, and translate each curve and its dot together over
    1.8 seconds. Then reveal the aligned mean, median date, and spread summary.

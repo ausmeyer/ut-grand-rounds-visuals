@@ -22,7 +22,6 @@
   "calendar_alignment": "Each protection curve is shifted to its own scenario-optimal vaccination week. The matching red dot marks the dose date, before the saved immune-response delay.",
   "epidemic_alignment": "State 4 normalizes these ten epidemic curves to equal AUC and shifts them to maximize shared area with a representative profile chosen from the epidemic curves alone. Optimal-date dots move with their curves; summary statistics describe only these ten examples.",
   "regret_definition": "Remaining burden at a candidate date minus the minimum remaining burden in that same scenario.",
-  "closing_question": "Could forecasts help choose among these dates?",
   "n_draws": 5000,
   "scenarios": [
     {

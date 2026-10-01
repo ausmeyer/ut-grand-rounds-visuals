@@ -56,11 +56,6 @@
         <path d="M444 183 H475 V292 H613 M444 421 H459 Q475 421 475 405 V292 M603 286 L613 292 L603 298" class="link"/>
         <text x="544" y="241" text-anchor="middle" font-size="15" font-weight="600">Compare every</text>
         <text x="544" y="262" text-anchor="middle" font-size="15" font-weight="600">vaccination date</text>
-        <g id="date-key" style="display:none">
-          <circle cx="483" cy="352" r="4" fill="#933a4b"/>
-          <text x="498" y="357" font-size="14" style="fill:var(--red)">Same dose date</text>
-          <text id="date-label" x="544" y="388" text-anchor="middle" font-size="23" font-weight="600" style="fill:var(--red)"></text>
-        </g>
         <text class="plot-title" x="680" y="61">Timing regret</text>
         <text class="axis" x="680" y="84">Burden avoidable by changing the dose date</text>
         <g id="decision-grid"></g>
@@ -69,8 +64,6 @@
         <g id="decision-axis"></g>
         </g>
         <g id="alignment-view" style="display:none">
-          <text class="plot-title" x="64" y="61">Align seasons by maximum overlap</text>
-          <text class="axis" x="64" y="84">Each season scaled to the same total area; red dots move with their curves</text>
           <line x1="64" x2="84" y1="106" y2="106" stroke="#a4b0b0" stroke-width="2"/>
           <text x="92" y="111" class="axis">Seasons</text>
           <line x1="176" x2="196" y1="106" y2="106" stroke="#0a6670" stroke-width="3"/>
@@ -97,7 +90,6 @@
             <text x="925" y="449" font-size="15" style="fill:var(--muted)">Some narrowing; outliers remain</text>
           </g>
         </g>
-        <text id="takeaway" x="604" y="531" text-anchor="middle" font-size="22" font-weight="550"></text>
       </svg>
       <div class="controls">
         <button id="start" aria-pressed="true">1 · Start</button>
@@ -201,9 +193,6 @@
           mark.style.display=i<count&&showDates?'':'none'; mark.style.opacity=selected?1:.65; mark.setAttribute('r',selected?5.5:4.5);
         });
       });
-      $('date-key').style.display=showDates?'':'none';
-      $('date-label').textContent=active>=0?`Week ${DATA.scenarios[active].best_week}`:'varies by scenario';
-      $('date-label').setAttribute('font-size',active>=0?23:17);
       $('season-label').textContent=active>=0?DATA.scenarios[active].season:'';
       $('sample-count').textContent=`${count} of ${DATA.n_draws.toLocaleString('en-US')} simulated scenarios shown`;
     }
@@ -220,7 +209,6 @@
       cancelAnimationFrame(animation); stage=Math.max(1,Math.min(4,Math.floor(value))); value=stage;
       document.body.dataset.state=value; history.replaceState(null,'',`#state=${value}`);
       buttons.forEach((id,i)=>$(id).setAttribute('aria-pressed',value===i+1));
-      $('takeaway').textContent='';
       $('scenario-view').style.display=value===4?'none':'';
       $('alignment-view').style.display=value===4?'':'none';
       $('chart-title').textContent=value===4?'Optimal dates after aligning epidemic curves':'Each scenario has its own best vaccination date';
@@ -235,9 +223,9 @@
         if(play&&value>previous&&!reducedMotion) {
           samples(1,0);
           animate(8000,p=>{const count=Math.min(graphics.length,1+Math.floor(p*graphics.length)); samples(count,count-1);},()=>{
-            samples(graphics.length); $('takeaway').textContent=DATA.closing_question;
+            samples(graphics.length);
           });
-        } else { samples(graphics.length); $('takeaway').textContent=DATA.closing_question; }
+        } else { samples(graphics.length); }
       } else {
         $('sample-count').textContent='10 illustrated scenarios';
         if(play&&value>previous&&!reducedMotion) {
