@@ -108,8 +108,8 @@
     for(const [week,month] of [[36,'Sep'],[40,'Oct'],[44,'Nov'],[48,'Dec'],[1,'Jan'],[5,'Feb'],[9,'Mar']])
       element('text',{x:X(index(week)),y:486,'text-anchor':'middle',class:'axis'},$('x-axis'),month);
     $('guidance-band').setAttribute('x',X(0));
-    $('guidance-band').setAttribute('width',X(8.5)-X(0));
-    $('guidance-label').setAttribute('x',(X(0)+X(8.5))/2);
+    $('guidance-band').setAttribute('width',X(8)-X(0));
+    $('guidance-label').setAttribute('x',(X(0)+X(8))/2);
     const low=index(DATA.highlight_weeks[0]), high=index(DATA.highlight_weeks[1]);
     $('best-band').setAttribute('x',X(low-.5));
     $('best-band').setAttribute('width',X(high+.5)-X(low-.5));

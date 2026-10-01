@@ -32,9 +32,13 @@ define the quantity and its encounter denominator.
 
 CDC's [Who Needs a Flu Vaccine](https://www.cdc.gov/flu/vaccines/vaccinations.html)
 was checked September 28, 2026. It identifies September–October as generally
-appropriate for most recipients needing one dose. The gray band follows the
-manuscript's approximate weeks 36–44 display, clipped to the plotted range.
-Month ticks are approximate calendar guides, not dates in one chosen year.
+appropriate for most recipients needing one dose, ideally by the end of October.
+The gray band runs from the first plotted week to the middle of week 44, where
+November 1 falls on average across the 12 study seasons. Manuscript Figure 2
+shades through the end of week 44, which ends November 1–7 depending on the
+season (November 7 in 2026), so it extends slightly past October.
+Month ticks are approximate calendar guides, not dates in one chosen year. In
+the average study season, each falls within about 3 days of the month's first day.
 
 ## Scientific meaning
 

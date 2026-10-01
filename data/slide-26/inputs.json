@@ -30,9 +30,9 @@
     "label": "September\u2013October guidance",
     "display_week_bounds": [
       35.5,
-      44.5
+      44
     ],
-    "note": "Approximate calendar band matches manuscript Figure 2; applies to most people receiving one dose."
+    "note": "Approximate calendar band ending mid-week 44, where November 1 falls on average across the 12 study seasons (manuscript Figure 2 shades through the end of week 44, which ends November 1-7); applies to most people receiving one dose."
   },
   "rows": [
     {
