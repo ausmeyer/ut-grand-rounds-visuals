@@ -8,12 +8,18 @@ claiming that a forecast-informed decision rule has been evaluated.
 
 ## Source and mathematical meaning
 
-`data/slide-30/inputs.json` pins `data/slide-25/inputs.json` by SHA-256 and
-records the ten draw IDs. These are the same saved primary-analysis
-simulations already shown on slide 25, in the same order, originally sampled
-with seed 20260928. They are neither newly invented example curves nor
-operational forecasts. The source and validation provenance are in
-[slide 25's evidence notes](slide-25-evidence.md).
+`data/slide-30/inputs.json` pins `data/slide-30/source-draws/inputs.json` by
+SHA-256 and records 50 draw IDs. The sample uses the same R seed 20260928
+and sampling without replacement as slide 25, extended from ten to fifty.
+Its first ten paired scenarios match slide 25's frozen inputs exactly, in
+the same order. The full 50 are saved in the slide-30 source file; slide 25
+retains its original ten. These are primary-analysis model simulations.
+
+The extraction replay uses the unchanged cached manuscript fits and original
+RNG sequences. All 13 source fingerprints match the earlier extraction.
+The full 5,000-draw mean-regret curve agrees with the saved publication table
+to 2.78e-17, and all 5,000 optimal utilities agree to 2.22e-16. Additional
+source and validation provenance is in [slide 25's notes](slide-25-evidence.md).
 
 For each of the 29 candidate dates, regret is the scenario's remaining burden
 minus the smallest remaining burden in that same scenario. The minimum is
@@ -22,6 +28,8 @@ burden. This is an absolute difference in modeled seasonal burden, not the
 relative loss fraction on slide 27. The plot uses one common linear scale
 with qualitative vertical labels; burden units are seasonal sums of national
 population-weighted outpatient ILI proportions.
+
+The first ten examples remain:
 
 | Draw | Best vaccination week |
 | --- | ---: |
@@ -36,7 +44,7 @@ population-weighted outpatient ILI proportions.
 | 644 | 44 |
 | 2496 | 3 |
 
-All ten minima are unique among the saved weekly candidates. All 290 saved
+All fifty minima are unique among the saved weekly candidates. All 1,450 saved
 candidate-date totals were checked against the protection calculation;
 maximum absolute difference was 1.33e-15. No models were fitted and no
 manuscript files were changed.
@@ -59,10 +67,10 @@ visualization of the selected date, not another optimization input.
 
 Markers retain their exact coordinates without jitter; overlapping minima
 remain overlapping. All three matching markers and curves appear together.
-Prior examples fade while the active scenario is emphasized, then all ten
+Prior examples fade while the active scenario is emphasized, then all fifty
 remain visible at the end. These are scenario-specific best dates with the
 scenario known. The fourth state summarizes their relative positions after
-epidemic alignment; it does not turn the ten optima into a clinical rule.
+epidemic alignment; it does not turn the fifty optima into a clinical rule.
 
 ## Alignment by shared area
 
@@ -71,14 +79,14 @@ are aligned by epidemic shape. Translating a curve cannot change its own
 AUC, so the alignment maximizes the **shared area**, the integral of the
 pointwise minimum of two curves.
 
-Each of the same ten weekly epidemic profiles is linearly interpolated,
+Each of the same fifty weekly epidemic profiles is linearly interpolated,
 given flat half-week caps at its endpoints, and normalized to AUC 1. The caps
 make the interpolated area equal to the original sum of weekly values before
 normalization. For each pair of curves, the builder searches shifts from
 −20 to +20 weeks in quarter-week increments and integrates shared area
 exactly, including crossings between linear segments. No selected shift is
 at a search boundary. It chooses the representative curve with the largest
-sum of pairwise maximum overlaps (draw 3434), then shifts each season to
+sum of pairwise maximum overlaps (draw 511), then shifts each season to
 maximize its overlap with that common reference. This is alignment to a
 representative profile, not a global optimization of all simultaneous
 pairwise overlaps. Ties prefer the smallest absolute shift.
@@ -86,26 +94,26 @@ pairwise overlaps. Ties prefer the smallest absolute shift.
 The alignment uses only epidemic profiles. Optimal vaccination dates and
 waning curves play no role in selecting the reference or shifts. Each red
 dot is carried by exactly its epidemic curve's shift; its normalized height
-is unchanged. The original weekly optimization is not rerun. The ten shifts,
-in the source order above, are 0, 0, 2, 0.75, 0, 3, 3.75, 3.25, 0, and −1 weeks.
+is unchanged. The original weekly optimization is not rerun. All fifty
+shifts are stored with their draw IDs in `data/slide-30/slide-30.json`.
 
-The teal mean uses all ten curves only over their common modeled support.
+The teal mean uses all fifty curves only over their common modeled support.
 There is no extrapolation or zero imputation of missing tails in that mean.
 The horizontal axis is recentered on the peak of the aligned mean. The large
-red marker evaluates this mean at the median of the ten shifted optimal
+red marker evaluates this mean at the median of the fifty shifted optimal
 **dates**; it is not an optimum obtained by optimizing the mean epidemic.
 The pale band shows the middle 50% of shifted dates.
 
 | Spread measure | Calendar dates | After overlap alignment |
 | --- | ---: | ---: |
-| Interquartile range | 3.5 weeks | 1.875 weeks |
-| Sample standard deviation | 3.240 weeks | 2.731 weeks |
-| Full range | 11 weeks | 10 weeks |
+| Interquartile range | 2.75 weeks | 2.125 weeks |
+| Sample standard deviation | 2.818 weeks | 2.382 weeks |
+| Full range | 14 weeks | 13.75 weeks |
 
-The median shifted optimal date is 9.125 weeks before the aligned mean peak,
+The median shifted optimal date is 9.25 weeks before the aligned mean peak,
 displayed as **~9 weeks**. Quartiles use linear interpolation (R type 7).
 Some narrowing occurs but outliers remain. These are descriptive summaries
-of the ten illustrated scenarios, not results for all 5,000 simulations or
+of the fifty illustrated scenarios, not results for all 5,000 simulations or
 an evaluated timing rule. Normalization removes total-burden differences;
 the vertical axis therefore says “Relative influenza activity.”
 
@@ -115,8 +123,9 @@ the vertical axis therefore says “Relative influenza activity.”
    still, with an empty regret plot and no red markers.
 2. **One scenario**: reveal the regret curve and its synchronized marker trio,
    at the actual selected week 47.
-3. **Sample scenarios**: reveal all ten pairs and their marker trios over
-   eight seconds.
+3. **Sample scenarios**: reveal all fifty pairs and their marker trios over
+   eight seconds. Each new example arrives every 0.16 seconds, five times
+   faster than the former ten-example cadence of 0.8 seconds.
 4. **Align seasons**: enlarge the epidemic plot, normalize each season to
    equal total area, and translate each curve and its dot together over
    1.8 seconds. Then reveal the aligned mean and median date, with the
@@ -139,22 +148,28 @@ and account for the chance of receiving a later dose, as discussed on slide
 
 Say: “Different futures favor different vaccination dates. Can forecasts
 help us distinguish those futures early enough to improve the decision?
-When we align these ten seasons by their epidemic shape, the middle group
+When we align these fifty seasons by their epidemic shape, the middle group
 of optimal dates comes closer together, though some outliers remain.”
 
 ## Build and verification
 
 Run `python3 scripts/build_slide_30.py` to build only slide 30, or
 `python3 scripts/build_closing_slides.py` for slides 28–30. The builder reads
-the pinned local slide-25 inputs, recomputes and checks candidate totals,
+the pinned local fifty-draw inputs, recomputes and checks candidate totals,
 and writes `data/slide-30/slide-30.json` and `docs/slide-30.html`. It does not
 modify slide 25. The editable source is `src/slide-30.html`.
 
+To repeat the read-only manuscript extraction, use
+`Rscript --vanilla scripts/extract_slide_25.R /path/to/flu_optimal_vaccine_estimate data/slide-30/source-draws 50 30`.
+The shared extractor's optional final arguments select the example count and
+slide number; its two-argument defaults remain ten examples for slide 25.
+Extraction replays cached fits and never refits or writes to the manuscript.
+
 Browser verification covers the static landing state, first-advance reveal,
-sequential scenario animation, all ten matching marker trios, exact plotted
+sequential scenario animation, all fifty matching marker trios, exact plotted
 minima, alignment motion, reset/back navigation, interruption, and static
 direct links. Independent midpoint quadrature at 0.01-week spacing selected
-the same maximizing shift for all ten profiles across the 161-point shift
-grid; mean overlap differed from the exact integration by 2.5e-8. Every
-mean point uses ten observed segments, and the median marker lies on the
+the same maximizing shift for all fifty profiles across the 161-point shift
+grid; mean overlap differed from the exact integration by 4.8e-8. Every
+mean point uses fifty observed segments, and the median marker lies on the
 mean curve. The final rendered view is checked at 1280 × 720 before publication.

@@ -77,7 +77,7 @@
           <g id="alignment-axis"></g>
           <text x="462" y="501" text-anchor="middle" class="axis">Weeks from the aligned mean peak</text>
           <g id="alignment-summary" transform="translate(0 90)">
-            <text x="925" y="151" font-size="15" font-weight="650" style="fill:var(--muted)">FOR THESE 10 SCENARIOS</text>
+            <text id="summary-count" x="925" y="151" font-size="15" font-weight="650" style="fill:var(--muted)"></text>
             <text x="925" y="190" font-size="18">Median optimal date</text>
             <text id="median-weeks" x="925" y="240" font-size="42" font-weight="600" style="fill:var(--red)"></text>
             <text x="925" y="270" font-size="18">before the mean peak</text>
@@ -115,7 +115,7 @@
     function path(points,X,Y) { return points.map(([t,v],i)=>`${i?'L':'M'}${X(t).toFixed(3)},${Y(v).toFixed(3)}`).join(' '); }
     for(const value of [0,DATA.burden_y_max/2,DATA.burden_y_max]) {
       element('line',{x1:64,x2:424,y1:BY(value),y2:BY(value),class:'grid'},$('burden-grid'));
-      element('text',{x:54,y:BY(value)+5,'text-anchor':'end',class:'axis'},$('burden-grid'),`${Math.round(value*100)}%`);
+      element('text',{x:54,y:BY(value)+5,'text-anchor':'end',class:'axis'},$('burden-grid'),`${+(value*100).toFixed(1)}%`);
     }
     for(const value of [0,.4,.8]) {
       element('line',{x1:64,x2:424,y1:PY(value),y2:PY(value),class:'grid'},$('protection-grid'));
@@ -152,13 +152,13 @@
     const AY=v=>443-v/alignment.y_max*293;
     for(const fraction of [0,.5,1]) element('line',{x1:64,x2:860,y1:AY(fraction*alignment.y_max),y2:AY(fraction*alignment.y_max),class:'grid'},$('alignment-grid'));
     element('text',{x:64,y:137,class:'axis'},$('alignment-grid'),'Relative influenza activity');
-    for(let t=-24;t<=16;t+=8) element('text',{x:AX(t),y:469,'text-anchor':'middle',class:'axis'},$('alignment-axis'),t===0?'Peak':`${t>0?'+':''}${t}`);
+    for(let t=Math.ceil(alignment.x_min/8)*8;t<=alignment.x_max;t+=8) element('text',{x:AX(t),y:469,'text-anchor':'middle',class:'axis'},$('alignment-axis'),t===0?'Peak':`${t>0?'+':''}${t}`);
     element('line',{x1:AX(0),x2:AX(0),y1:150,y2:443,stroke:'#a4b0b0','stroke-dasharray':'3 5'},$('alignment-grid'));
     element('rect',{x:AX(alignment.after.q1),y:150,width:AX(alignment.after.q3)-AX(alignment.after.q1),height:293,fill:'#933a4b',opacity:.08},$('alignment-band'));
     const alignmentGraphics=alignment.profiles.map(profile=>{
       const group=element('g',{'data-draw':profile.draw,'data-shift':profile.shift},$('aligned-profiles'));
-      element('path',{d:path(profile.points,AX,AY),class:'sample',stroke:'#a4b0b0','stroke-width':1.6,opacity:.65},group);
-      element('circle',{cx:AX(profile.optimal_time_before),cy:AY(profile.optimal_height),r:4.5,fill:'#933a4b',opacity:.72,stroke:'#fbfaf6','stroke-width':1},group);
+      element('path',{d:path(profile.points,AX,AY),class:'sample',stroke:'#a4b0b0','stroke-width':1.1,opacity:.38},group);
+      element('circle',{cx:AX(profile.optimal_time_before),cy:AY(profile.optimal_height),r:3.4,fill:'#933a4b',opacity:.65,stroke:'#fbfaf6','stroke-width':.8},group);
       return group;
     });
     element('path',{d:path(alignment.mean_points,AX,AY),class:'sample',stroke:'#0a6670','stroke-width':3.2},$('alignment-mean'));
@@ -166,6 +166,7 @@
     element('circle',{cx:AX(alignment.median_point[0]),cy:AY(alignment.median_point[1]),r:6.5,fill:'#933a4b',stroke:'#fbfaf6','stroke-width':2},$('alignment-mean'));
     element('text',{x:AX(alignment.median_point[0])-10,y:171,'text-anchor':'end','font-size':15,fill:'#933a4b'},$('alignment-mean'),'Median date');
     $('median-weeks').textContent=`~${Math.round(-alignment.after.median)} weeks`;
+    $('summary-count').textContent=`FOR THESE ${DATA.scenarios.length} SCENARIOS`;
     function alignSeasons(progress) {
       alignmentGraphics.forEach((group,i)=>group.setAttribute('transform',`translate(${AX(progress*alignment.profiles[i].shift)-AX(0)} 0)`));
       $('alignment-view').dataset.progress=progress;
@@ -178,10 +179,10 @@
           curve.style.opacity='';
           curve.style.display=i<count&&(panel<2||showDates)?'':'none';
           curve.setAttribute('stroke',panel===0?(selected?'#647b7d':'#a4b0b0'):(selected?'#0a6670':'#7b9e9a'));
-          curve.setAttribute('stroke-width',selected?2.6:1.5); curve.setAttribute('opacity',selected?1:[.6,.42,.65][panel]);
+          curve.setAttribute('stroke-width',selected?2.6:1.1); curve.setAttribute('opacity',selected?1:[.35,.23,.35][panel]);
         });
         graphic.markers.forEach(mark=>{
-          mark.style.display=i<count&&showDates?'':'none'; mark.style.opacity=selected?1:.65; mark.setAttribute('r',selected?5.5:4.5);
+          mark.style.display=i<count&&showDates?'':'none'; mark.style.opacity=selected?1:.5; mark.setAttribute('r',selected?5.5:3.4);
         });
       });
       $('season-label').textContent=active>=0?DATA.scenarios[active].season:'';
@@ -213,12 +214,13 @@
       } else if(value===3) {
         if(play&&value>previous&&!reducedMotion) {
           samples(1,0);
-          animate(8000,p=>{const count=Math.min(graphics.length,1+Math.floor(p*graphics.length)); samples(count,count-1);},()=>{
+          let shown=1;
+          animate(8000,p=>{const count=Math.min(graphics.length,1+Math.floor(p*graphics.length)); if(count!==shown) { samples(count,count-1); shown=count; }},()=>{
             samples(graphics.length);
           });
         } else { samples(graphics.length); }
       } else {
-        $('sample-count').textContent='10 illustrated scenarios';
+        $('sample-count').textContent=`${DATA.scenarios.length} illustrated scenarios`;
         if(play&&value>previous&&!reducedMotion) {
           alignSeasons(0); animate(1800,p=>alignSeasons(p*p*(3-2*p)));
         } else alignSeasons(1);
@@ -227,8 +229,8 @@
         '',
         'One saved simulated epidemic and vaccine-protection pair. Advance to reveal its best vaccination date.',
         `The regret curve reaches its calculated minimum at week ${DATA.scenarios[0].best_week}. Red dots mark that same dose date on the epidemic and calendar-aligned protection curves. Protection begins after the saved immune-response delay.`,
-        'Ten saved scenarios appear in sequence, each with a calculated regret minimum and matching dose-date dots on its epidemic and protection curves. These scenario-specific optima motivate a future forecast study; they are not a validated forecast-informed decision rule.',
-        'The ten epidemic curves are normalized to equal total area and shifted to maximize shared area with a representative epidemic profile. The optimal dates move with their curves and are not used to choose the shifts. The median date is about nine weeks before the aligned mean peak. These are descriptive results for the ten displayed scenarios, not a validated decision rule.'
+        `${DATA.scenarios.length} saved scenarios appear in sequence, each with a calculated regret minimum and matching dose-date dots on its epidemic and protection curves. These scenario-specific optima motivate a future forecast study; they are not a validated forecast-informed decision rule.`,
+        `The ${DATA.scenarios.length} epidemic curves are normalized to equal total area and shifted to maximize shared area with a representative epidemic profile. The optimal dates move with their curves and are not used to choose the shifts. The median date is about ${Math.round(-alignment.after.median)} weeks before the aligned mean peak. These are descriptive results for the ${DATA.scenarios.length} displayed scenarios, not a validated decision rule.`
       ][value];
       $('chart-desc').textContent=desc; $('status').textContent=desc;
     }

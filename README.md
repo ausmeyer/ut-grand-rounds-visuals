@@ -119,10 +119,11 @@ Standalone **slides 28–30** close the vaccine-timing section:
   [Evidence notes](specs/slide-29-evidence.md) distinguish the study assumption
   from this conceptual missed-vaccination branch.
 - [Slide 30](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-30.html#state=1)
-  reuses slide 25's ten scenarios, adding synchronized red dots at each
-  scenario's best vaccination date across all three plots. Its fourth state
-  aligns the epidemic curves by maximum shared area and summarizes the
-  shifted optimal dates for those ten examples.
+  extends slide 25's sample to 50 scenarios, adding synchronized red dots at
+  each scenario's best vaccination date across all three plots. The examples
+  arrive every 0.16 seconds in an eight-second reveal. Its fourth state aligns
+  all 50 epidemic curves by maximum shared area and summarizes their shifted
+  optimal dates.
   [Evidence notes](specs/slide-30-evidence.md) define the future-study question.
 
 Slides 28–30 each have four states and a static Start,

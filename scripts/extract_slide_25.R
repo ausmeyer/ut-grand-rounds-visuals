@@ -6,10 +6,13 @@ suppressPackageStartupMessages({
   library(readr)
 })
 args <- commandArgs(trailingOnly = TRUE)
-stopifnot(length(args) == 2L)
+stopifnot(length(args) %in% 2:4)
 project <- normalizePath(args[[1]])
-out <- normalizePath(args[[2]], mustWork = FALSE)
+out <- args[[2]]
+n_examples <- if (length(args) >= 3L) as.integer(args[[3]]) else 10L
+slide_number <- if (length(args) >= 4L) as.integer(args[[4]]) else 25L
 dir.create(out, recursive = TRUE, showWarnings = FALSE)
+out <- normalizePath(out)
 setwd(project)
 source("R/latent_curve_gam.R")
 source("R/decision_engine.R")
@@ -103,7 +106,7 @@ stopifnot(regret_error < 1e-10, optimum_error < 1e-10,
           mean_curve$vaccination_week[[best_index]] == 47L)
 
 set.seed(20260928)
-shown_ids <- sample.int(n, 10L, replace = FALSE)
+shown_ids <- sample.int(n, n_examples, replace = FALSE)
 examples <- lapply(shown_ids, function(id) {
   b <- burden %>% filter(.data$draw == id)
   p <- ve %>% filter(.data$draw == id)
@@ -121,7 +124,7 @@ sources <- unique(c(manifest_path, ve_path, regret_path, optimum_path,
                     "R/calendar.R", "R/protection_models.R"))
 fingerprints <- lapply(sources, function(p) list(path = p,
   sha256 = digest::digest(file = p, algo = "sha256")))
-export <- list(slide = 25, analysis = "gam_primary", n_draws = n,
+export <- list(slide = slide_number, analysis = "gam_primary", n_draws = n,
   selection = list(seed = 20260928, method = "Simple random sample without replacement", draw_ids = shown_ids),
   candidate_weeks = candidate_weeks, mean_remaining = mean_curve$remaining,
   mean_baseline = mean(total$baseline),
@@ -133,5 +136,5 @@ export <- list(slide = 25, analysis = "gam_primary", n_draws = n,
                     compared_candidate_weeks = 29L),
   sources = fingerprints)
 write_json(export, file.path(out, "inputs.json"), auto_unbox = TRUE, pretty = TRUE, digits = 16)
-message("Saved ten original scenarios and exact 5,000-draw mean; regret error = ",
+message("Saved ", n_examples, " original scenarios and exact 5,000-draw mean; regret error = ",
         format(regret_error), "; optimal-utility error = ", format(optimum_error))

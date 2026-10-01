@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the linked scenario minima from slide 25's frozen manuscript draws."""
+"""Build the linked scenario minima from 50 frozen manuscript draws."""
 
 import hashlib
 import json
@@ -142,18 +142,19 @@ def build():
             'epidemic_at_dose': row['burden'][row['weeks'].index(best_week)],
             'protection_at_dose': 0, 'immune_lag_weeks': params['immune_lag_weeks'],
         })
-    assert len(scenarios) == 10 and max_error < 1e-12
+    assert len(scenarios) == 50 and max_error < 1e-12
+    candidate_totals = len(scenarios)*len(original['candidate_weeks'])
     data = {**config, 'n_draws': original['n_draws'], 'scenarios': scenarios,
             'alignment': align_seasons(scenarios),
             'burden_y_max': math.ceil(max(max(r['burden']) for r in original['scenarios'])*100)/100,
             'protection_y_max': .8,
             'regret_y_max': math.ceil(max(max(p[1] for p in s['decision_points']) for s in scenarios)*10)/10,
-            'validation': {'candidate_totals_checked': 290, 'max_absolute_error': max_error}}
+            'validation': {'candidate_totals_checked': candidate_totals, 'max_absolute_error': max_error}}
     (ROOT / 'data/slide-30/slide-30.json').write_text(json.dumps(data, indent=2)+'\n')
     html = (ROOT / 'src/slide-30.html').read_text()
     assert html.count('/*__SLIDE_DATA__*/') == 1
     (ROOT / 'docs/slide-30.html').write_text(html.replace('/*__SLIDE_DATA__*/', json.dumps(data, separators=(',', ':'))))
-    print(f'Built slide 30: 10 matched minima, 290 candidate totals checked; maximum error {max_error:.3g}.')
+    print(f'Built slide 30: {len(scenarios)} matched minima, {candidate_totals} candidate totals checked; maximum error {max_error:.3g}.')
 
 
 if __name__ == '__main__':
