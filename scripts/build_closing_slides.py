@@ -5,11 +5,13 @@ import json
 import math
 from pathlib import Path
 
+from build_slide_30 import build as build_slide_30
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def build():
-    for number in (28, 29, 30):
+    for number in (28, 29):
         data = json.loads((ROOT / f"data/slide-{number}/inputs.json").read_text())
         if number == 28:
             assert data["n_draws_per_model"] == 5000
@@ -20,18 +22,12 @@ def build():
                 assert all(math.isfinite(v) and 0 <= v <= .6 for v in model["mean_protection"])
         if number == 29:
             assert data["missed_dose_probability"] is None
-        if number == 30:
-            assert data["synthetic"] is True and data["decision_rule_validated"] is False
-            for key in ("initial", "updated"):
-                scenario = data[key]
-                assert len(scenario["forecast"]) == 33
-                assert all(0 <= row[1] <= row[2] <= row[3] <= 1 for row in scenario["forecast"])
-                assert abs(scenario["forecast"][0][2] - scenario["observations"][-1]) < 1e-12
         source = (ROOT / f"src/slide-{number}.html").read_text()
         assert source.count("/*__SLIDE_DATA__*/") == 1
         (ROOT / f"docs/slide-{number}.html").write_text(
             source.replace("/*__SLIDE_DATA__*/", json.dumps(data, separators=(",", ":"))))
         print(f"Built standalone slide {number}.")
+    build_slide_30()
 
 
 if __name__ == "__main__":
