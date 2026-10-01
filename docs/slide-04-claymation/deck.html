@@ -32,14 +32,15 @@ input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:#d7d
 input[type=range]::-moz-range-progress{height:6px;border-radius:3px;background:#246d70}
 input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;border:2px solid #246d70;background:#fffcf5}
 </style></head><body><div class="stage">
-<div class="film"><video id="film" playsinline preload="auto" aria-label="Following influenza through U.S. surveillance" poster="poster.png?v=1f2348e88914" src="surveillance_claymation.mp4?v=1f2348e88914"></video></div>
-<div class="transport"><button type="button" id="start"><svg viewBox="0 0 9 10" aria-hidden="true"><path d="M0 0 9 5 0 10z"/></svg>Play</button><button type="button" id="restart">↺ Restart</button><button type="button" id="sound" aria-pressed="true" aria-label="Sound on"></button><span class="time" id="now">0:00</span><div class="scrub" id="ticks"><input type="range" id="scrub" min="0" max="126" step="0.1" value="0" aria-label="Position in the film"></div><span class="time" id="total">2:06</span></div>
-<nav aria-label="Jump to a surveillance system"><button type="button" data-start="10"><span>01</span>ILINet<small>0:10</small></button><button type="button" data-start="32"><span>02</span>NSSP<small>0:32</small></button><button type="button" data-start="52"><span>03</span>FluSurv-NET<small>0:52</small></button><button type="button" data-start="60"><span>04</span>NHSN<small>1:00</small></button><button type="button" data-start="76"><span>05</span>ICLS<small>1:16</small></button><button type="button" data-start="84"><span>06</span>NREVSS<small>1:24</small></button><button type="button" data-start="106"><span>07</span>NCHS<small>1:46</small></button><button type="button" data-start="118"><span>08</span>Pediatric deaths<small>1:58</small></button></nav>
+<div class="film"><video id="film" playsinline preload="auto" aria-label="Following influenza through U.S. surveillance" poster="poster.png?v=f6c7be245271" src="surveillance_claymation.mp4?v=f6c7be245271"></video></div>
+<div class="transport"><button type="button" id="start"><svg viewBox="0 0 9 10" aria-hidden="true"><path d="M0 0 9 5 0 10z"/></svg>Play</button><button type="button" id="restart">↺ Restart</button><button type="button" id="sound" aria-pressed="true" aria-label="Sound on"></button><span class="time" id="now">0:00</span><div class="scrub" id="ticks"><input type="range" id="scrub" min="0" max="130" step="0.1" value="0" aria-label="Position in the film"></div><span class="time" id="total">2:10</span></div>
+<nav aria-label="Jump to a surveillance system"><button type="button" data-start="10"><span>01</span>ILINet<small>0:10</small></button><button type="button" data-start="32"><span>02</span>NSSP<small>0:32</small></button><button type="button" data-start="52"><span>03</span>FluSurv-NET<small>0:52</small></button><button type="button" data-start="60"><span>04</span>NHSN<small>1:00</small></button><button type="button" data-start="76"><span>05</span>ICLS<small>1:16</small></button><button type="button" data-start="84"><span>06</span>NREVSS<small>1:24</small></button><button type="button" data-start="106"><span>07</span>NCHS<small>1:46</small></button><button type="button" data-start="114"><span>08</span>Pediatric deaths<small>1:54</small></button></nav>
 </div><script>
 const video = document.querySelector('#film');
 const scrub = document.querySelector('#scrub');
 const chapters = [...document.querySelectorAll('[data-start]')];
 const START = 0;               // the film moves from its first frame
+const OVERVIEW = 122;          // closing pull-back to the whole town: no chapter highlighted
 const starts = chapters.map(b => Number(b.dataset.start));
 const embedded = window.parent !== window;
 let scrubbing = false, resumeAfterScrub = false;
@@ -60,6 +61,7 @@ function paint() {  // slider, clock, and chapter highlight follow the film (or 
   document.querySelector('#now').textContent = clock(t);
   let k = -1;
   starts.forEach((s, i) => { if (t >= s - 0.05) k = i; });
+  if (t >= OVERVIEW - 0.05) k = -1;
   chapters.forEach((b, i) => b.classList.toggle('active', i === k));
 }
 function tick() { paint(); if (!video.paused) requestAnimationFrame(tick); }

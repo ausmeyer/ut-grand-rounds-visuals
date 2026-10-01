@@ -269,10 +269,11 @@ the 1240 × 540 iframe, with their titles in Slides.com.
 ## Slide 4 claymation
 
 The finished animation and editable Blender project are in
-`docs/slide-04-claymation/`. The video is 2 minutes 6 seconds at 1920 × 1080
+`docs/slide-04-claymation/`. The video is 2 minutes 10 seconds at 1920 × 1080
 and 24 fps, with sound: an original instrumental plus recorded public-domain
 (CC0) sneezes and coughs. The patient walks from the first frame. The title shows
 for half a second; after that, only the eight surveillance information cards appear.
+The film closes by pulling back to its opening view of the town.
 Each card states what the system measures and what it shows, checked against CDC
 pages on October 1, 2026. The standalone player keeps the eight chapter shortcuts,
 the video and Blender downloads, and each card's text with its CDC source.
