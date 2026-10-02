@@ -1,0 +1,27 @@
+{
+  "model_path": "/Users/austinmeyer/Library/CloudStorage/GoogleDrive-austin.g.meyer@gmail.com/My Drive/Research/Faculty/SantillanaLab/UT_grand_rounds/ut-grand-rounds-visuals/data/slide-30/threshold-example/cache/gam-pre-plus-2022.rds",
+  "model_sha256": "3cdb38369f61f85e2feb94411657bdf20348d77e9a4203bf314d6142f076c879",
+  "source_files": [
+    {
+      "path": "/Users/austinmeyer/Library/CloudStorage/GoogleDrive-austin.g.meyer@gmail.com/My Drive/Research/Faculty/SantillanaLab/UT_grand_rounds/ut-grand-rounds-visuals/data/slide-30/threshold-example/ilinet-state-2022-23.csv",
+      "sha256": "76cc5c0ce6da057288c840c917600e0970781bcc8832d8c76e43cf154f552cd5"
+    },
+    {
+      "path": "data/processed/ilinet_state_all_age_primary_seasons.csv",
+      "sha256": "1d5fda53b4fd62afa061d2e64291ec658962ce484034ba0cb928d7742f8c88fd"
+    },
+    {
+      "path": "R/latent_curve_gam.R",
+      "sha256": "4be15efc6ba461b0cae7c076c9dd60f4ce63e7c10c0e27945a10ae6ab9ae6cb1"
+    },
+    {
+      "path": "R/calendar.R",
+      "sha256": "0d5cd7ad71443ae9ff72e902571d0ece6f0986ac179dfa2137c38334d7e8eeb1"
+    }
+  ],
+  "fitting_seasons": ["2010/11", "2011/12", "2012/13", "2013/14", "2014/15", "2015/16", "2016/17", "2017/18", "2018/19", "2022/23"],
+  "early_missing_rows": 1,
+  "model": "Statewise quasibinomial GAM, global k14, season k12, gamma1, REML",
+  "R_version": "R version 4.5.1 (2025-06-13)",
+  "mgcv_version": "1.9.3"
+}

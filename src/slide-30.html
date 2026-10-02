@@ -33,7 +33,7 @@
 <body>
   <main class="slide" aria-label="Slide 30. When can forecasts improve the decision?">
     <h1>When can forecasts improve the decision?</h1>
-    <section class="visual" aria-label="Vaccination timing scenarios and an illustration of forecasts during the influenza rise">
+    <section class="visual" aria-label="Pre-pandemic vaccination scenarios and a threshold tested on later seasons">
       <svg viewBox="0 0 1208 535" role="img" aria-labelledby="chart-title chart-desc">
         <title id="chart-title">Each scenario has its own best vaccination date</title>
         <desc id="chart-desc"></desc>
@@ -76,27 +76,37 @@
           <g id="alignment-mean"></g>
           <g id="alignment-axis"></g>
           <text x="462" y="528" text-anchor="middle" class="axis">Weeks from the aligned mean peak</text>
-          <g id="alignment-summary" transform="translate(0 78)">
-            <text id="summary-count" x="925" y="151" font-size="15" font-weight="650" style="fill:var(--muted)"></text>
-            <text x="925" y="190" font-size="18">Median optimal date</text>
-            <text id="median-weeks" x="925" y="240" font-size="42" font-weight="600" style="fill:var(--red)"></text>
-            <text x="925" y="270" font-size="18">before the mean peak</text>
+          <g id="alignment-summary">
+            <text x="1040" y="213" text-anchor="middle" font-size="16" style="fill:var(--muted)">Pre-pandemic threshold</text>
+            <text id="threshold-value" x="1040" y="274" text-anchor="middle" font-size="48" font-weight="600" style="fill:var(--teal)"></text>
+            <text x="1040" y="308" text-anchor="middle" font-size="18">September baseline</text>
+            <text x="1040" y="344" text-anchor="middle" class="axis">From 5,000 paired draws</text>
           </g>
         </g>
-        <g id="forecast-view" style="display:none">
-          <line x1="64" x2="84" y1="106" y2="106" stroke="#a4b0b0" stroke-width="2"/>
-          <text x="92" y="111" class="axis">Observed seasons</text>
-          <circle cx="268" cy="106" r="4.5" fill="#933a4b"/>
-          <text x="280" y="111" class="axis">Observed week</text>
-          <line x1="429" x2="455" y1="106" y2="106" stroke="#0a6670" stroke-width="2"/>
-          <circle cx="442" cy="106" r="4.5" fill="#0a6670"/>
-          <text x="466" y="111" class="axis">Nowcast · 90% interval</text>
-          <text x="1040" y="111" text-anchor="middle" font-size="18" font-weight="600">Horizon 0</text>
-          <g id="forecast-grid"></g>
-          <g id="forecast-observed"></g>
-          <g id="forecast-comparison"></g>
-          <g id="forecast-axis"></g>
-          <text x="462" y="501" text-anchor="middle" class="axis">Weeks from the aligned rising week</text>
+        <g id="threshold-view" style="display:none">
+          <line x1="64" x2="84" y1="56" y2="56" stroke="#a4b0b0" stroke-width="2"/>
+          <text x="92" y="61" class="axis">Later seasons</text>
+          <circle cx="253" cy="56" r="4.5" fill="#933a4b"/>
+          <text x="265" y="61" class="axis">Optimal dates</text>
+          <circle cx="425" cy="56" r="4.5" fill="#fbfaf6" stroke="#0a6670" stroke-width="2"/>
+          <text x="437" y="61" class="axis">Threshold dates</text>
+          <g id="threshold-grid"></g>
+          <g id="threshold-profiles"></g>
+          <g id="threshold-rules"></g>
+          <g id="threshold-markers"></g>
+          <g id="threshold-axis"></g>
+          <text x="462" y="528" text-anchor="middle" class="axis">Calendar date</text>
+          <g id="threshold-comparison">
+            <text x="1040" y="173" text-anchor="middle" font-size="18">Median gap to optimum</text>
+            <text id="fixed-label" x="973" y="218" text-anchor="middle" font-size="16" style="fill:var(--muted)"></text>
+            <text x="1100" y="218" text-anchor="middle" font-size="16" style="fill:var(--teal)">Threshold</text>
+            <text id="fixed-gap" x="973" y="262" text-anchor="middle" font-size="32" font-weight="600"></text>
+            <text id="threshold-gap" x="1100" y="262" text-anchor="middle" font-size="32" font-weight="600" style="fill:var(--teal)"></text>
+            <text x="1040" y="330" text-anchor="middle" font-size="17">Benefit vs. optimum</text>
+            <text id="fixed-retained" x="973" y="370" text-anchor="middle" font-size="26" font-weight="600"></text>
+            <text id="threshold-retained" x="1100" y="370" text-anchor="middle" font-size="26" font-weight="600" style="fill:var(--teal)"></text>
+            <text x="1040" y="410" text-anchor="middle" class="axis">Across all 5,000 pairs</text>
+          </g>
         </g>
       </svg>
       <div class="controls">
@@ -104,7 +114,7 @@
         <button id="one" aria-pressed="false">2 · One scenario</button>
         <button id="samples" aria-pressed="false">3 · Sample scenarios</button>
         <button id="align" aria-pressed="false">4 · Align seasons</button>
-        <button id="forecast" aria-pressed="false">5 · Nowcast the rise</button>
+        <button id="threshold" aria-pressed="false">5 · Test a threshold</button>
         <span id="control-hint">Arrow keys to advance</span>
         <button id="reset" aria-label="Reset demonstration" title="Reset">↺</button>
       </div>
@@ -119,7 +129,7 @@
     const BY = burden => 250-burden/DATA.burden_y_max*138;
     const PY = protection => 477-protection/DATA.protection_y_max*106;
     const DX = t => 680+t/29*474, DY = regret => 477-regret/DATA.regret_y_max*365;
-    const buttons = ['start','one','samples','align','forecast'];
+    const buttons = ['start','one','samples','align','threshold'];
     const reducedMotion = matchMedia('(prefers-reduced-motion:reduce)').matches;
     let stage = 1, animation = 0;
     function element(tag,attrs,parent,text) {
@@ -163,11 +173,15 @@
       });
       return {curves,markers};
     });
-    const alignment=DATA.alignment;
+    const alignment=DATA.alignment, threshold=DATA.threshold_example;
+    const plotMax=Math.max(alignment.y_max,threshold.y_max), multiplier=threshold.fit.threshold_multiplier;
     const AX=t=>64+(t-alignment.x_min)/(alignment.x_max-alignment.x_min)*796;
-    const AY=v=>470-v/alignment.y_max*370;
-    for(const fraction of [0,.5,1]) element('line',{x1:64,x2:860,y1:AY(fraction*alignment.y_max),y2:AY(fraction*alignment.y_max),class:'grid'},$('alignment-grid'));
-    element('text',{x:64,y:87,class:'axis'},$('alignment-grid'),'Relative influenza activity');
+    const AY=v=>470-v/plotMax*370;
+    for(const value of [0,plotMax/2,plotMax]) {
+      element('line',{x1:64,x2:860,y1:AY(value),y2:AY(value),class:'grid'},$('alignment-grid'));
+      element('text',{x:53,y:AY(value)+5,'text-anchor':'end',class:'axis'},$('alignment-grid'),`${value}×`);
+    }
+    element('text',{x:64,y:87,class:'axis'},$('alignment-grid'),'Activity / September baseline');
     for(let t=Math.ceil(alignment.x_min/8)*8;t<=alignment.x_max;t+=8) element('text',{x:AX(t),y:496,'text-anchor':'middle',class:'axis'},$('alignment-axis'),t===0?'Peak':`${t>0?'+':''}${t}`);
     element('line',{x1:AX(0),x2:AX(0),y1:100,y2:470,stroke:'#a4b0b0','stroke-dasharray':'3 5'},$('alignment-grid'));
     element('rect',{x:AX(alignment.after.q1),y:100,width:AX(alignment.after.q3)-AX(alignment.after.q1),height:370,fill:'#933a4b',opacity:.08},$('alignment-band'));
@@ -178,37 +192,37 @@
       return group;
     });
     element('path',{d:path(alignment.mean_points,AX,AY),class:'sample',stroke:'#0a6670','stroke-width':3.2},$('alignment-mean'));
-    element('line',{x1:AX(alignment.median_point[0]),x2:AX(alignment.median_point[0]),y1:100,y2:470,stroke:'#933a4b','stroke-width':1.5,'stroke-dasharray':'5 5'},$('alignment-mean'));
-    element('circle',{cx:AX(alignment.median_point[0]),cy:AY(alignment.median_point[1]),r:6.5,fill:'#933a4b',stroke:'#fbfaf6','stroke-width':2},$('alignment-mean'));
-    element('text',{x:AX(alignment.median_point[0])-10,y:121,'text-anchor':'end','font-size':15,fill:'#933a4b'},$('alignment-mean'),'Median date');
-    $('median-weeks').textContent=`~${Math.round(-alignment.after.median)} weeks`;
-    $('summary-count').textContent=`FOR THESE ${DATA.scenarios.length} SCENARIOS`;
-    const forecast=DATA.forecast_example;
-    const FX=t=>64+(t+4)/4*796, FY=v=>443-v/forecast.y_max*293;
-    for(const value of [0,2,4,6]) {
-      element('line',{x1:64,x2:860,y1:FY(value),y2:FY(value),class:'grid'},$('forecast-grid'));
-      element('line',{x1:943,x2:1154,y1:FY(value),y2:FY(value),class:'grid'},$('forecast-grid'));
-      element('text',{x:53,y:FY(value)+5,'text-anchor':'end',class:'axis'},$('forecast-axis'),`${value}×`);
+    element('line',{x1:64,x2:860,y1:AY(multiplier),y2:AY(multiplier),stroke:'#0a6670','stroke-width':1.7,'stroke-dasharray':'6 5'},$('alignment-mean'));
+    element('text',{x:848,y:AY(multiplier)-9,'text-anchor':'end','font-size':15,style:'fill:var(--teal)'},$('alignment-mean'),`${multiplier.toFixed(1)}×`);
+    $('threshold-value').textContent=`${multiplier.toFixed(1)}×`;
+    const TX=t=>64+(t+.5)/40*796;
+    for(const value of [0,plotMax/2,plotMax]) {
+      element('line',{x1:64,x2:860,y1:AY(value),y2:AY(value),class:'grid'},$('threshold-grid'));
+      element('text',{x:53,y:AY(value)+5,'text-anchor':'end',class:'axis'},$('threshold-axis'),`${value}×`);
     }
-    for(const week of [-4,-3,-2,-1,0]) element('text',{x:FX(week),y:469,'text-anchor':'middle',class:'axis'},$('forecast-axis'),week===0?'Aligned week':String(week));
-    element('line',{x1:FX(0),x2:FX(0),y1:150,y2:443,stroke:'#933a4b','stroke-width':1.5,'stroke-dasharray':'5 5',opacity:.45},$('forecast-grid'));
-    element('text',{x:76,y:FY(4)-10,'font-size':14,style:'fill:var(--muted)'},$('forecast-grid'),'4× early-November level');
-    forecast.seasons.forEach((season,i)=>{
-      const x=959+i*80, nowcast=season.nowcast;
-      element('path',{d:path(season.observed_points,FX,FY),class:'sample',stroke:'#a4b0b0','stroke-width':2,opacity:.8,'data-season':season.season},$('forecast-observed'));
-      element('circle',{cx:FX(0),cy:FY(season.ratio),r:5.5,fill:'#933a4b',stroke:'#fbfaf6','stroke-width':1.5,'data-season':season.season,'data-date':season.target_date},$('forecast-observed'));
-      element('text',{x:FX(0)+12,y:FY(season.ratio)+5,'font-size':14,style:'fill:var(--muted)'},$('forecast-observed'),season.season);
-      const comparison=element('g',{'data-season':season.season,'data-date':nowcast.date,'data-horizon':nowcast.horizon},$('forecast-comparison'));
-      element('line',{x1:x,x2:x,y1:FY(nowcast.lower),y2:FY(nowcast.upper),stroke:'#0a6670','stroke-width':12,opacity:.1},comparison);
-      element('line',{x1:x,x2:x,y1:FY(nowcast.lower),y2:FY(nowcast.upper),stroke:'#0a6670','stroke-width':1.7},comparison);
-      for(const value of [nowcast.lower,nowcast.upper]) element('line',{x1:x-6,x2:x+6,y1:FY(value),y2:FY(value),stroke:'#0a6670','stroke-width':1.7},comparison);
-      element('circle',{cx:x,cy:FY(nowcast.median),r:5.5,fill:'#0a6670',stroke:'#fbfaf6','stroke-width':1.5,'data-kind':'median'},comparison);
-      element('circle',{cx:x,cy:FY(season.ratio),r:5.5,fill:'#933a4b',stroke:'#fbfaf6','stroke-width':1.5,'data-kind':'observed'},comparison);
-      element('text',{x,y:469,'text-anchor':'middle',class:'axis'},$('forecast-axis'),season.season);
+    element('text',{x:64,y:87,class:'axis'},$('threshold-grid'),'Activity / September baseline');
+    for(const [week,label] of [[0,'Sep'],[9,'Nov'],[18,'Jan'],[27,'Mar'],[36,'May']]) element('text',{x:TX(week),y:496,'text-anchor':'middle',class:'axis'},$('threshold-axis'),label);
+    element('line',{x1:64,x2:860,y1:AY(multiplier),y2:AY(multiplier),stroke:'#0a6670','stroke-width':1.7,'stroke-dasharray':'6 5'},$('threshold-rules'));
+    element('text',{x:848,y:AY(multiplier)-9,'text-anchor':'end','font-size':15,style:'fill:var(--teal)'},$('threshold-rules'),`${multiplier.toFixed(1)}×`);
+    const fixedTime=threshold.scenarios[0].fixed_time;
+    element('line',{x1:TX(fixedTime),x2:TX(fixedTime),y1:100,y2:470,stroke:'#647278','stroke-width':1.5,'stroke-dasharray':'3 5'},$('threshold-rules'));
+    element('text',{x:TX(fixedTime)-9,y:122,'text-anchor':'end','font-size':15,style:'fill:var(--muted)'},$('threshold-rules'),`Fixed week ${threshold.fit.fixed_week}`);
+    threshold.scenarios.forEach(row=>{
+      const points=[...row.burden_points];
+      points.unshift([points[0][0]-.5,points[0][1]]); points.push([points.at(-1)[0]+.5,points.at(-1)[1]]);
+      element('path',{d:path(points,TX,AY),class:'sample',stroke:'#a4b0b0','stroke-width':1.1,opacity:.38,'data-draw':row.draw,'data-season':row.season},$('threshold-profiles'));
+      row.optimal_times.forEach((time,i)=>element('circle',{cx:TX(time),cy:AY(row.optimal_heights[i]),r:3.5,fill:'#933a4b',opacity:.7,stroke:'#fbfaf6','stroke-width':.8,'data-draw':row.draw,'data-kind':'optimal','data-time':time},$('threshold-markers')));
+      if(row.threshold_time!==null) element('circle',{cx:TX(row.threshold_time),cy:AY(row.threshold_height),r:4.4,fill:'#fbfaf6',stroke:'#0a6670','stroke-width':1.7,opacity:.8,'data-draw':row.draw,'data-kind':'threshold','data-time':row.threshold_time},$('threshold-markers'));
     });
-    function revealForecast(progress) {
-      $('forecast-comparison').style.opacity=progress;
-      $('forecast-view').dataset.progress=progress;
+    $('fixed-label').textContent=`Week ${threshold.fit.fixed_week}`;
+    for(const policy of ['fixed','threshold']) {
+      $(policy+'-gap').textContent=`${threshold.summary[policy].median_absolute_weeks} wk`;
+      $(policy+'-retained').textContent=`${((1-threshold.summary[policy].pooled_relative_loss)*100).toFixed(1)}%`;
+    }
+    function revealThreshold(progress) {
+      $('threshold-markers').style.opacity=progress;
+      $('threshold-comparison').style.opacity=progress;
+      $('threshold-view').dataset.progress=progress;
     }
     function alignSeasons(progress) {
       alignmentGraphics.forEach((group,i)=>group.setAttribute('transform',`translate(${AX(progress*alignment.profiles[i].shift)-AX(0)} 0)`));
@@ -229,7 +243,7 @@
         });
       });
       $('season-label').textContent=active>=0?DATA.scenarios[active].season:'';
-      $('sample-count').textContent=`${count} of ${DATA.n_draws.toLocaleString('en-US')} simulated scenarios shown`;
+      $('sample-count').textContent=`${count} of ${DATA.n_draws.toLocaleString('en-US')} pre-pandemic pairs`;
     }
     function animate(duration,tick,done=()=>{}) {
       const start=performance.now();
@@ -246,9 +260,9 @@
       buttons.forEach((id,i)=>$(id).setAttribute('aria-pressed',value===i+1));
       $('scenario-view').style.display=value>=4?'none':'';
       $('alignment-view').style.display=value===4?'':'none';
-      $('forecast-view').style.display=value===5?'':'none';
-      $('alignment-view').style.opacity=1; $('forecast-view').style.opacity=1;
-      $('chart-title').textContent=value===5?'Archived FluSight ensemble nowcasts during the influenza rise':value===4?'Optimal dates after aligning epidemic curves':'Each scenario has its own best vaccination date';
+      $('threshold-view').style.display=value===5?'':'none';
+      $('alignment-view').style.opacity=1; $('threshold-view').style.opacity=1;
+      $('chart-title').textContent=value===5?'A pre-pandemic threshold tested on 5,000 later-season pairs':value===4?'Optimal dates after aligning epidemic curves':'Each scenario has its own best vaccination date';
       if(value===1) samples(1,0,false);
       else if(value===2) {
         samples(1,0);
@@ -265,32 +279,32 @@
           });
         } else { samples(graphics.length); }
       } else if(value===4) {
-        $('sample-count').textContent='';
+        $('sample-count').textContent='Pre-pandemic seasons · 2011–19';
         if(play&&value>previous&&!reducedMotion) {
           alignSeasons(0); animate(1800,p=>alignSeasons(p*p*(3-2*p)));
         } else alignSeasons(1);
       } else {
-        $('sample-count').textContent='US hospitalizations · 2023–24, 2024–25, 2025–26';
+        $('sample-count').textContent='50 of 5,000 later-season pairs · 2023–26';
         if(play&&value>previous&&!reducedMotion) {
-          revealForecast(0);
+          revealThreshold(0);
           if(previous===4) {
-            $('alignment-view').style.display=''; $('forecast-view').style.opacity=0;
+            $('alignment-view').style.display=''; $('threshold-view').style.opacity=0;
             animate(1400,p=>{
               const incoming=Math.max(0,Math.min(1,(p-.2)/.65));
               $('alignment-view').style.opacity=1-Math.min(1,p/.65);
-              $('forecast-view').style.opacity=incoming*incoming*(3-2*incoming);
-              revealForecast(Math.max(0,Math.min(1,(p-.55)/.45)));
-            },()=>{$('alignment-view').style.display='none';});
-          } else animate(700,revealForecast);
-        } else revealForecast(1);
+              $('threshold-view').style.opacity=incoming*incoming*(3-2*incoming);
+              revealThreshold(Math.max(0,Math.min(1,(p-.55)/.45)));
+            },()=>{$('alignment-view').style.display='none';revealThreshold(1);});
+          } else animate(700,revealThreshold);
+        } else revealThreshold(1);
       }
       const desc=[
         '',
-        'One saved simulated epidemic and vaccine-protection pair. Advance to reveal its best vaccination date.',
+        'One pre-pandemic epidemic and vaccine-protection pair. Advance to reveal its best vaccination date.',
         `The regret curve reaches its calculated minimum at week ${DATA.scenarios[0].best_week}. Red dots mark that same dose date on the epidemic and calendar-aligned protection curves. Protection begins after the saved immune-response delay.`,
-        `${DATA.scenarios.length} saved scenarios appear in sequence, each with a calculated regret minimum and matching dose-date dots on its epidemic and protection curves. These scenario-specific optima motivate a future forecast study; they are not a validated forecast-informed decision rule.`,
-        `The ${DATA.scenarios.length} epidemic curves are normalized to equal total area and shifted to maximize shared area with a representative epidemic profile. The optimal dates move with their curves and are not used to choose the shifts. The median date is about ${Math.round(-alignment.after.median)} weeks before the aligned mean peak. These are descriptive results for the ${DATA.scenarios.length} displayed scenarios, not a validated decision rule.`,
-        'Three observed US influenza hospitalization curves are aligned at the first reported week above four times their early-November level, using a baseline frozen before each nowcast. Gray curves and red points show later revised observations. The right-hand panel uses the same vertical scale: teal points and 90% prediction intervals are actual archived FluSight ensemble horizon-0 nowcasts for those same weeks, compared with the red observations. All three nowcast medians underestimate the observed rise. The comparison weeks are illustrative, not optimal vaccination dates. No peak is used for scaling or alignment. This hospitalization example does not establish that nowcasting is sufficient for a vaccination timing rule.'
+        `${DATA.scenarios.length} pre-pandemic pairs appear in sequence, each with a calculated regret minimum and matching dose-date dots. They are the first 50 of 5,000 seeded draws from 2011/12 through 2018/19, with pre-pandemic VE estimates.`,
+        `These 50 pre-pandemic curves are shifted by maximum shared area after AUC normalization. Displayed heights are divided by each draw's September baseline. Red optimal dates move with their curves and are not used to choose the shifts. Across all 5,000 training pairs, median activity at the optimal date gives a frozen threshold of ${multiplier.toFixed(1)} times baseline. The pale band is the middle half of the 50 aligned optimal dates.`,
+        `Apply the frozen ${multiplier.toFixed(1)}-times-September-baseline rule and fixed week ${threshold.fit.fixed_week} to ${threshold.evaluation_n.toLocaleString()} pairs from 2023/24 through 2025/26. The first 50 are shown. Gray curves are post-pandemic latent epidemic draws; burgundy dots are their individual optima, and teal rings are the first eligible weeks above the threshold. Median absolute timing gaps are ${threshold.summary.fixed.median_absolute_weeks} wk for the fixed date and ${threshold.summary.threshold.median_absolute_weeks} wk for the threshold. Pooled retained modeled protection is ${((1-threshold.summary.fixed.pooled_relative_loss)*100).toFixed(1)} percent and ${((1-threshold.summary.threshold.pooled_relative_loss)*100).toFixed(1)} percent, respectively, relative to the sum of each draw's optimum. All ${threshold.evaluation_n.toLocaleString()} cross the threshold. This is a retrospective simulation using revised-data latent curves, not a real-time surveillance evaluation or a validated clinical recommendation.`
       ][value];
       $('chart-desc').textContent=desc; $('status').textContent=desc;
     }

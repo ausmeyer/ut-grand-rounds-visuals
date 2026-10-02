@@ -1,0 +1,86 @@
+{
+  "training_season_start_years": [
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018
+  ],
+  "evaluation_season_start_years": [
+    2023,
+    2024,
+    2025
+  ],
+  "training_draws": 5000,
+  "evaluation_draws": 50,
+  "baseline_weeks": [
+    36,
+    37,
+    38,
+    39
+  ],
+  "baseline_rule": "Arithmetic mean of national latent ILI in the first four modeled September weeks of each draw.",
+  "candidate_weeks": [
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "threshold_rule": "Median across informative pre-pandemic draws of ILI at that draw's optimal vaccination date divided by its September baseline, rounded to the nearest 0.1 before evaluation. For tied optimal dates, use the median of their activity ratios. Draws with no positive vaccine benefit do not identify a calibration date.",
+  "trigger_rule": "First candidate week after the baseline window with ILI at or above the frozen multiplier times that draw's baseline. Report non-crossing draws explicitly; do not impute a date.",
+  "timing_error": "Trigger date minus the closest optimal date in the same paired draw, in elapsed seasonal weeks. Negative is early. Exact ties are treated as a set of equally optimal dates.",
+  "protection_distribution": "Original exponential-effect-ratio protection model, Ray 2019 waning prior, uncertain 1-3 week immune-response lag, 8-week VE reference, and only 2010-2018 source-season VE estimates for both training and evaluation.",
+  "epidemic_draws": "Cached manuscript statewise GAM coefficient draws, national population weighting, and N(0, 0.75-week SD) timing shifts. Pre-pandemic draws use the separately fitted pre-pandemic GAM cache. Post-pandemic draws use complete-season posterior curves as retrospective benchmark scenarios.",
+  "population_weights": "Same fixed 2025 Census population weights as the manuscript, for a common US target population in all seasons.",
+  "training_seeds": {
+    "season": 20261001,
+    "posterior": 20261101,
+    "protection": 20261201
+  },
+  "evaluation_seeds": {
+    "season": 20261002,
+    "posterior": 20261102,
+    "protection": 20261202
+  },
+  "evaluation_status": "New retrospective simulation illustration using revised-data latent curves. Not a real-time surveillance backtest, nowcast-accuracy evaluation, or validated vaccination recommendation. No threshold adjustment after viewing the 50 evaluation draws.",
+  "ve_source_season_start_years": [
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018
+  ],
+  "training_eligibility": "Exclude 2010/11 before threshold calibration because the cached ILI series begins in week 40 and lacks all four September baseline weeks. Retain its pre-pandemic VE estimate in the protection pool."
+}

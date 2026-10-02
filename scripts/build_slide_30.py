@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Build the linked scenario minima from 50 frozen manuscript draws."""
+"""Build linked pre-pandemic draws and a frozen-rule test on later seasons."""
 
+import gzip
 import hashlib
 import json
 import math
@@ -9,7 +10,7 @@ from bisect import bisect_right
 from pathlib import Path
 
 from build_slide_25 import protection, week_index
-from build_slide_30_forecast import build_forecast_example
+from build_slide_30_threshold import build_threshold_example
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -65,7 +66,15 @@ def align_seasons(scenarios):
             fits[i][j], fits[j][i] = (score, shift), (score, -shift)
     reference = max(range(len(curves)), key=lambda i: sum(row[0] for row in fits[i]))
     shifts = [row[1] for row in fits[reference]]
-    shifted = [[[t+shift, v] for t, v in curve] for curve, shift in zip(curves, shifts)]
+    # Shared-area alignment uses unit AUC; the displayed heights use September baseline.
+    displayed = []
+    for row in scenarios:
+        points = row['burden_points']
+        base = row['baseline']
+        displayed.append([[points[0][0]-.5, points[0][1]/base]]
+                         + [[t, v/base] for t, v in points]
+                         + [[points[-1][0]+.5, points[-1][1]/base]])
+    shifted = [[[t+shift, v] for t, v in curve] for curve, shift in zip(displayed, shifts)]
     left, right = max(c[0][0] for c in shifted), min(c[-1][0] for c in shifted)
     mean = [[k/4, statistics.mean(curve_at(c, k/4) for c in shifted)]
             for k in range(math.ceil(left*4), math.floor(right*4)+1)]
@@ -83,12 +92,13 @@ def align_seasons(scenarios):
     profiles = [{'draw': row['draw'], 'points': [[t-peak, v] for t, v in curve],
                  'shift': shift, 'optimal_time_before': date, 'optimal_time_after': date+shift,
                  'optimal_height': curve_at(curve, row['dose_time'])}
-                for row, curve, shift, date in zip(scenarios, curves, shifts, before)]
+                for row, curve, shift, date in zip(scenarios, displayed, shifts, before)]
     all_times = [t+offset for profile in profiles for t, _ in profile['points']
                  for offset in (0, profile['shift'])]
     median = statistics.median(after)
     assert mean[0][0] <= median <= mean[-1][0]
     return {'method': 'Maximum pairwise shared area after normalizing each seasonal AUC to one; representative-profile alignment',
+            'display_scale': 'Each draw divided by its September weeks 36-39 mean; unit AUC used only to choose shifts',
             'n_scenarios': len(curves), 'reference_draw': scenarios[reference]['draw'],
             'shift_grid_weeks': .25, 'search_limit_weeks': 20,
             'mean_peak_before_recentering': peak, 'mean_common_window': [left-peak, right-peak],
@@ -98,7 +108,7 @@ def align_seasons(scenarios):
             'overlap_before': statistics.mean(overlap_area(curves[reference], c, 0) for c in curves),
             'overlap_after': statistics.mean(row[0] for row in fits[reference]),
             'x_min': math.floor(min(all_times)/4)*4, 'x_max': math.ceil(max(all_times)/4)*4,
-            'y_max': math.ceil(max(v for c in curves for _, v in c)*100)/100}
+            'y_max': math.ceil(max(v for c in displayed for _, v in c))}
 
 
 def build():
@@ -106,6 +116,12 @@ def build():
     source = ROOT / config['source']['path']
     assert hashlib.sha256(source.read_bytes()).hexdigest() == config['source']['sha256']
     original = json.loads(source.read_text())
+    training = ROOT / 'data/slide-30/threshold-example/training-draws.json.gz'
+    assert hashlib.sha256(training.read_bytes()).hexdigest() == original['training_draws_sha256']
+    training_rows = json.loads(gzip.decompress(training.read_bytes()))['scenarios'][:50]
+    for row, saved in zip(original['scenarios'], training_rows):
+        assert all(row[key] == saved[key] for key in ['draw', 'season', 'weeks', 'max_week', 'burden', 'parameters'])
+        assert max(abs(r-(math.fsum(saved['burden'])-u)) for r, u in zip(row['remaining'], saved['utility'])) < 1e-12
     assert original['n_draws'] == 5000
     assert config['decision_rule_validated'] is False
     assert config['forecast_evaluation_performed'] is False
@@ -136,6 +152,7 @@ def build():
         assert all(0 <= point[1] <= .8 for point in protection_points)
         scenarios.append({
             'draw': row['draw'], 'season': row['season'], 'max_week': row['max_week'],
+            'baseline': statistics.mean(row['burden'][row['weeks'].index(w)] for w in [36, 37, 38, 39]),
             'burden_points': list(map(list, zip(elapsed, row['burden']))),
             'protection_points': protection_points,
             'decision_points': list(map(list, zip(candidates, regret))),
@@ -145,9 +162,14 @@ def build():
         })
     assert len(scenarios) == 50 and max_error < 1e-12
     candidate_totals = len(scenarios)*len(original['candidate_weeks'])
+    threshold = build_threshold_example('expanded')
+    threshold['evaluation_n'] = len(threshold['scenarios'])
+    threshold['scenarios'] = threshold['scenarios'][:50]
+    threshold['display_selection'] = 'First 50 of the seeded 5000 evaluation pairs; summaries use all 5000.'
+    threshold['y_max'] = math.ceil(max(v for row in threshold['scenarios'] for _, v in row['burden_points']))
     data = {**config, 'n_draws': original['n_draws'], 'scenarios': scenarios,
             'alignment': align_seasons(scenarios),
-            'forecast_example': build_forecast_example(),
+            'threshold_example': threshold,
             'burden_y_max': math.ceil(max(max(r['burden']) for r in original['scenarios'])*100)/100,
             'protection_y_max': .8,
             'regret_y_max': math.ceil(max(max(p[1] for p in s['decision_points']) for s in scenarios)*10)/10,

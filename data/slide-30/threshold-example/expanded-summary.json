@@ -1,0 +1,203 @@
+{
+  "fit": {
+    "training_draws_sha256": "e4fb6d14d6750e1c52333b12e2687a4849b514f9a8f14f5d42f01ce005b278eb",
+    "design_sha256": "2220a85d2c1fc02059dc5701cee47226a11af9f382b56804f0766f09705badbb",
+    "analysis_plan_sha256": "a75c133586cdd6ffb8473cc146712f4b17e57340d27527c4133ee60d0058164f",
+    "training_n": 5000,
+    "informative_n": 5000,
+    "optimal_activity_ratio_median": 1.691351423986592,
+    "threshold_multiplier": 1.7,
+    "fixed_week": 47,
+    "fixed_index": 11,
+    "candidate_weeks": [
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "training_mean_utility": [
+      0.1809612629269016,
+      0.18949865491728524,
+      0.19801763936308478,
+      0.2064721806844383,
+      0.21475956007448943,
+      0.22268720631089353,
+      0.23002449688268517,
+      0.2366224123131406,
+      0.24247342920311835,
+      0.2475912646797974,
+      0.2517437588229236,
+      0.25427854765250474,
+      0.25425967930657983,
+      0.25098413241739753,
+      0.2445321480272369,
+      0.23576798988176192,
+      0.22564494558316364,
+      0.21238996855844952,
+      0.20032701624546684,
+      0.18700139713800035,
+      0.1726175778933256,
+      0.15771464980176453,
+      0.14288016187993552,
+      0.12853347001404755,
+      0.11489385911600103,
+      0.10205061284721335,
+      0.09003248112965358,
+      0.07884693037844172,
+      0.06850272737387648
+    ],
+    "validation": {
+      "candidate_totals_checked": 145000,
+      "max_absolute_error": 4.440892098500626e-16
+    }
+  },
+  "season_counts": {
+    "2023/24": 1707,
+    "2024/25": 1662,
+    "2025/26": 1631
+  },
+  "summary": {
+    "threshold": {
+      "n": 5000,
+      "n_timing": 5000,
+      "non_crossings": 0,
+      "median_signed_weeks": 1.0,
+      "median_absolute_weeks": 1.0,
+      "mean_absolute_weeks": 1.612,
+      "within_2_weeks": 4061,
+      "median_relative_loss": 0.013459797921705128,
+      "mean_relative_loss": 0.02106257863177356,
+      "total_utility": 1879.1474617314723,
+      "pooled_relative_loss": 0.023966077121436613
+    },
+    "fixed": {
+      "n": 5000,
+      "n_timing": 5000,
+      "non_crossings": 0,
+      "median_signed_weeks": 0.0,
+      "median_absolute_weeks": 1.0,
+      "mean_absolute_weeks": 1.5082,
+      "within_2_weeks": 4029,
+      "median_relative_loss": 0.007819978654745301,
+      "mean_relative_loss": 0.01920121307734574,
+      "total_utility": 1891.052699758524,
+      "pooled_relative_loss": 0.017782466515571915
+    }
+  },
+  "by_season": {
+    "2023/24": {
+      "threshold": {
+        "n": 1707,
+        "n_timing": 1707,
+        "non_crossings": 0,
+        "median_signed_weeks": 0,
+        "median_absolute_weeks": 1,
+        "mean_absolute_weeks": 1.5893380199179847,
+        "within_2_weeks": 1351,
+        "median_relative_loss": 0.00595795194816964,
+        "mean_relative_loss": 0.012839474760634418,
+        "total_utility": 641.4942692817324,
+        "pooled_relative_loss": 0.01397136817453215
+      },
+      "fixed": {
+        "n": 1707,
+        "n_timing": 1707,
+        "non_crossings": 0,
+        "median_signed_weeks": 1,
+        "median_absolute_weeks": 2,
+        "mean_absolute_weeks": 2.0480374926772114,
+        "within_2_weeks": 1122,
+        "median_relative_loss": 0.010536033074797264,
+        "mean_relative_loss": 0.020246354887034152,
+        "total_utility": 634.0558983581194,
+        "pooled_relative_loss": 0.02540474654754976
+      }
+    },
+    "2024/25": {
+      "threshold": {
+        "n": 1662,
+        "n_timing": 1662,
+        "non_crossings": 0,
+        "median_signed_weeks": 1.0,
+        "median_absolute_weeks": 1.0,
+        "mean_absolute_weeks": 1.6191335740072201,
+        "within_2_weeks": 1350,
+        "median_relative_loss": 0.012708647663812586,
+        "mean_relative_loss": 0.01954670861356445,
+        "total_utility": 674.3874423823224,
+        "pooled_relative_loss": 0.023795646705846107
+      },
+      "fixed": {
+        "n": 1662,
+        "n_timing": 1662,
+        "non_crossings": 0,
+        "median_signed_weeks": -1.0,
+        "median_absolute_weeks": 1.0,
+        "mean_absolute_weeks": 1.4819494584837545,
+        "within_2_weeks": 1358,
+        "median_relative_loss": 0.009036380837963221,
+        "mean_relative_loss": 0.023433405793629913,
+        "total_utility": 679.6350105928699,
+        "pooled_relative_loss": 0.016199569718931772
+      }
+    },
+    "2025/26": {
+      "threshold": {
+        "n": 1631,
+        "n_timing": 1631,
+        "non_crossings": 0,
+        "median_signed_weeks": 2,
+        "median_absolute_weeks": 2,
+        "mean_absolute_weeks": 1.6284488044144696,
+        "within_2_weeks": 1360,
+        "median_relative_loss": 0.024266765388771185,
+        "mean_relative_loss": 0.0312135377233113,
+        "total_utility": 563.2657500674176,
+        "pooled_relative_loss": 0.03530426816775745
+      },
+      "fixed": {
+        "n": 1631,
+        "n_timing": 1631,
+        "non_crossings": 0,
+        "median_signed_weeks": 0,
+        "median_absolute_weeks": 1,
+        "mean_absolute_weeks": 0.9699570815450643,
+        "within_2_weeks": 1549,
+        "median_relative_loss": 0.004830602062669523,
+        "mean_relative_loss": 0.013794737685805329,
+        "total_utility": 577.3617908075349,
+        "pooled_relative_loss": 0.011162217393150597
+      }
+    }
+  },
+  "y_max": 5,
+  "validation": {
+    "candidate_totals_checked": 145000,
+    "max_absolute_error": 4.440892098500626e-16
+  }
+}

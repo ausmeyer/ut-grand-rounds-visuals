@@ -119,17 +119,14 @@ Standalone **slides 28–30** close the vaccine-timing section:
   [Evidence notes](specs/slide-29-evidence.md) distinguish the study assumption
   from this conceptual missed-vaccination branch.
 - [Slide 30](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-30.html#state=1)
-  extends slide 25's sample to 50 scenarios, adding synchronized red dots at
-  each scenario's best vaccination date across all three plots. The examples
-  arrive every 0.16 seconds in an eight-second reveal. Its fourth state aligns
-  all 50 epidemic curves by maximum shared area and summarizes their shifted
-  optimal dates. State 5 overlays observed national hospitalization curves
-  from 2023–24, 2024–25, and 2025–26 with their real archived FluSight ensemble
-  horizon-0 nowcasts at an illustrative rising level. It matches state 4's
-  plot frame and palette, with a crossfade into a current-week comparison.
-  The comparison uses no peaks;
-  its link to optimal vaccination timing remains untested.
-  [Evidence notes](specs/slide-30-evidence.md) define the future-study question.
+  shows 50 pre-pandemic epidemic / VE pairs and aligns their curves in state 4.
+  A threshold of 1.7× September baseline and fixed week 47 are learned from
+  5,000 pre-pandemic pairs, then frozen. State 5 displays 50 later-season
+  pairs and compares the rules across all 5,000 evaluation draws from 2023–26.
+  The plot frame, vertical scale, and palette stay consistent through the
+  crossfade. A separate 5,000-draw 2022–23 stress test is documented in the
+  [evidence notes](specs/slide-30-evidence.md). These are new retrospective
+  simulations using latent ILI curves, not a real-time policy evaluation.
 
 Slides 28–29 have four states; slide 30 has five. Each has a static Start,
 arrow navigation, and Reset. Build slide 30 alone with

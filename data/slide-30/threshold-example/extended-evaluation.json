@@ -1,0 +1,26 @@
+{
+  "reason": "User requested a larger evaluation and a separate stress test of the unusually early 2022/23 season after reviewing the initial 50 later-season draws. No rule is recalibrated.",
+  "threshold_fit_sha256": "18bcc4a2e25ad04bd2a95c72eba815d9589f2c2b75a6bd25aeea34329869a373",
+  "expanded_draws": 5000,
+  "expanded_season_start_years": [
+    2023,
+    2024,
+    2025
+  ],
+  "expanded_seeds": {
+    "season": 20261003,
+    "posterior": 20261103,
+    "protection": 20261203
+  },
+  "early_draws": 5000,
+  "early_season_start_years": [
+    2022
+  ],
+  "early_seeds": {
+    "season": 20261004,
+    "posterior": 20261104,
+    "protection": 20261204
+  },
+  "early_model": "Separate slide-only statewise GAM fit to 2010/11\u20132018/19 plus 2022/23, with original quasibinomial model, gk14, sk12, gamma1; only 2022/23 curves evaluated.",
+  "rule_lock": "Keep threshold 1.7 and fixed week47 exactly; same pre-pandemic VE pool, September baseline, immune lag, timing shifts, candidate dates, and outcome utility as the initial test."
+}

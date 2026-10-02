@@ -1,0 +1,16 @@
+{
+  "outputs/sensitivity/gam_precovid_primary/tables/gam_precovid_primary_analysis_manifest.json": "6715e5444b5da21f8e74f288bcf2dd902a339246e0be99517b4495b5bc849368",
+  "models/gam_all_age_ilinet_statewise_quasibinomial_wk36_gk14_sk12_gamma1_seasons_2010-2018_through_2019w22_srcb713e983fa.rds": "806d1ff44523b74c88ced01e407b8d9b5873e695413551dd2af486020a124d6e",
+  "data/processed/cdc_ve_estimates.csv": "d88fa12e19a33bca03ea82c533a4276fa4d33cd8821c94970695eea9ccf4e5a4",
+  "data/processed/ilinet_state_all_age_primary_seasons.csv": "1d5fda53b4fd62afa061d2e64291ec658962ce484034ba0cb928d7742f8c88fd",
+  "data/processed/state_population.csv": "182f2be46fe274a2e0f221c3fba3ab912ecac4c927696ce898cafc0dc82ab1a6",
+  "R/decision_engine.R": "16b2d16341f395691ebbab28efc3002f77e71787c0a6cba5256d368d5b0d1ab0",
+  "R/latent_curve_gam.R": "4be15efc6ba461b0cae7c076c9dd60f4ce63e7c10c0e27945a10ae6ab9ae6cb1",
+  "scripts/run_gam_primary_analysis.R": "926278592daae65eddfc40783d225dbc2104e183e6b2fb609fd6ff4cb43418c8",
+  "R/calendar.R": "0d5cd7ad71443ae9ff72e902571d0ece6f0986ac179dfa2137c38334d7e8eeb1",
+  "R/protection_models.R": "6d0cc08c980903d570626266376c4b3c7baf53c1581cb87578449437618fe7fb",
+  "R/ve_priors.R": "216a07e2fc2db5ae036cbe1437e02eedeb33516aa7ce7b3d9e32b835eb478f3b",
+  "R/ve_draws_from_estimates.R": "a9bca64f309708f924353762af2afe87a354072ecb345e4e8a62a7d9e854aab7",
+  "outputs/primary/tables/gam_primary_analysis_manifest.json": "44ae965918f87e1be411fedfad00d52184d2b74212a2331ef4c624821e6d472a",
+  "models/gam_all_age_ilinet_statewise_quasibinomial_wk36_gk14_sk12_gamma1_seasons_2010-2018_2023-2025_through_2026w22_srcb713e983fa.rds": "321eb64df465855923f8f005378e9288c2ebb179f7472ae3a3a7dc7325cf7655"
+}

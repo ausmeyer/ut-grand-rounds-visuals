@@ -1,0 +1,13 @@
+{
+  "source": "CDC FluView official download service",
+  "url": "https://gis.cdc.gov/flu2/PostPhase02DataDownload",
+  "retrieved_utc": "2026-10-02T02:10:13.793135+00:00",
+  "download_seasons": [
+    2021,
+    2022
+  ],
+  "retained_weeks": "2022 weeks36\u201352; 2023 weeks1\u201322",
+  "sha256": "76cc5c0ce6da057288c840c917600e0970781bcc8832d8c76e43cf154f552cd5",
+  "client": "Read-only manuscript R/fluview_download.R",
+  "client_sha256": "5bddb0620dc4879552d2a6d8377b7a900120ddbf3e2db2eb200c2fd9ee80f30b"
+}

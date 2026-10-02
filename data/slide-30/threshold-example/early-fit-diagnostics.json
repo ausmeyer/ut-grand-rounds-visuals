@@ -1,0 +1,11 @@
+{
+  "fully_converged_models": 51,
+  "minimum_covariance_eigenvalue": 2.602499e-07,
+  "dispersion_range": [
+    1.640373,
+    22.23414
+  ],
+  "warning": "model has repeated 1-d smooths of same variable",
+  "warning_explanation": "Expected from original global plus season-specific smooth formula. All 51 outer optimizations fully converged and all covariance matrices are positive definite.",
+  "independent_Alabama_refit_max_coefficient_difference": 0
+}

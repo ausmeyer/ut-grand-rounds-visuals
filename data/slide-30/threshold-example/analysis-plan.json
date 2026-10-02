@@ -1,0 +1,10 @@
+{
+  "threshold_calibration": "Use the median optimal-date activity ratio across all informative 5,000 pre-pandemic pairs, rounded to the nearest 0.1 as specified in design.json.",
+  "fixed_week_calibration": "Choose the candidate vaccination week maximizing mean utility across the same 5,000 pre-pandemic pairs. Resolve exact ties by the earliest seasonal candidate.",
+  "displayed_pre_pandemic_pairs": "First 50 pairs of the seeded pre-pandemic simulation; no selection by optimal date, fit, or appearance.",
+  "post_pandemic_pairs": 50,
+  "evaluation": "Apply both frozen policies to each post-pandemic pair and compare each with that pair's optimum. Report absolute timing gaps and relative modeled protection loss for both policies, including non-crossings.",
+  "stage_4_display": "Align the 50 pre-pandemic profiles by maximum shared area after AUC normalization, then display activity divided by each draw's September baseline so that the learned activity threshold has the same meaning across curves.",
+  "stage_5_display": "Show 50 post-pandemic profiles on a calendar axis with their own optima, threshold-triggered dates, and the fixed pre-pandemic week. Compare timing gaps, with modeled regret available in the evidence notes.",
+  "frozen_before_evaluation": true
+}
