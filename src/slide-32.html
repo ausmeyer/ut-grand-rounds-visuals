@@ -45,11 +45,9 @@
         <g id="timing-legend">
           <circle cx="69" cy="56" r="5" fill="#933a4b"/>
           <text id="dose-legend" x="82" y="61" class="axis">Optimal vaccination</text>
-          <circle cx="288" cy="56" r="5" fill="#fbfaf6" stroke="#0a6670" stroke-width="2"/>
-          <text id="onset-legend" x="301" y="61" class="axis">Modeled protection onset</text>
           <g id="reference-legend">
-            <line x1="538" x2="560" y1="56" y2="56" stroke="#647278" stroke-width="1.5" stroke-dasharray="4 4"/>
-            <text x="568" y="61" class="axis">Fastest rise</text>
+            <line x1="288" x2="310" y1="56" y2="56" stroke="#647278" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <text x="318" y="61" class="axis">Fastest rise</text>
           </g>
         </g>
         <g id="chart"></g>
@@ -113,14 +111,12 @@
         const g=element('g',{'data-draw':data.draw??'mean',opacity},$('chart'));
         for(const [panel,scale] of [['activity',Y],['slope',D]]) element('path',{d:path(data[panel],X,scale,shift),class:'curve',stroke:color,'stroke-width':width,'data-panel':panel},g);
         const timing=element('g',{'data-layer':'timing'},g);
-        for(const [kind,color] of [['dose','#933a4b'],['onset','#0a6670']]) {
-          const t=data[kind], x=X(t+shift);
-          if(mean||single) element('line',{x1:x,x2:x,y1:102,y2:487,stroke:color,'stroke-width':1,opacity:.28},timing);
-          for(const [panel,scale] of [['activity',Y],['slope',D]]) {
-            const v=at(data[panel],t);
-            const dot=element('circle',{cx:x,cy:scale(v),r:mean||single?6:3.1,fill:kind==='dose'?color:'#fbfaf6',stroke:kind==='dose'?'#fbfaf6':color,'stroke-width':kind==='dose'?1:1.7,'data-kind':kind,'data-panel':panel,'data-time':t,'data-aligned-time':t+shift,'data-value':v},timing);
-            element('title',{},dot,`${kind==='dose'?'Optimal vaccination':'Modeled protection onset'}${data.draw?`, draw ${data.draw}`:', median aligned date'}`);
-          }
+        const t=data.dose, x=X(t+shift);
+        if(mean||single) element('line',{x1:x,x2:x,y1:102,y2:487,stroke:'#933a4b','stroke-width':1,opacity:.28},timing);
+        for(const [panel,scale] of [['activity',Y],['slope',D]]) {
+          const v=at(data[panel],t);
+          const dot=element('circle',{cx:x,cy:scale(v),r:mean||single?6:3.1,fill:'#933a4b',stroke:'#fbfaf6','stroke-width':1,'data-kind':'dose','data-panel':panel,'data-time':t,'data-aligned-time':t+shift,'data-value':v},timing);
+          element('title',{},dot,`Optimal vaccination${data.draw?`, draw ${data.draw}`:', median aligned date'}`);
         }
         if(stage===1) timing.style.opacity=0;
         marks.push(timing); return g;
@@ -144,21 +140,19 @@
       DATA.seasons.forEach((row,i)=>{
         const y=132+i*46, g=element('g',{'data-season':row.season},$('chart'));
         element('text',{x:64,y:y+5,'font-size':18},g,row.season.replace('/','–'));
-        for(const [kind,dy,color] of [['dose',-6,'#933a4b'],['onset',6,'#0a6670']]) {
-          const q=row[kind], attrs={'data-kind':kind,'data-q1':q.q1,'data-q3':q.q3,'data-median':q.median};
-          element('line',{x1:X(q.q1),x2:X(q.q3),y1:y+dy,y2:y+dy,stroke:color,'stroke-width':3,'stroke-linecap':'round',opacity:.65,...attrs},g);
-          element('circle',{cx:X(q.median),cy:y+dy,r:5,fill:kind==='dose'?color:'#fbfaf6',stroke:color,'stroke-width':2,...attrs},g);
-        }
+        const q=row.dose, attrs={'data-kind':'dose','data-q1':q.q1,'data-q3':q.q3,'data-median':q.median};
+        element('line',{x1:X(q.q1),x2:X(q.q3),y1:y,y2:y,stroke:'#933a4b','stroke-width':3,'stroke-linecap':'round',opacity:.65,...attrs},g);
+        element('circle',{cx:X(q.median),cy:y,r:5,fill:'#933a4b',stroke:'#933a4b','stroke-width':2,...attrs},g);
       });
       element('text',{x:680,y:528,'text-anchor':'middle',class:'axis'},$('chart'),'Weeks before / after the fastest rise');
     }
     function updateDescription() {
       const row=DATA.scenarios[selected];
-      const scope='Existing national pre-pandemic ILI and VE pairs from eight historical seasons. Raw ILI percent, with no division by or subtraction of an estimated background. Weekly change is the centered difference, (ILI one week later minus ILI one week earlier) divided by two. No additional smoothing is applied. Vaccination dates maximize each pair’s saved utility; modeled protection starts after that pair’s saved 1–3-week response delay. These are retrospective smoothed latent curves, not an evaluated real-time rule.';
-      const detail=stage<=2?`The aligned mean of the first 50 pairs. Horizontal shifts are reused from slide 30’s AUC-overlap alignment. Marks in state 2 are the separate median aligned vaccination and onset dates, placed on the mean, not a single representative pair. Median onset is at aligned week ${DATA.mean.onset}, and the mean’s fastest weekly rise is at ${DATA.mean.fastest}. Start does not animate.`:
-        stage===3?'All first 50 paired draws, in saved order, with each pair’s own vaccination and onset dates in both panels. Curves and markers appear together over eight seconds.':
-        stage===4?`Individual draw ${row.draw}, ${row.season}. Optimal vaccination week ${row.dose_week}; modeled response delay ${row.immune_lag_weeks} weeks. Vaccination is ${Math.abs(row.dose_offset)} weeks ${row.dose_offset<=0?'before':'after'} this curve’s fastest rise; protection onset is ${Math.abs(row.onset_offset)} weeks ${row.onset_offset<=0?'before':'after'} it. The select menu and previous/next draw buttons inspect all 50 pairs. Vertical axes rescale to each draw, retaining percent and percentage-point units.`:
-        'All 5,000 saved pairs, grouped by their eight historical seasons. Dots show medians and lines show the middle 50 percent of timing offsets from each individual curve’s own maximum positive weekly rise. These intervals describe conditional draws, not uncertainty across 5,000 independent seasons. Nearness in the mean is not consistently reproduced within every season.';
+      const scope='Existing national pre-pandemic ILI and VE pairs from eight historical seasons. Raw ILI percent, with no division by or subtraction of an estimated background. Weekly change is the centered difference, (ILI one week later minus ILI one week earlier) divided by two. No additional smoothing is applied. Vaccination dates maximize each pair’s saved utility, which already incorporates the immune-response delay and waning. These are retrospective smoothed latent curves, not an evaluated real-time rule.';
+      const detail=stage<=2?`The aligned mean of the first 50 pairs. Horizontal shifts are reused from slide 30’s AUC-overlap alignment. Marks in state 2 show the median aligned optimal vaccination date, placed on the mean. It is a summary, not a single representative pair. Median vaccination is at aligned week ${DATA.mean.dose}. Start does not animate.`:
+        stage===3?'All first 50 paired draws, in saved order, with each pair’s own optimal vaccination date in both panels. Curves and markers appear together over eight seconds.':
+        stage===4?`Individual draw ${row.draw}, ${row.season}. Optimal vaccination week ${row.dose_week}. Vaccination is ${Math.abs(row.dose_offset)} weeks ${row.dose_offset<=0?'before':'after'} this curve’s fastest rise. The select menu and previous/next draw buttons inspect all 50 pairs. Vertical axes rescale to each draw, retaining percent and percentage-point units.`:
+        'All 5,000 saved pairs, grouped by their eight historical seasons. Dots show medians and lines show the middle 50 percent of optimal vaccination-date offsets from each individual curve’s own maximum positive weekly rise. These intervals describe conditional draws, not uncertainty across 5,000 independent seasons. Nearness in the mean is not consistently reproduced within every season.';
       const reference='Fastest rise means the largest positive centered weekly change from week 36 through week 21, taking the earliest exact tie. It can be a later upswing in a multi-wave season; it is not necessarily the first transition from accelerating to approximately linear growth. Future weeks are used to describe slope and find this reference; no prospective detection threshold or clinical recommendation is being established.';
       $('chart-title').textContent=stage===5?'Timing by historical season':stage===4?`Draw ${row.draw}: ${row.season}`:'Activity and its first derivative';
       $('chart-desc').textContent=`${detail} ${scope} ${reference}`; $('status').textContent=detail;
@@ -168,7 +162,6 @@
       $('timing-legend').style.visibility=stage===1?'hidden':'visible';
       $('reference-legend').style.display=stage===4?'':'none';
       $('dose-legend').textContent=stage<=2?'Median vaccination':'Optimal vaccination';
-      $('onset-legend').textContent=stage<=2?'Median protection onset':'Modeled protection onset';
       $('draw-picker').hidden=stage!==4;
       $('previous-draw').disabled=selected===0; $('next-draw').disabled=selected===DATA.scenarios.length-1;
       $('draw-select').value=selected;

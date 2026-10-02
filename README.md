@@ -148,8 +148,9 @@ using the existing paired draws without an explicit background baseline.
 [Open the slide](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-32.html#state=1).
 Five states move from the aligned mean to timing markers, 50 paired curves,
 individual draw inspection, and a summary across the eight historical seasons.
-The activity and first-derivative panels mark vaccination and modeled protection
-onset. The final state uses all 5,000 saved pairs and shows why the mean alone
+The activity and first-derivative panels mark optimal vaccination dates,
+which already account for the immune-response delay. The final state uses
+all 5,000 saved pairs and shows why the mean alone
 cannot establish a consistent within-season pattern. Build with
 `python3 scripts/build_slide_32.py`; independently verify with
 `Rscript scripts/check_slide_32.R`. The [source and handoff notes](specs/slide-32-evidence.md)
