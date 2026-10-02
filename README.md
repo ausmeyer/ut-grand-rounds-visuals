@@ -108,7 +108,7 @@ or edit `src/slide-27.html`. Start is static; each subsequent advance reveals
 one bar. [Source and handoff notes](specs/slide-27-evidence.md) define the
 scenario-specific denominator and record the frozen manuscript results.
 
-Standalone **slides 28–30** close the vaccine-timing section:
+Standalone **slides 28–31** close the vaccine-timing section:
 
 - [Slide 28](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-28.html#state=1)
   compares protection under three waning models with selected weeks 47, 46,
@@ -127,6 +127,14 @@ Standalone **slides 28–30** close the vaccine-timing section:
   crossfade. A separate 5,000-draw 2022–23 stress test is documented in the
   [evidence notes](specs/slide-30-evidence.md). These are new retrospective
   simulations using latent ILI curves, not a real-time policy evaluation.
+- [Slide 31](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-31.html#state=1)
+  tests those same frozen rules in the early 2022–23 US season, then in
+  Texas, California, Minnesota, and New York. Each location displays the
+  first 50 pairs and summarizes all 5,000. Three states provide a static
+  Start, the national comparison, and four state panels. Build with
+  `python3 scripts/build_slide_31.py`; edit `src/slide-31.html`.
+  [Evidence notes](specs/slide-31-evidence.md) record the paired extraction,
+  independent checks, and limits of this retrospective comparison.
 
 Slides 28–29 have four states; slide 30 has five. Each has a static Start,
 arrow navigation, and Reset. Build slide 30 alone with

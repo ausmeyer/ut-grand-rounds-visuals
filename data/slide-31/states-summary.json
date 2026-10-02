@@ -1,0 +1,126 @@
+{
+  "states": {
+    "Texas": {
+      "fixed": {
+        "n": 5000,
+        "n_timing": 5000,
+        "non_crossings": 0,
+        "median_signed_weeks": 8.0,
+        "median_absolute_weeks": 8.0,
+        "mean_absolute_weeks": 8.1666,
+        "within_2_weeks": 0,
+        "median_relative_loss": 0.3333954791745114,
+        "mean_relative_loss": 0.3310762612869747,
+        "total_utility": 1787.8778964087498,
+        "pooled_relative_loss": 0.33380459075784763
+      },
+      "threshold": {
+        "n": 5000,
+        "n_timing": 5000,
+        "non_crossings": 0,
+        "median_signed_weeks": 4.0,
+        "median_absolute_weeks": 4.0,
+        "mean_absolute_weeks": 4.4402,
+        "within_2_weeks": 533,
+        "median_relative_loss": 0.11329615147301902,
+        "mean_relative_loss": 0.11391236773700127,
+        "total_utility": 2360.7851681944653,
+        "pooled_relative_loss": 0.12032905355716195
+      },
+      "threshold_better_draws": 5000
+    },
+    "California": {
+      "fixed": {
+        "n": 5000,
+        "n_timing": 5000,
+        "non_crossings": 0,
+        "median_signed_weeks": 5.0,
+        "median_absolute_weeks": 5.0,
+        "mean_absolute_weeks": 4.8064,
+        "within_2_weeks": 79,
+        "median_relative_loss": 0.17161642762802154,
+        "mean_relative_loss": 0.17023962147723748,
+        "total_utility": 1812.0992592534838,
+        "pooled_relative_loss": 0.17195982696629575
+      },
+      "threshold": {
+        "n": 5000,
+        "n_timing": 5000,
+        "non_crossings": 0,
+        "median_signed_weeks": 1.0,
+        "median_absolute_weeks": 1.0,
+        "mean_absolute_weeks": 0.8794,
+        "within_2_weeks": 4866,
+        "median_relative_loss": 0.004213048965626404,
+        "mean_relative_loss": 0.008218351658494579,
+        "total_utility": 2168.318989376001,
+        "pooled_relative_loss": 0.009184942829881249
+      },
+      "threshold_better_draws": 4986
+    },
+    "Minnesota": {
+      "fixed": {
+        "n": 5000,
+        "n_timing": 5000,
+        "non_crossings": 0,
+        "median_signed_weeks": 6.0,
+        "median_absolute_weeks": 6.0,
+        "mean_absolute_weeks": 5.6344,
+        "within_2_weeks": 26,
+        "median_relative_loss": 0.3127253271991191,
+        "mean_relative_loss": 0.30800539300703766,
+        "total_utility": 797.5962559739418,
+        "pooled_relative_loss": 0.30581673385411057
+      },
+      "threshold": {
+        "n": 5000,
+        "n_timing": 5000,
+        "non_crossings": 0,
+        "median_signed_weeks": 2.0,
+        "median_absolute_weeks": 2.0,
+        "mean_absolute_weeks": 2.0064,
+        "within_2_weeks": 3430,
+        "median_relative_loss": 0.029972002803204827,
+        "mean_relative_loss": 0.036939203611949016,
+        "total_utility": 1103.3056779970175,
+        "pooled_relative_loss": 0.03974431503061482
+      },
+      "threshold_better_draws": 4992
+    },
+    "New York": {
+      "fixed": {
+        "n": 5000,
+        "n_timing": 5000,
+        "non_crossings": 0,
+        "median_signed_weeks": 5.0,
+        "median_absolute_weeks": 5.0,
+        "mean_absolute_weeks": 5.4106,
+        "within_2_weeks": 61,
+        "median_relative_loss": 0.18897429739551125,
+        "mean_relative_loss": 0.18936193642724555,
+        "total_utility": 2235.521895643283,
+        "pooled_relative_loss": 0.19341074012081272
+      },
+      "threshold": {
+        "n": 5000,
+        "n_timing": 5000,
+        "non_crossings": 0,
+        "median_signed_weeks": -1.0,
+        "median_absolute_weeks": 1.0,
+        "mean_absolute_weeks": 1.1392,
+        "within_2_weeks": 4558,
+        "median_relative_loss": 0.004587363173388408,
+        "mean_relative_loss": 0.01322638951078548,
+        "total_utility": 2745.5382279260875,
+        "pooled_relative_loss": 0.009393890729181176
+      },
+      "threshold_better_draws": 4882
+    }
+  },
+  "validation": {
+    "candidate_utilities_checked": 580000,
+    "max_absolute_error": 4.440892098500626e-16,
+    "model_sha256": "3cdb38369f61f85e2feb94411657bdf20348d77e9a4203bf314d6142f076c879",
+    "state_draws_sha256": "96d9f6a5f5288cfada7f1988fb3d600b373f55865e0646cadc6f6ec0fd854e70"
+  }
+}

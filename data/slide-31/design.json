@@ -1,0 +1,26 @@
+{
+  "slide": 31,
+  "season": "2022/23",
+  "states": [
+    "Texas",
+    "California",
+    "Minnesota",
+    "New York"
+  ],
+  "selection": "User selected these four states for geographic coverage before any state results were calculated. Retain every selected state regardless of results.",
+  "evaluation_n_per_location": 5000,
+  "display_n_per_location": 50,
+  "display_selection": "First 50 paired draw IDs, without outcome or appearance selection. Summaries use all 5000.",
+  "rule": "Frozen national pre-pandemic threshold 1.7 times each evaluated location\u2019s September mean (weeks36\u201339), first crossing after week39; comparator fixed national week47. No state-specific tuning.",
+  "state_draws": "Replay each selected state component of the existing 2022/23 national posterior: same cached state fit, same posterior seed plus original model-list index, same 5000 timing shifts and VE parameter pairs. Optimize separately within each state/draw.",
+  "scientific_status": "Out-of-period evaluation of a frozen rule with retrospective full-season latent curves. Not an as-of-data backtest or a geographic holdout.",
+  "source_pins": {
+    "data/slide-30/threshold-example/threshold-fit.json": "18bcc4a2e25ad04bd2a95c72eba815d9589f2c2b75a6bd25aeea34329869a373",
+    "data/slide-30/threshold-example/early-draws.json.gz": "c31cab064a8da96b3ce28420cbbb0312e87fad842851b9f006889ab3bf109962",
+    "data/slide-30/threshold-example/early-results.json.gz": "cca880b539563778f60d41b6d3d14f053bb8de7285d195d20813fe7f95e1751f",
+    "data/slide-30/threshold-example/early-model-manifest.json": "dd4c8b7916ee98cd72e4cb999368e29afaf69e482b8edd20189b418aa67fc601",
+    "data/slide-30/threshold-example/design.json": "2220a85d2c1fc02059dc5701cee47226a11af9f382b56804f0766f09705badbb",
+    "data/slide-30/threshold-example/extended-evaluation.json": "c427dfe2ed4436d62639aeef53f714623fa253ffe4a103cae78e640d839e26f7",
+    "data/slide-30/slide-30.json": "849d4396ad6e130d6325a4e6b6a1c0c4aa58d73de3e41ce080ac22b8d231eeff"
+  }
+}
