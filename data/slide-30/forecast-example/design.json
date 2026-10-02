@@ -9,14 +9,15 @@
   "baseline_freeze_month_day": "11-19",
   "rise_multiple": 4,
   "target_rule": "First reported week at or above four times the frozen early-November reference, using later observed data to locate this illustrative comparison week.",
-  "hub_horizon_at_comparison": 2,
-  "forecast_rule": "One archived FluSight-ensemble submission per season, reference date two weeks before the comparison week; no forecast-fit-based example selection.",
+  "hub_horizon_at_comparison": 0,
+  "forecast_rule": "One original archived FluSight-ensemble horizon-0 nowcast per season, with reference date equal to the unchanged comparison week.",
   "forecast_selected_before_inspecting_values": true,
-  "scope": "Illustration of forecasts on the rising limb. The threshold is not estimated from the vaccine model and is not a validated vaccination cutoff.",
+  "scope": "Illustration of nowcasts on the rising limb. The threshold is not estimated from the vaccine model and is not a validated vaccination cutoff.",
   "observed_truth_commit": "b758798766336111d3ae0151a3bf4aea383d5d6c",
   "plot_week_range": [
     -4,
     0
   ],
-  "display_window_note": "The displayed window ends at the comparison week to show only the rise; no peak is displayed or used for scaling or alignment."
+  "display_window_note": "The displayed window ends at the comparison week to show only the rise; no peak is displayed or used for scaling or alignment.",
+  "horizon_revision": "Changed from horizon 2 to horizon 0 at user request. Comparison weeks and scaling remain fixed, before inspecting the new nowcast values."
 }

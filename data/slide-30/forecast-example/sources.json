@@ -31,30 +31,30 @@
     "sha256": "d88b9fe309997bb9a8d5bf603fee7536c0009cb277d376e497da3287ca1d096b"
   },
   {
-    "name": "forecast-2023",
-    "file": "forecast-2023-12-09.csv.gz",
-    "reference_date": "2023-12-09",
-    "commit": "eb9257a2ee7e31e8e2cd895ebfa1fd23e19dd544",
-    "released_at": "2023-12-07T05:10:44Z",
-    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/eb9257a2ee7e31e8e2cd895ebfa1fd23e19dd544/model-output/FluSight-ensemble/2023-12-09-FluSight-ensemble.csv",
-    "sha256": "a794b44e454c0f0d3937972822ace0140b9b6401f26f8fef0c653967abd0c5dc"
+    "name": "nowcast-2023",
+    "file": "nowcast-2023-12-23.csv.gz",
+    "reference_date": "2023-12-23",
+    "commit": "335bf3d246860d812b364dfde5cb75f78a1471e4",
+    "released_at": "2023-12-21T05:32:55Z",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/335bf3d246860d812b364dfde5cb75f78a1471e4/model-output/FluSight-ensemble/2023-12-23-FluSight-ensemble.csv",
+    "sha256": "1e7f6f83dd2bcc2e4aeb85d62b93879f0bedd519cea9d02a00729346ea63596d"
   },
   {
-    "name": "forecast-2024",
-    "file": "forecast-2024-12-07.csv.gz",
-    "reference_date": "2024-12-07",
-    "commit": "c447978d6bf2e5168c587a041d28f2fdc2a2fb98",
-    "released_at": "2024-12-05T15:37:58Z",
-    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/c447978d6bf2e5168c587a041d28f2fdc2a2fb98/model-output/FluSight-ensemble/2024-12-07-FluSight-ensemble.csv",
-    "sha256": "a826062c33b865d9db39acac987140bae665d46a5f656cd7ea5807a08bb31ae7"
+    "name": "nowcast-2024",
+    "file": "nowcast-2024-12-21.csv.gz",
+    "reference_date": "2024-12-21",
+    "commit": "87a6f0bac2738220754dd772f3453dfbee3ce38d",
+    "released_at": "2024-12-19T14:12:58Z",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/87a6f0bac2738220754dd772f3453dfbee3ce38d/model-output/FluSight-ensemble/2024-12-21-FluSight-ensemble.csv",
+    "sha256": "3b1fe87c177864b54c1bd4c299d63abf33a30f7bc798b4e466502befe9c5c98c"
   },
   {
-    "name": "forecast-2025",
-    "file": "forecast-2025-11-22.csv.gz",
-    "reference_date": "2025-11-22",
-    "commit": "49197bcc8f2e04ff59af5655904dc988afe34124",
-    "released_at": "2025-11-20T13:32:43Z",
-    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/49197bcc8f2e04ff59af5655904dc988afe34124/model-output/FluSight-ensemble/2025-11-22-FluSight-ensemble.csv",
-    "sha256": "2d19a10cdd85f831de5a260de0b3d7f148e27924b6d5281fffa759a1d6b798cb"
+    "name": "nowcast-2025",
+    "file": "nowcast-2025-12-06.csv.gz",
+    "reference_date": "2025-12-06",
+    "commit": "231502b841408ddd0675f7182ec29a94f223f95d",
+    "released_at": "2025-12-04T12:58:59Z",
+    "url": "https://raw.githubusercontent.com/cdcepi/FluSight-forecast-hub/231502b841408ddd0675f7182ec29a94f223f95d/model-output/FluSight-ensemble/2025-12-06-FluSight-ensemble.csv",
+    "sha256": "cd2e2d0e8ea216edc6ca10e3e908f527547f9cccddbc5cf47384ff7a6e5a82c6"
   }
 ]

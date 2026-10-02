@@ -125,7 +125,9 @@ Standalone **slides 28–30** close the vaccine-timing section:
   all 50 epidemic curves by maximum shared area and summarizes their shifted
   optimal dates. State 5 overlays observed national hospitalization curves
   from 2023–24, 2024–25, and 2025–26 with their real archived FluSight ensemble
-  forecasts at an illustrative rising level. The comparison uses no peaks;
+  horizon-0 nowcasts at an illustrative rising level. It matches state 4's
+  plot frame and palette, with a crossfade into a current-week comparison.
+  The comparison uses no peaks;
   its link to optimal vaccination timing remains untested.
   [Evidence notes](specs/slide-30-evidence.md) define the future-study question.
 

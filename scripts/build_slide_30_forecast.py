@@ -41,40 +41,36 @@ def build_forecast_example():
                          'target_date': target_date.isoformat(), 'observed': observed[target_date],
                          'ratio': observed[target_date]/baseline, 'reference_date': reference.isoformat()}
         baseline_release = metadata[f'baseline-{year}']['released_at']
-        forecast_release = metadata[f'forecast-{year}']['released_at']
+        forecast_release = metadata[f'nowcast-{year}']['released_at']
         assert baseline_release <= f'{year}-11-19T23:59:59Z' < forecast_release
-        assert forecast_release[:10] <= reference.isoformat() < target_date.isoformat()
-        forecast_rows = [r for r in tables[f'forecast-{year}']
+        assert forecast_release[:10] < reference.isoformat() == target_date.isoformat()
+        forecast_rows = [r for r in tables[f'nowcast-{year}']
                          if r['location'] == design['location'] and r['target'] == 'wk inc flu hosp'
-                         and r['output_type'] == 'quantile']
-        forecast = []
-        for horizon in range(3):
-            rows = [r for r in forecast_rows if int(r['horizon']) == horizon]
-            quantiles = {float(r['output_type_id']): float(r['value']) for r in rows}
-            assert len(quantiles) == len(rows) == 23
-            assert all(r['reference_date'] == reference.isoformat() for r in rows)
-            end = reference+timedelta(weeks=horizon)
-            assert all(r['target_end_date'] == end.isoformat() for r in rows)
-            values = [v for _, v in sorted(quantiles.items())]
-            assert all(math.isfinite(v) and v >= 0 for v in values)
-            assert values == sorted(values)
-            forecast.append({'week': horizon-2, 'date': end.isoformat(), 'horizon': horizon,
-                             'lower': quantiles[.05]/baseline, 'median': quantiles[.5]/baseline,
-                             'upper': quantiles[.95]/baseline,
-                             'counts': {str(q): quantiles[q] for q in [.05, .5, .95]}})
+                         and r['output_type'] == 'quantile' and int(r['horizon']) == 0]
+        quantiles = {float(r['output_type_id']): float(r['value']) for r in forecast_rows}
+        assert len(quantiles) == len(forecast_rows) == 23
+        assert all(r['reference_date'] == reference.isoformat() for r in forecast_rows)
+        assert all(r['target_end_date'] == target_date.isoformat() for r in forecast_rows)
+        values = [v for _, v in sorted(quantiles.items())]
+        assert all(math.isfinite(v) and v >= 0 for v in values)
+        assert values == sorted(values)
+        nowcast = {'week': 0, 'date': target_date.isoformat(), 'horizon': 0,
+                   'lower': quantiles[.05]/baseline, 'median': quantiles[.5]/baseline,
+                   'upper': quantiles[.95]/baseline,
+                   'counts': {str(q): quantiles[q] for q in [.05, .5, .95]}}
         points = []
         for week in range(design['plot_week_range'][0], design['plot_week_range'][1]+1):
             day = target_date+timedelta(weeks=week)
             points.append([week, observed[day]/baseline])
         assert all(a[1] < b[1] for a, b in zip(points, points[1:]))
         assert points[-2][1] < design['rise_multiple'] <= points[-1][1]
-        seasons.append({**saved, 'season': label, 'observed_points': points, 'forecast': forecast,
+        seasons.append({**saved, 'season': label, 'observed_points': points, 'nowcast': nowcast,
                         'forecast_released_at': forecast_release})
     assert len(seasons) == 3
     ymax = max(max(p[1] for p in s['observed_points']) for s in seasons)
-    ymax = max(ymax, max(p['upper'] for s in seasons for p in s['forecast']))
+    ymax = max(ymax, max(s['nowcast']['upper'] for s in seasons))
     return {'design': design, 'seasons': seasons, 'y_max': math.ceil(ymax),
-            'interval': .9, 'quantile_rows_checked': 207,
+            'interval': .9, 'quantile_rows_checked': 69,
             'source_ledger': 'data/slide-30/forecast-example/sources.json'}
 
 

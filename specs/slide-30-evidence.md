@@ -117,66 +117,75 @@ of the fifty illustrated scenarios, not results for all 5,000 simulations or
 an evaluated timing rule. Normalization removes total-burden differences;
 the vertical axis therefore says “Relative influenza activity.”
 
-## Archived forecasts on the rising limb
+## Archived nowcasts on the rising limb
 
 State 5 switches to **observed US influenza hospitalizations**, a different
-outcome from the simulated outpatient ILI profiles in states 1–4. It overlays
-three complete-season examples, 2023–24, 2024–25, and 2025–26, with actual
-FluSight ensemble forecasts. It uses no fitted or invented forecast curves.
-All seven source CSV files are frozen under `data/slide-30/forecast-example/`;
-`sources.json` records the exact commit, original URL, uncompressed SHA-256,
-and historical release time where applicable. The offline builder verifies
-every hash before using the inputs.
+outcome from the simulated outpatient ILI profiles in states 1–4. It shows
+three season examples, 2023–24, 2024–25, and 2025–26, with actual FluSight
+ensemble **horizon-0 nowcasts**. All seven source CSV files are frozen under
+`data/slide-30/forecast-example/`; `sources.json` records each exact commit,
+original URL, uncompressed SHA-256, and historical release time where
+applicable. The offline builder verifies every hash before using the inputs.
 
-The illustration uses the first reported week with at least **four times
-the early-November level**. The reference is the second Saturday in November,
-using its value from the last archived target-data release on or before
-November 19. This reference was available before each selected forecast.
-It avoids reliance on a future peak, full-season total, or seasonal mean.
-The 2024 and 2025 ensemble archives begin in late November; this illustrative
-level provides an available two-week-horizon forecast in all three seasons.
-The common rule, three target weeks, and horizon were saved before the
-selected forecast values were inspected. No alternative threshold was
-searched to improve forecast agreement.
+The comparison week remains the first reported week with at least **four
+times the early-November level**. The reference is the second Saturday in
+November, using its value from the last archived target-data release on or
+before November 19. This reference was available before each nowcast. The
+rule does not use a future peak, full-season total, or seasonal mean. The
+threshold and three target weeks were fixed before inspecting the original
+forecast values. At the user's request, the displayed horizon changed from
+2 to 0, keeping those target weeks and reference counts unchanged; that
+choice also preceded inspection of the replacement nowcasts.
 
 Later revised observations locate the comparison week retrospectively.
 That week is placed at zero on the horizontal axis, and the preceding four
-weeks are displayed. The forecast comes from the archive with reference date
-two weeks before the comparison week. Its three displayed points are hub
-horizons 0, 1, and 2 from that **single** reference date, not a sequence of
-updated forecasts. The small bracket spans reference date to target week.
-The actual archive releases preceded those reference Saturdays by two days;
-“2-week-ahead” denotes the hub horizon, not exactly 14 days after issuance.
-The original file version already present by its reference date is used.
+weeks are displayed. Each nowcast's **reference date and target end date
+both equal the comparison week**. Each original archived file was released
+two days before its reference Saturday. These are contemporaneous
+current-week estimates, not the horizon-0 values from the earlier
+horizon-2 submissions. No forecast model is refitted here.
 
-All observed and forecast values are divided by the same frozen reference
-count within season. Solid lines are later revised observations; dashed
-lines are ensemble medians. Shading joins the published 0.05 and 0.95
-quantiles at each week, a 90% **pointwise** prediction interval. Connecting
-weekly values is a visual interpolation, not a sampled joint trajectory or
-a probability distribution for the threshold-crossing date. The three red
-points now mark observed comparison weeks, not optimal vaccination dates.
-Weekly jumps explain why their heights differ even though each is the first
-reported week above the same relative level. No point is asserted to be an
-inflection point, and no peak is displayed or used in the calculation.
+All observed and nowcast values are divided by the same frozen reference
+count within season. The left plot uses gray observed curves and red
+comparison-week markers. The right panel uses the **same vertical scale**,
+with a separate column for each season: teal points are nowcast medians,
+vertical whiskers join the original 0.05 and 0.95 quantiles, and red points
+show the subsequently observed values. These are 90% prediction intervals
+for the current week's count, not intervals for the date of crossing a
+threshold. No time jitter or joint forecast trajectory is introduced.
+Weekly jumps explain why the three observed marker heights differ even
+though each is the first reported week above the same relative level. No
+point is asserted to be an inflection point, and no peak is displayed or
+used in the calculation.
 
-| Season | Frozen reference date / count | Forecast reference | Comparison week | Observed | Forecast median | 90% interval |
+| Season | Frozen reference date / count | Nowcast reference and comparison week | Archive release | Observed | Nowcast median | 90% interval |
 | --- | --- | --- | --- | ---: | ---: | --- |
-| 2023–24 | Nov 11 / 2,763 | Dec 9, 2023 | Dec 23, 2023 | 15,755 | 8,385.916 | 5,265.161–13,454 |
-| 2024–25 | Nov 9 / 2,481 | Dec 7, 2024 | Dec 21, 2024 | 16,127 | 7,080 | 3,686–12,023 |
-| 2025–26 | Nov 8 / 1,672 | Nov 22, 2025 | Dec 6, 2025 | 7,451 | 3,791 | 1,866–7,766 |
+| 2023–24 | Nov 11 / 2,763 | Dec 23, 2023 | Dec 21, 2023 | 15,755 | 11,531 | 8,692.702–14,528 |
+| 2024–25 | Nov 9 / 2,481 | Dec 21, 2024 | Dec 19, 2024 | 16,127 | 10,669 | 7,345–14,153 |
+| 2025–26 | Nov 8 / 1,672 | Dec 6, 2025 | Dec 4, 2025 | 7,451 | 5,777 | 3,868–8,127 |
 
-The ensemble anticipates growth but all three medians underpredict the
-observed rise; two observations exceed the displayed upper interval. These
-discrepancies are retained. Three retrospective examples do not measure
-general forecast skill or establish reliable crossing-time forecasts.
-**Four times the reference is an illustrative level, not an estimate from
-the vaccine model or a validated vaccination trigger.** This is not a test
-of forecasting the state-4 median optimal date. The link to optimal
-vaccination timing remains untested. A future
-study must derive a trigger on a compatible outcome and scale, freeze it
-using training data, and evaluate it at historical forecast origins with
-contemporaneous data, suitable uncertainty, comparator rules, and uptake.
+All three nowcast medians underpredict the observed count; two observations
+exceed the displayed upper interval. These discrepancies are retained.
+Three retrospective examples do not measure general nowcast skill or
+establish reliable detection of a vaccination window. **Four times the
+reference is an illustrative level, not an estimate from the vaccine model
+or a validated vaccination trigger.** This is not a test of nowcasting the
+state-4 median optimal date. A broad timing window motivates investigating
+whether current-week estimates could be sufficient; the displayed spread
+alone does not establish that conclusion. A future study must derive a
+trigger on a compatible outcome and scale, freeze it using training data,
+and evaluate it at historical origins with contemporaneous data, suitable
+uncertainty, comparator rules, and uptake.
+
+The plot occupies the same x=64–860, y=150–443 frame as state 4, with the
+same gray, teal, and burgundy palette and legend baseline. The comparison
+panel occupies the previous right-hand summary area. A 1.4-second crossfade
+replaces the simulated profiles with observed rises, then reveals the
+nowcast comparisons. The curves do not morph into one another: the two
+states use different datasets, outcomes, and vertical normalization.
+The source label updates to US hospitalizations. The previously removed
+question, footer, scenario-count label, and hospitalization-axis heading
+remain absent.
 
 Primary documentation: [FluSight forecast hub](https://github.com/cdcepi/FluSight-forecast-hub)
 and [target data](https://github.com/cdcepi/FluSight-forecast-hub/tree/main/target-data).
@@ -196,10 +205,10 @@ The exact source versions used here are pinned in the local source ledger.
    1.8 seconds. Then reveal the aligned mean and median date, with the
    median-date summary centered vertically beside the plot. The spread
    comparison remains in these notes rather than on the slide.
-5. **Forecast the rise**: switch to the three observed hospitalization rises,
-   aligned at the common illustrative level. Fade in the actual archived
-   ensemble medians and pointwise 90% intervals over one second. Direct
-   loading displays the completed overlay.
+5. **Nowcast the rise**: crossfade into the three observed hospitalization
+   rises aligned at the common illustrative level. Reveal the horizon-0
+   nowcasts and their 90% intervals in the right panel. Direct loading and
+   reduced motion display the completed comparison.
 
 Loading any state or navigating backward gives a completed static view;
 reduced motion also skips animation. The first arrow from Start enters state
@@ -220,10 +229,10 @@ help us distinguish those futures early enough to improve the decision?
 When we align these fifty seasons by their epidemic shape, the middle group
 of optimal dates comes closer together, though some outliers remain.”
 
-For state 5: “The forecasting target could be a recognizable amount of rise.
-Here are actual ensemble forecasts from three seasons at one illustrative
-level. They anticipate growth but underestimate its size. The next project
-is to test whether forecasts can identify a useful vaccination trigger.”
+For state 5: “If the useful timing window is broad enough, estimating where
+we are now might be sufficient. Here are actual same-week ensemble
+nowcasts from three seasons at one illustrative rising level. The next
+project is to test whether such estimates can guide vaccination timing.”
 
 ## Build and verification
 
@@ -232,7 +241,7 @@ Run `python3 scripts/build_slide_30.py` to build only slide 30, or
 the pinned local fifty-draw inputs, recomputes and checks candidate totals,
 and uses `scripts/build_slide_30_forecast.py` to verify and normalize the
 seven archived source files. That module recomputes the frozen example
-selection and checks 207 quantile rows for unique values, ordering, target
+selection and checks 69 quantile rows for unique values, ordering, target
 dates, and horizons. The build writes `data/slide-30/slide-30.json` and
 `docs/slide-30.html`. It does not
 modify slide 25. The editable source is `src/slide-30.html`.
@@ -252,13 +261,7 @@ grid; mean overlap differed from the exact integration by 4.8e-8. Every
 mean point uses fifty observed segments, and the median marker lies on the
 mean curve. The final rendered view is checked at 1280 × 720 before publication.
 
-For the state-5 addition, every pre-existing field in `slide-30.json` was
-identical to the prior four-state build, and protected slide-25, slide-28,
-and slide-29 source, data, and published files retained their hashes. All
-27 displayed forecast quantiles were independently checked against the
-original CSV counts after reversing normalization. JavaScript syntax and
-browser console checks passed. At 1280 × 720, the browser showed three
-observed curves, three median curves, three interval bands, and the expected
-comparison markers. Forward animation, completed direct loading, the
-state-5 upper boundary, backward return to completed alignment, and reset
-during the new animation were verified.
+For the nowcast revision, the first four states retain their prior data.
+Verification covers the nine displayed quantiles against the source CSVs,
+matching horizon-0 reference and target dates, the shared plot scale,
+forward crossfade, direct loading, back/reset, and animation interruption.
