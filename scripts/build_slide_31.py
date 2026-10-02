@@ -28,6 +28,8 @@ def build():
         assert digest(ROOT / name) == sha, name
     base = ROOT / 'data/slide-30/threshold-example'
     fit = json.loads((base / 'threshold-fit.json').read_text())
+    guidance = json.loads((FOLDER / 'guidance-comparator.json').read_text())
+    assert guidance['week'] == 44
     national = read_gzip(base / 'early-results.json.gz')
     pairs = read_gzip(base / 'early-draws.json.gz')['scenarios']
     source = read_gzip(FOLDER / 'states-draws.json.gz')
@@ -64,7 +66,7 @@ def build():
                    'optimal_times': [candidate_times[i] for i in opt],
                    'optimal_heights': [burden[positions[i]]/baseline for i in opt],
                    'optimal_utility': max(utility)}
-            for policy, index in [('fixed', fit['fixed_index']), ('threshold', trigger)]:
+            for policy, index in [('guidance', candidates.index(guidance['week'])), ('fixed', fit['fixed_index']), ('threshold', trigger)]:
                 row[f'{policy}_week'] = candidates[index] if index is not None else None
                 row[f'{policy}_time'] = candidate_times[index] if index is not None else None
                 row[f'{policy}_height'] = burden[positions[index]]/baseline if index is not None else None
@@ -73,7 +75,7 @@ def build():
                 row[f'{policy}_relative_loss'] = (max(utility)-row[f'{policy}_utility'])/max(utility)
                 assert -1e-12 <= row[f'{policy}_relative_loss'] <= 1
             rows.append(row)
-        metrics = {policy: summary(rows, policy) for policy in ['fixed', 'threshold']}
+        metrics = {policy: summary(rows, policy) for policy in ['guidance', 'fixed', 'threshold']}
         metrics['threshold_better_draws'] = sum(r['threshold_utility'] > r['fixed_utility']+1e-12 for r in rows)
         full_results[name] = {'scenarios': rows, 'summary': metrics}
         locations.append({'name': name, 'scenarios': rows[:config['display_n_per_location']], 'summary': metrics})
@@ -82,13 +84,16 @@ def build():
     validation = {'candidate_utilities_checked': len(pairs)*len(candidates)*len(locations),
                   'max_absolute_error': max_error, 'model_sha256': source['model_sha256'],
                   'state_draws_sha256': digest(FOLDER / 'states-draws.json.gz')}
-    full = {'design_sha256': digest(FOLDER / 'design.json'), 'states': full_results, 'validation': validation}
+    full = {'design_sha256': digest(FOLDER / 'design.json'),
+            'guidance_comparator_sha256': digest(FOLDER / 'guidance-comparator.json'),
+            'states': full_results, 'validation': validation}
     (FOLDER / 'states-results.json.gz').write_bytes(gzip.compress(json.dumps(full, separators=(',', ':')).encode(), mtime=0))
     (FOLDER / 'states-summary.json').write_text(json.dumps({'states': {k: v['summary'] for k, v in full_results.items()}, 'validation': validation}, indent=2)+'\n')
     national_view = {'name': 'United States', 'scenarios': national['scenarios'][:50], 'summary': national['summary']}
     previous = json.loads((ROOT / 'data/slide-30/slide-30.json').read_text())
     data = {'slide': 31, 'season': config['season'], 'evaluation_n': len(pairs), 'display_n': 50,
-            'fit': {'threshold_multiplier': fit['threshold_multiplier'], 'fixed_week': fit['fixed_week']},
+            'fit': {'threshold_multiplier': fit['threshold_multiplier'], 'fixed_week': fit['fixed_week'],
+                    'guidance_week': guidance['week']},
             'national': national_view, 'states': locations,
             'national_y_max': max(previous['alignment']['y_max'], math.ceil(max(v for r in national_view['scenarios'] for _, v in r['burden_points']))),
             'states_y_max': math.ceil(max(v for loc in locations for r in loc['scenarios'] for _, v in r['burden_points'])),

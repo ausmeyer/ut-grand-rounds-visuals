@@ -130,8 +130,9 @@ Standalone **slides 28–31** close the vaccine-timing section:
 - [Slide 31](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-31.html#state=1)
   tests those same frozen rules in the early 2022–23 US season, then in
   Texas, California, Minnesota, and New York. Each location displays the
-  first 50 pairs and summarizes all 5,000. Three states provide a static
-  Start, the national comparison, and four state panels. Build with
+  first 50 pairs and summarizes all 5,000. Five presenter states provide
+  a static Start, the national comparison, and four state panels that add
+  week 44, week 47, and the threshold in sequence. Build with
   `python3 scripts/build_slide_31.py`; edit `src/slide-31.html`.
   [Evidence notes](specs/slide-31-evidence.md) record the paired extraction,
   independent checks, and limits of this retrospective comparison.

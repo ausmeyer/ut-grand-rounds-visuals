@@ -1,6 +1,19 @@
 {
   "states": {
     "Texas": {
+      "guidance": {
+        "n": 5000,
+        "n_timing": 5000,
+        "non_crossings": 0,
+        "median_signed_weeks": 5.0,
+        "median_absolute_weeks": 5.0,
+        "mean_absolute_weeks": 5.1666,
+        "within_2_weeks": 246,
+        "median_relative_loss": 0.15840589031898877,
+        "mean_relative_loss": 0.15750087326838041,
+        "total_utility": 2245.393526634142,
+        "pooled_relative_loss": 0.16332605129778865
+      },
       "fixed": {
         "n": 5000,
         "n_timing": 5000,
@@ -30,6 +43,19 @@
       "threshold_better_draws": 5000
     },
     "California": {
+      "guidance": {
+        "n": 5000,
+        "n_timing": 5000,
+        "non_crossings": 0,
+        "median_signed_weeks": 2.0,
+        "median_absolute_weeks": 2.0,
+        "mean_absolute_weeks": 1.8412,
+        "within_2_weeks": 3692,
+        "median_relative_loss": 0.026464027247492007,
+        "mean_relative_loss": 0.03239767382067737,
+        "total_utility": 2111.4699320871136,
+        "pooled_relative_loss": 0.035162163996941054
+      },
       "fixed": {
         "n": 5000,
         "n_timing": 5000,
@@ -59,6 +85,19 @@
       "threshold_better_draws": 4986
     },
     "Minnesota": {
+      "guidance": {
+        "n": 5000,
+        "n_timing": 5000,
+        "non_crossings": 0,
+        "median_signed_weeks": 3.0,
+        "median_absolute_weeks": 3.0,
+        "mean_absolute_weeks": 2.6452,
+        "within_2_weeks": 2366,
+        "median_relative_loss": 0.05761328915562832,
+        "mean_relative_loss": 0.06738055286933384,
+        "total_utility": 1067.6617901661148,
+        "pooled_relative_loss": 0.0707667656593226
+      },
       "fixed": {
         "n": 5000,
         "n_timing": 5000,
@@ -88,6 +127,19 @@
       "threshold_better_draws": 4992
     },
     "New York": {
+      "guidance": {
+        "n": 5000,
+        "n_timing": 5000,
+        "non_crossings": 0,
+        "median_signed_weeks": 2.0,
+        "median_absolute_weeks": 2.0,
+        "mean_absolute_weeks": 2.4382,
+        "within_2_weeks": 2621,
+        "median_relative_loss": 0.033643712858492075,
+        "mean_relative_loss": 0.03939902364436416,
+        "total_utility": 2649.9579260734336,
+        "pooled_relative_loss": 0.043879817742737526
+      },
       "fixed": {
         "n": 5000,
         "n_timing": 5000,

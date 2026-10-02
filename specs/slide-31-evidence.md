@@ -15,6 +15,18 @@ after week 39 meeting or exceeding that value. The comparator is **week
 47**. Both rules were chosen using only the pre-pandemic national pairs in
 slide 30 and remain unchanged. There is no state-specific calibration.
 
+The state panels also compare **vaccination in week 44**, selected by the
+user to match the manuscript's end-of-October comparator. This addition is
+recorded separately in `guidance-comparator.json`, preserving the original
+draw design and source hashes. The manuscript's Results (lines 142, 164,
+and 166 in `manuscript/overleaf_repo/manuscript.tex`) use week 44 for regret
+and retained-protection comparisons. [CDC timing guidance](https://www.cdc.gov/flu/vaccines/keyfacts.html)
+allows vaccination during September and October for most people requiring
+one dose and aims for completion by the end of October (checked October 1,
+2026). The plotted comparator models a dose **in week 44**, near the end
+of that window; it does not represent every vaccination date permitted
+within the window or simulate a campaign's timing distribution.
+
 The multiplier is learned from pre-pandemic seasons; the baseline is
 estimated separately in the evaluated season and location. Neither policy
 uses a future peak or full-season AUC in its decision formula.
@@ -71,13 +83,20 @@ per-draw optimal benefit**, expressed as a percentage. It is not absolute
 vaccine effectiveness, the fraction of infections prevented, or the mean
 of per-draw ratios. The modeled outcome is outpatient ILI.
 
-| Location | Fixed median gap | Threshold median gap | Fixed benefit / optimum | Threshold benefit / optimum |
-| --- | ---: | ---: | ---: | ---: |
-| United States | 6 weeks | 2 weeks | 74.6519% | 96.7760% |
-| Texas | 8 weeks | 4 weeks | 66.6195% | 87.9671% |
-| California | 5 weeks | 1 week | 82.8040% | 99.0815% |
-| Minnesota | 6 weeks | 2 weeks | 69.4183% | 96.0256% |
-| New York | 5 weeks | 1 week | 80.6589% | 99.0606% |
+The national view retains its original two-rule comparison: median gaps
+of 6 weeks for week 47 and 2 weeks for the threshold, retaining 74.6519%
+and 96.7760% of modeled optimum benefit, respectively.
+
+| State | Week 44 gap | Week 47 gap | Threshold gap | Week 44 benefit / optimum | Week 47 benefit / optimum | Threshold benefit / optimum |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Texas | 5 weeks | 8 weeks | 4 weeks | 83.6674% | 66.6195% | 87.9671% |
+| California | 2 weeks | 5 weeks | 1 week | 96.4838% | 82.8040% | 99.0815% |
+| Minnesota | 3 weeks | 6 weeks | 2 weeks | 92.9233% | 69.4183% | 96.0256% |
+| New York | 2 weeks | 5 weeks | 1 week | 95.6120% | 80.6589% | 99.0606% |
+
+All timing gaps in the table are medians across the same 5,000 pairs.
+The added week-44 calculations reuse the existing utilities and per-draw
+optima; all prior fixed-week and threshold outcomes remain identical.
 
 All 5,000 pairs in every location cross the threshold. Threshold benefit
 exceeds week 47 benefit in 5,000 national, 5,000 Texas, 4,986 California,
@@ -101,8 +120,13 @@ finite-grid limitations are retained rather than dropping those draws.
 1. **Start:** hold the 50 national 2022/23 curves still.
 2. **Early US season:** reveal the same frozen 1.7× line, fixed week 47,
    optimal-date dots, threshold-date rings, and national results in 0.7 s.
-3. **Selected states:** crossfade over 0.9 s into four matched panels for
-   Texas, California, Minnesota, and New York, using those same rules.
+3. **Week 44:** crossfade over 0.9 s into four matched panels for Texas,
+   California, Minnesota, and New York. Show only week 44's vertical line
+   and its median-gap and retained-benefit column, with red optimal dates.
+4. **Week 47:** add the fixed week's vertical line and comparison column
+   over 0.7 s. Keep the week-44 results and all curves in place.
+5. **Threshold:** add the 1.7× line, threshold-date rings, their legend,
+   and the final comparison column over 0.7 s. Both earlier columns remain.
 
 The national plot preserves slide 30 state 5's 796 × 370 frame and 0–7×
 vertical scale. State panels share a 0–8× scale, selected from the largest
@@ -110,6 +134,10 @@ displayed value across all four states. Every curve is scaled to its own
 September baseline. The red optimal-date dots and teal threshold rings
 are placed at the actual weekly curve values; no date is jittered or moved
 onto the threshold line. Weekly crossings can therefore lie above it.
+
+The state-view axis label has been removed as requested. Curves, dots,
+panel locations, and column positions remain fixed through states 3–5;
+only the next policy's annotation and values fade in.
 
 Start and direct hash loads are static. Right/PageDown/Space advance;
 Left/PageUp go back; Home and Reset return to Start. Backward navigation

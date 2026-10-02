@@ -6,15 +6,18 @@ config <- fromJSON(paste0(folder,'design.json'))
 source <- fromJSON(gzfile(paste0(folder,'states-draws.json.gz')))
 results <- fromJSON(gzfile(paste0(folder,'states-results.json.gz')),simplifyVector=FALSE)
 fit <- fromJSON('data/slide-30/threshold-example/threshold-fit.json')
+guidance <- fromJSON(paste0(folder,'guidance-comparator.json'))
+policies <- c('guidance','fixed','threshold')
 stopifnot(source$n_draws==5000, identical(source$draw_ids,1:5000),
           identical(names(source$states),config$states),
-          fit$threshold_multiplier==1.7, fit$fixed_week==47)
+          fit$threshold_multiplier==1.7, fit$fixed_week==47, guidance$week==44,
+          results$guidance_comparator_sha256==digest::digest(file=paste0(folder,'guidance-comparator.json'),algo='sha256'))
 for(state_name in config$states) {
   input <- source$states[[state_name]]
   output <- results$states[[state_name]]
   weeks <- input$weeks; candidates <- source$candidate_weeks
   times <- ifelse(candidates>=36,candidates-36,input$max_week-36+candidates)
-  timing <- benefit <- matrix(NA_real_,5000,2,dimnames=list(NULL,c('fixed','threshold')))
+  timing <- benefit <- matrix(NA_real_,5000,length(policies),dimnames=list(NULL,policies))
   optima <- numeric(5000); baseline_optima <- boundary_optima <- 0L
   stopifnot(nrow(input$burden)==5000,nrow(input$utility)==5000,
             length(output$scenarios)==5000)
@@ -32,8 +35,8 @@ for(state_name in config$states) {
               abs(row$optimal_utility-optima[i])<1e-12)
     plotted <- do.call(rbind,row$burden_points)
     stopifnot(max(abs(as.numeric(plotted[,2])-burden/baseline))<1e-12)
-    for(policy in c('fixed','threshold')) {
-      k <- if(policy=='fixed') match(47,candidates) else trigger
+    for(policy in policies) {
+      k <- switch(policy,guidance=match(guidance$week,candidates),fixed=match(47,candidates),threshold=trigger)
       benefit[i,policy] <- if(is.na(k)) 0 else utility[k]
       if(is.na(k)) {
         stopifnot(is.null(row[[paste0(policy,'_week')]]))
@@ -49,7 +52,7 @@ for(state_name in config$states) {
                 abs(row[[paste0(policy,'_relative_loss')]]-loss)<1e-12)
     }
   }
-  for(policy in c('fixed','threshold')) {
+  for(policy in policies) {
     reported <- output$summary[[policy]]
     error <- timing[,policy]; loss <- 1-benefit[,policy]/optima
     stopifnot(reported$n==5000,reported$non_crossings==sum(is.na(error)),

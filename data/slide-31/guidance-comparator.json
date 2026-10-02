@@ -1,0 +1,8 @@
+{
+  "week": 44,
+  "selection": "User selected week 44 to match the manuscript's end-of-October comparator, before calculating its state results.",
+  "interpretation": "Vaccination in week 44 represents the end of the guidance window; this does not model the full range or distribution of vaccination dates allowed within September and October.",
+  "manuscript_reference": "manuscript/overleaf_repo/manuscript.tex, Results: Timing of Seasonal Influenza and Optimal Vaccination; week-44 regret and retained-protection comparisons",
+  "guidance_source": "https://www.cdc.gov/flu/vaccines/keyfacts.html",
+  "guidance_checked": "2026-10-01"
+}
