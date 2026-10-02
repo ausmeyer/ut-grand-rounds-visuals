@@ -64,19 +64,19 @@
         <g id="decision-axis"></g>
         </g>
         <g id="alignment-view" style="display:none">
-          <line x1="64" x2="84" y1="106" y2="106" stroke="#a4b0b0" stroke-width="2"/>
-          <text x="92" y="111" class="axis">Seasons</text>
-          <line x1="176" x2="196" y1="106" y2="106" stroke="#0a6670" stroke-width="3"/>
-          <text x="204" y="111" class="axis">Aligned mean</text>
-          <circle cx="341" cy="106" r="4.5" fill="#933a4b"/>
-          <text x="353" y="111" class="axis">Optimal dates</text>
+          <line x1="64" x2="84" y1="56" y2="56" stroke="#a4b0b0" stroke-width="2"/>
+          <text x="92" y="61" class="axis">Seasons</text>
+          <line x1="176" x2="196" y1="56" y2="56" stroke="#0a6670" stroke-width="3"/>
+          <text x="204" y="61" class="axis">Aligned mean</text>
+          <circle cx="341" cy="56" r="4.5" fill="#933a4b"/>
+          <text x="353" y="61" class="axis">Optimal dates</text>
           <g id="alignment-grid"></g>
           <g id="alignment-band"></g>
           <g id="aligned-profiles"></g>
           <g id="alignment-mean"></g>
           <g id="alignment-axis"></g>
-          <text x="462" y="501" text-anchor="middle" class="axis">Weeks from the aligned mean peak</text>
-          <g id="alignment-summary" transform="translate(0 90)">
+          <text x="462" y="528" text-anchor="middle" class="axis">Weeks from the aligned mean peak</text>
+          <g id="alignment-summary" transform="translate(0 78)">
             <text id="summary-count" x="925" y="151" font-size="15" font-weight="650" style="fill:var(--muted)"></text>
             <text x="925" y="190" font-size="18">Median optimal date</text>
             <text id="median-weeks" x="925" y="240" font-size="42" font-weight="600" style="fill:var(--red)"></text>
@@ -165,12 +165,12 @@
     });
     const alignment=DATA.alignment;
     const AX=t=>64+(t-alignment.x_min)/(alignment.x_max-alignment.x_min)*796;
-    const AY=v=>443-v/alignment.y_max*293;
+    const AY=v=>470-v/alignment.y_max*370;
     for(const fraction of [0,.5,1]) element('line',{x1:64,x2:860,y1:AY(fraction*alignment.y_max),y2:AY(fraction*alignment.y_max),class:'grid'},$('alignment-grid'));
-    element('text',{x:64,y:137,class:'axis'},$('alignment-grid'),'Relative influenza activity');
-    for(let t=Math.ceil(alignment.x_min/8)*8;t<=alignment.x_max;t+=8) element('text',{x:AX(t),y:469,'text-anchor':'middle',class:'axis'},$('alignment-axis'),t===0?'Peak':`${t>0?'+':''}${t}`);
-    element('line',{x1:AX(0),x2:AX(0),y1:150,y2:443,stroke:'#a4b0b0','stroke-dasharray':'3 5'},$('alignment-grid'));
-    element('rect',{x:AX(alignment.after.q1),y:150,width:AX(alignment.after.q3)-AX(alignment.after.q1),height:293,fill:'#933a4b',opacity:.08},$('alignment-band'));
+    element('text',{x:64,y:87,class:'axis'},$('alignment-grid'),'Relative influenza activity');
+    for(let t=Math.ceil(alignment.x_min/8)*8;t<=alignment.x_max;t+=8) element('text',{x:AX(t),y:496,'text-anchor':'middle',class:'axis'},$('alignment-axis'),t===0?'Peak':`${t>0?'+':''}${t}`);
+    element('line',{x1:AX(0),x2:AX(0),y1:100,y2:470,stroke:'#a4b0b0','stroke-dasharray':'3 5'},$('alignment-grid'));
+    element('rect',{x:AX(alignment.after.q1),y:100,width:AX(alignment.after.q3)-AX(alignment.after.q1),height:370,fill:'#933a4b',opacity:.08},$('alignment-band'));
     const alignmentGraphics=alignment.profiles.map(profile=>{
       const group=element('g',{'data-draw':profile.draw,'data-shift':profile.shift},$('aligned-profiles'));
       element('path',{d:path(profile.points,AX,AY),class:'sample',stroke:'#a4b0b0','stroke-width':1.1,opacity:.38},group);
@@ -178,9 +178,9 @@
       return group;
     });
     element('path',{d:path(alignment.mean_points,AX,AY),class:'sample',stroke:'#0a6670','stroke-width':3.2},$('alignment-mean'));
-    element('line',{x1:AX(alignment.median_point[0]),x2:AX(alignment.median_point[0]),y1:150,y2:443,stroke:'#933a4b','stroke-width':1.5,'stroke-dasharray':'5 5'},$('alignment-mean'));
+    element('line',{x1:AX(alignment.median_point[0]),x2:AX(alignment.median_point[0]),y1:100,y2:470,stroke:'#933a4b','stroke-width':1.5,'stroke-dasharray':'5 5'},$('alignment-mean'));
     element('circle',{cx:AX(alignment.median_point[0]),cy:AY(alignment.median_point[1]),r:6.5,fill:'#933a4b',stroke:'#fbfaf6','stroke-width':2},$('alignment-mean'));
-    element('text',{x:AX(alignment.median_point[0])-10,y:171,'text-anchor':'end','font-size':15,fill:'#933a4b'},$('alignment-mean'),'Median date');
+    element('text',{x:AX(alignment.median_point[0])-10,y:121,'text-anchor':'end','font-size':15,fill:'#933a4b'},$('alignment-mean'),'Median date');
     $('median-weeks').textContent=`~${Math.round(-alignment.after.median)} weeks`;
     $('summary-count').textContent=`FOR THESE ${DATA.scenarios.length} SCENARIOS`;
     const forecast=DATA.forecast_example;
