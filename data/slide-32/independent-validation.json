@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "method": "Independent R adjacent differences and type-7 quantiles",
+  "checked_pairs": 5000,
+  "checked_plotted_pairs": 50,
+  "maximum_absolute_errors": {
+    "curve": 0,
+    "slope": 0,
+    "markers": 0,
+    "aligned_mean": 1.7763568394002505e-15,
+    "season_summaries": 0
+  },
+  "pooled_onset_quartiles": [-6, -2, -1],
+  "pooled_onset_within_two_weeks": 0.51839999999999997,
+  "sources_sha256": {
+    "training-draws.json.gz": "91a5921c4d8cfec5f27cb395953395c097375d38ec949e74a1e48107f6a25b03",
+    "alignment.json": "b1c27a8d8860998ac52d4fd0fbfca1034ad7bd2a93867a4a49b2be5797a5427e"
+  }
+}
