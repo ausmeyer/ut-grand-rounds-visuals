@@ -172,8 +172,8 @@ discrepancies are retained. Three retrospective examples do not measure
 general forecast skill or establish reliable crossing-time forecasts.
 **Four times the reference is an illustrative level, not an estimate from
 the vaccine model or a validated vaccination trigger.** This is not a test
-of forecasting the state-4 median optimal date. The projected footer states
-that the link to optimal vaccination timing remains untested. A future
+of forecasting the state-4 median optimal date. The link to optimal
+vaccination timing remains untested. A future
 study must derive a trigger on a compatible outcome and scale, freeze it
 using training data, and evaluate it at historical forecast origins with
 contemporaneous data, suitable uncertainty, comparator rules, and uptake.

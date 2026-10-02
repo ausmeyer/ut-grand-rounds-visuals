@@ -84,7 +84,6 @@
           </g>
         </g>
         <g id="forecast-view" style="display:none">
-          <text class="plot-title" x="64" y="61">Can we anticipate this part of the rise?</text>
           <line x1="64" x2="94" y1="94" y2="94" stroke="#647278" stroke-width="3"/>
           <text x="104" y="99" class="axis">Observed</text>
           <line x1="223" x2="253" y1="94" y2="94" stroke="#647278" stroke-width="2.5" stroke-dasharray="7 5"/>
@@ -98,7 +97,6 @@
           <g id="forecast-medians"></g>
           <g id="forecast-axis"></g>
           <text x="532" y="493" text-anchor="middle" class="axis">Weeks relative to the first reported week above 4× the early-November level</text>
-          <text x="64" y="526" font-size="15" style="fill:var(--muted)">Illustrative rising level · Link to optimal vaccination timing remains untested</text>
         </g>
       </svg>
       <div class="controls">
@@ -264,7 +262,7 @@
           });
         } else { samples(graphics.length); }
       } else if(value===4) {
-        $('sample-count').textContent=`${DATA.scenarios.length} illustrated scenarios`;
+        $('sample-count').textContent='';
         if(play&&value>previous&&!reducedMotion) {
           alignSeasons(0); animate(1800,p=>alignSeasons(p*p*(3-2*p)));
         } else alignSeasons(1);
