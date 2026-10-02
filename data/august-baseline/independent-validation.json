@@ -1,0 +1,50 @@
+{
+  "training_calibration_passed": true,
+  "training_n": 5000,
+  "policy_checks": {
+    "early": {
+      "n": 5000,
+      "earliest_candidate_optima": 5,
+      "all_policy_checks_passed": true,
+      "threshold_better_than_fixed": 5000,
+      "threshold_better_than_guidance": 4455
+    },
+    "expanded": {
+      "n": 5000,
+      "earliest_candidate_optima": 0,
+      "all_policy_checks_passed": true,
+      "threshold_better_than_fixed": 1324,
+      "threshold_better_than_guidance": 2877
+    },
+    "Texas": {
+      "n": 5000,
+      "earliest_candidate_optima": 545,
+      "all_policy_checks_passed": true,
+      "threshold_better_than_fixed": 5000,
+      "threshold_better_than_guidance": 4966
+    },
+    "California": {
+      "n": 5000,
+      "earliest_candidate_optima": 0,
+      "all_policy_checks_passed": true,
+      "threshold_better_than_fixed": 4995,
+      "threshold_better_than_guidance": 3496
+    },
+    "Minnesota": {
+      "n": 5000,
+      "earliest_candidate_optima": 7,
+      "all_policy_checks_passed": true,
+      "threshold_better_than_fixed": 4979,
+      "threshold_better_than_guidance": 4141
+    },
+    "New York": {
+      "n": 5000,
+      "earliest_candidate_optima": 1,
+      "all_policy_checks_passed": true,
+      "threshold_better_than_fixed": 4936,
+      "threshold_better_than_guidance": 3792
+    }
+  },
+  "preserved_prior_files": 75,
+  "threshold_fit_sha256": "97b6e6d4c614d693c6aedf601a7ee60118b8220e9c5607caa9685dda000e2dd7"
+}

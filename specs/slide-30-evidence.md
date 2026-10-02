@@ -1,5 +1,10 @@
 # Slide 30: When can forecasts improve the decision?
 
+**Current revision:** both slides now use the refitted August baseline and
+a 2.3× threshold. See [August-baseline evidence](august-baseline-evidence.md)
+for the active methods, results, and presenter states. The September analysis
+below is retained as a historical record; it does not describe the current HTML.
+
 This is a new exploratory simulation for the closing slide, separate from
 the manuscript's reported results. States 1–4 show pre-pandemic epidemic / VE
 pairs. State 5 applies two frozen pre-pandemic rules to later seasons, with

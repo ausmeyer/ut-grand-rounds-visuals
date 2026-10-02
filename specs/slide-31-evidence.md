@@ -1,5 +1,10 @@
 # Slide 31: Can the same rule adapt to an early season?
 
+**Current revision:** both slides now use the refitted August baseline and
+a 2.3× threshold. See [August-baseline evidence](august-baseline-evidence.md)
+for the active methods, results, and presenter states. The September analysis
+below is retained as a historical record; it does not describe the current HTML.
+
 This standalone slide follows slide 30's later-season comparison with the
 early 2022/23 season, first nationally and then in Texas, California,
 Minnesota, and New York. The user selected those four states for geographic

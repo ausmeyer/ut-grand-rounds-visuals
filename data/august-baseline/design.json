@@ -1,0 +1,169 @@
+{
+  "revision_reason": "User requested an August baseline after reviewing September-baseline early-season results. This is an exploratory sensitivity analysis; post-pandemic outcomes have already informed the choice to examine this variant.",
+  "supersedes_commit": "962bbbb52882dd830e8b3da00b15b681602e837f",
+  "baseline_weeks": [
+    32,
+    33,
+    34,
+    35
+  ],
+  "baseline_rule": "Arithmetic mean of each shifted latent curve during weeks32-35; same definition in calibration and evaluation.",
+  "model_window_start_week": 32,
+  "outcome_window_start_week": 36,
+  "window_end_week": 22,
+  "candidate_weeks": [
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "first_trigger_week": 36,
+  "guidance_week": 44,
+  "fixed_week": 47,
+  "fixed_week_policy": "Retain the previously trained week47 comparator, as requested. Report the optimum under the refitted training model separately without changing this comparator after evaluation.",
+  "threshold_rule": "Median activity at each training pair optimum divided by its August baseline, with median ratio across exact tied optima; round to nearest0.1. Freeze before any new evaluation draw extraction.",
+  "non_crossing_policy": "No trigger, zero modeled vaccine benefit, timing missing; retain in pooled benefit denominator.",
+  "training_seasons": [
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016,
+    2017,
+    2018
+  ],
+  "early_seasons": [
+    2022
+  ],
+  "expanded_seasons": [
+    2023,
+    2024,
+    2025
+  ],
+  "model_fit_seasons": {
+    "training": [
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018
+    ],
+    "early": [
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2022
+    ],
+    "expanded": [
+      2010,
+      2011,
+      2012,
+      2013,
+      2014,
+      2015,
+      2016,
+      2017,
+      2018,
+      2023,
+      2024,
+      2025
+    ]
+  },
+  "model": {
+    "family": "quasibinomial",
+    "global_k": 14,
+    "season_k": 12,
+    "gamma": 1,
+    "method": "REML"
+  },
+  "n_draws": 5000,
+  "display_n": 50,
+  "states": [
+    "Texas",
+    "California",
+    "Minnesota",
+    "New York"
+  ],
+  "seeds": {
+    "training": {
+      "season": 20261001,
+      "posterior": 20261101,
+      "protection": 20261201
+    },
+    "early": {
+      "season": 20261004,
+      "posterior": 20261104,
+      "protection": 20261204
+    },
+    "expanded": {
+      "season": 20261003,
+      "posterior": 20261103,
+      "protection": 20261203
+    }
+  },
+  "paired_inputs": {
+    "training": {
+      "path": "data/slide-30/threshold-example/training-draws.json.gz",
+      "sha256": "e4fb6d14d6750e1c52333b12e2687a4849b514f9a8f14f5d42f01ce005b278eb"
+    },
+    "early": {
+      "path": "data/slide-30/threshold-example/early-draws.json.gz",
+      "sha256": "c31cab064a8da96b3ce28420cbbb0312e87fad842851b9f006889ab3bf109962"
+    },
+    "expanded": {
+      "path": "data/slide-30/threshold-example/expanded-draws.json.gz",
+      "sha256": "b22b3e83d757bbf7d3bed1f10509532751c28a029363832b383cd1529cd10c0a"
+    }
+  },
+  "pairing": "Reuse prior season assignment, timing shifts, and pre-pandemic VE parameter pairs by draw ID; refit epidemic posteriors with August included. First50 IDs displayed without selection.",
+  "scope": "Retrospective full-season latent-curve sensitivity analysis, not an as-of-data backtest, untouched temporal holdout, geographic holdout, or clinical recommendation. Manuscript checkpoints remain unchanged.",
+  "baseline_missingness_policy": "Preserve missing observations with zero likelihood weights, as in the original GAM. Estimate latent August values through the same global plus season-specific smooth. Report missing-baseline cells; do not drop states or seasons based on outcomes.",
+  "pre_fit_coverage_audit": {
+    "fully_unobserved_baselines": [
+      "Delaware 2011/12",
+      "District of Columbia 2015/16"
+    ],
+    "partly_unobserved_baselines": [
+      "Oklahoma 2011/12: one week",
+      "Colorado 2013/14: one week",
+      "Utah 2018/19: one week"
+    ],
+    "selected_states_and_postpandemic_baselines": "All four August weeks observed."
+  }
+}

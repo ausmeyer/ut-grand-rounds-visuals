@@ -79,7 +79,7 @@
           <g id="alignment-summary">
             <text x="1040" y="213" text-anchor="middle" font-size="16" style="fill:var(--muted)">Pre-pandemic threshold</text>
             <text id="threshold-value" x="1040" y="274" text-anchor="middle" font-size="48" font-weight="600" style="fill:var(--teal)"></text>
-            <text x="1040" y="308" text-anchor="middle" font-size="18">September baseline</text>
+            <text x="1040" y="308" text-anchor="middle" font-size="18">August baseline</text>
             <text x="1040" y="344" text-anchor="middle" class="axis">From 5,000 paired draws</text>
           </g>
         </g>
@@ -181,7 +181,7 @@
       element('line',{x1:64,x2:860,y1:AY(value),y2:AY(value),class:'grid'},$('alignment-grid'));
       element('text',{x:53,y:AY(value)+5,'text-anchor':'end',class:'axis'},$('alignment-grid'),`${value}×`);
     }
-    element('text',{x:64,y:87,class:'axis'},$('alignment-grid'),'Activity / September baseline');
+    element('text',{x:64,y:87,class:'axis'},$('alignment-grid'),'Activity / August baseline');
     for(let t=Math.ceil(alignment.x_min/8)*8;t<=alignment.x_max;t+=8) element('text',{x:AX(t),y:496,'text-anchor':'middle',class:'axis'},$('alignment-axis'),t===0?'Peak':`${t>0?'+':''}${t}`);
     element('line',{x1:AX(0),x2:AX(0),y1:100,y2:470,stroke:'#a4b0b0','stroke-dasharray':'3 5'},$('alignment-grid'));
     element('rect',{x:AX(alignment.after.q1),y:100,width:AX(alignment.after.q3)-AX(alignment.after.q1),height:370,fill:'#933a4b',opacity:.08},$('alignment-band'));
@@ -200,7 +200,7 @@
       element('line',{x1:64,x2:860,y1:AY(value),y2:AY(value),class:'grid'},$('threshold-grid'));
       element('text',{x:53,y:AY(value)+5,'text-anchor':'end',class:'axis'},$('threshold-axis'),`${value}×`);
     }
-    element('text',{x:64,y:87,class:'axis'},$('threshold-grid'),'Activity / September baseline');
+    element('text',{x:64,y:87,class:'axis'},$('threshold-grid'),'Activity / August baseline');
     for(const [week,label] of [[0,'Sep'],[9,'Nov'],[18,'Jan'],[27,'Mar'],[36,'May']]) element('text',{x:TX(week),y:496,'text-anchor':'middle',class:'axis'},$('threshold-axis'),label);
     element('line',{x1:64,x2:860,y1:AY(multiplier),y2:AY(multiplier),stroke:'#0a6670','stroke-width':1.7,'stroke-dasharray':'6 5'},$('threshold-rules'));
     element('text',{x:848,y:AY(multiplier)-9,'text-anchor':'end','font-size':15,style:'fill:var(--teal)'},$('threshold-rules'),`${multiplier.toFixed(1)}×`);
@@ -303,8 +303,8 @@
         'One pre-pandemic epidemic and vaccine-protection pair. Advance to reveal its best vaccination date.',
         `The regret curve reaches its calculated minimum at week ${DATA.scenarios[0].best_week}. Red dots mark that same dose date on the epidemic and calendar-aligned protection curves. Protection begins after the saved immune-response delay.`,
         `${DATA.scenarios.length} pre-pandemic pairs appear in sequence, each with a calculated regret minimum and matching dose-date dots. They are the first 50 of 5,000 seeded draws from 2011/12 through 2018/19, with pre-pandemic VE estimates.`,
-        `These 50 pre-pandemic curves are shifted by maximum shared area after AUC normalization. Displayed heights are divided by each draw's September baseline. Red optimal dates move with their curves and are not used to choose the shifts. Across all 5,000 training pairs, median activity at the optimal date gives a frozen threshold of ${multiplier.toFixed(1)} times baseline. The pale band is the middle half of the 50 aligned optimal dates.`,
-        `Apply the frozen ${multiplier.toFixed(1)}-times-September-baseline rule and fixed week ${threshold.fit.fixed_week} to ${threshold.evaluation_n.toLocaleString()} pairs from 2023/24 through 2025/26. The first 50 are shown. Gray curves are post-pandemic latent epidemic draws; burgundy dots are their individual optima, and teal rings are the first eligible weeks above the threshold. Median absolute timing gaps are ${threshold.summary.fixed.median_absolute_weeks} wk for the fixed date and ${threshold.summary.threshold.median_absolute_weeks} wk for the threshold. Pooled retained modeled protection is ${((1-threshold.summary.fixed.pooled_relative_loss)*100).toFixed(1)} percent and ${((1-threshold.summary.threshold.pooled_relative_loss)*100).toFixed(1)} percent, respectively, relative to the sum of each draw's optimum. All ${threshold.evaluation_n.toLocaleString()} cross the threshold. This is a retrospective simulation using revised-data latent curves, not a real-time surveillance evaluation or a validated clinical recommendation.`
+        `These 50 pre-pandemic curves are shifted by maximum shared area after AUC normalization. Displayed heights are divided by each draw's August baseline. Red optimal dates move with their curves and are not used to choose the shifts. Across all 5,000 training pairs, median activity at the optimal date gives a frozen threshold of ${multiplier.toFixed(1)} times baseline. The pale band is the middle half of the 50 aligned optimal dates.`,
+        `Apply the frozen ${multiplier.toFixed(1)}-times-August-baseline rule and fixed week ${threshold.fit.fixed_week} to ${threshold.evaluation_n.toLocaleString()} pairs from 2023/24 through 2025/26. The first 50 are shown. Gray curves are post-pandemic latent epidemic draws; burgundy dots are their individual optima, and teal rings are the first eligible weeks above the threshold. Median absolute timing gaps are ${threshold.summary.fixed.median_absolute_weeks} wk for the fixed date and ${threshold.summary.threshold.median_absolute_weeks} wk for the threshold. Pooled retained modeled protection is ${((1-threshold.summary.fixed.pooled_relative_loss)*100).toFixed(1)} percent and ${((1-threshold.summary.threshold.pooled_relative_loss)*100).toFixed(1)} percent, respectively, relative to the sum of each draw's optimum. ${threshold.evaluation_n-threshold.summary.threshold.non_crossings} of ${threshold.evaluation_n} cross the threshold. This August-baseline variant is an exploratory sensitivity analysis chosen after reviewing the early-season results. It uses revised-data, full-season latent curves, not a real-time surveillance evaluation or a validated clinical recommendation.`
       ][value];
       $('chart-desc').textContent=desc; $('status').textContent=desc;
     }

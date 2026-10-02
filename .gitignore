@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 node_modules/
 data/slide-30/threshold-example/cache/
+data/august-baseline/cache/

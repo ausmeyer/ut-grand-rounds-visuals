@@ -1,0 +1,178 @@
+{
+  "fit": {
+    "training_draws_sha256": "91a5921c4d8cfec5f27cb395953395c097375d38ec949e74a1e48107f6a25b03",
+    "design_sha256": "aafc70759526cc550c517f619317688974f03a86ebff210c2e63d4b44039b426",
+    "training_n": 5000,
+    "optimal_activity_ratio_median": 2.329045518878403,
+    "threshold_multiplier": 2.3,
+    "baseline_weeks": [
+      32,
+      33,
+      34,
+      35
+    ],
+    "first_trigger_week": 36,
+    "guidance_week": 44,
+    "fixed_week": 47,
+    "fixed_index": 11,
+    "refitted_training_optimal_fixed_week": 48,
+    "candidate_weeks": [
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "training_mean_utility": [
+      0.18113774669601748,
+      0.18972806761505484,
+      0.1982507344426865,
+      0.20668833007721535,
+      0.21495664305484,
+      0.22289137737105766,
+      0.23028695891269843,
+      0.23697425127555458,
+      0.24286538173369876,
+      0.24789999553483194,
+      0.2518850455191961,
+      0.25434122279919075,
+      0.25449692426792525,
+      0.2515752496330884,
+      0.24530375299563675,
+      0.2362590831718215,
+      0.2255736326455757,
+      0.2119765908488099,
+      0.2001111105216013,
+      0.1872211362531606,
+      0.1730751758529659,
+      0.15800525735313312,
+      0.14281123792384007,
+      0.12827060904875942,
+      0.1147304728377574,
+      0.10211924275268038,
+      0.0902360350355172,
+      0.07900860623961738,
+      0.06853707605368896
+    ],
+    "validation": {
+      "candidate_utilities_checked": 145000,
+      "max_absolute_error": 3.3306690738754696e-16
+    }
+  },
+  "summary": {
+    "guidance": {
+      "n": 5000,
+      "n_timing": 5000,
+      "non_crossings": 0,
+      "median_signed_weeks": 3.0,
+      "median_absolute_weeks": 3.0,
+      "mean_absolute_weeks": 3.2994,
+      "within_2_weeks": 1305,
+      "median_relative_loss": 0.07579745156275475,
+      "mean_relative_loss": 0.07907362818725608,
+      "total_utility": 1800.6062390982966,
+      "pooled_relative_loss": 0.08437278809508997
+    },
+    "fixed": {
+      "n": 5000,
+      "n_timing": 5000,
+      "non_crossings": 0,
+      "median_signed_weeks": 6.0,
+      "median_absolute_weeks": 6.0,
+      "mean_absolute_weeks": 6.2966,
+      "within_2_weeks": 7,
+      "median_relative_loss": 0.25355449195777824,
+      "mean_relative_loss": 0.25120248900777103,
+      "total_utility": 1465.8729636115597,
+      "pooled_relative_loss": 0.25458817950637536
+    },
+    "threshold": {
+      "n": 5000,
+      "n_timing": 5000,
+      "non_crossings": 0,
+      "median_signed_weeks": 2.0,
+      "median_absolute_weeks": 2.0,
+      "mean_absolute_weeks": 2.1792,
+      "within_2_weeks": 3092,
+      "median_relative_loss": 0.03125847019086292,
+      "mean_relative_loss": 0.03452972803599435,
+      "total_utility": 1889.9291767684556,
+      "pooled_relative_loss": 0.038951134764020456
+    }
+  },
+  "by_season": {
+    "2022/23": {
+      "guidance": {
+        "n": 5000,
+        "n_timing": 5000,
+        "non_crossings": 0,
+        "median_signed_weeks": 3.0,
+        "median_absolute_weeks": 3.0,
+        "mean_absolute_weeks": 3.2994,
+        "within_2_weeks": 1305,
+        "median_relative_loss": 0.07579745156275475,
+        "mean_relative_loss": 0.07907362818725608,
+        "total_utility": 1800.6062390982966,
+        "pooled_relative_loss": 0.08437278809508997
+      },
+      "fixed": {
+        "n": 5000,
+        "n_timing": 5000,
+        "non_crossings": 0,
+        "median_signed_weeks": 6.0,
+        "median_absolute_weeks": 6.0,
+        "mean_absolute_weeks": 6.2966,
+        "within_2_weeks": 7,
+        "median_relative_loss": 0.25355449195777824,
+        "mean_relative_loss": 0.25120248900777103,
+        "total_utility": 1465.8729636115597,
+        "pooled_relative_loss": 0.25458817950637536
+      },
+      "threshold": {
+        "n": 5000,
+        "n_timing": 5000,
+        "non_crossings": 0,
+        "median_signed_weeks": 2.0,
+        "median_absolute_weeks": 2.0,
+        "mean_absolute_weeks": 2.1792,
+        "within_2_weeks": 3092,
+        "median_relative_loss": 0.03125847019086292,
+        "mean_relative_loss": 0.03452972803599435,
+        "total_utility": 1889.9291767684556,
+        "pooled_relative_loss": 0.038951134764020456
+      }
+    }
+  },
+  "season_counts": {
+    "2022/23": 5000
+  },
+  "validation": {
+    "candidate_utilities_checked": 145000,
+    "max_absolute_error": 2.220446049250313e-16
+  },
+  "draws_sha256": "e624001b2d37ef2ab0a5b10521f7ee83c21d5a147d849c74b0a17052a40a0947"
+}

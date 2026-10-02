@@ -18,8 +18,8 @@
     .axis { fill:var(--muted); font-size:14px; }
     .sample { fill:none; stroke-linejoin:round; stroke-linecap:round; }
     .grid { stroke:#dfe4df; stroke-width:1; }
-    .controls { height:49px; padding:11px 29px 0; display:flex; align-items:center; gap:10px; }
-    button { border:1px solid #b9c3c0; border-radius:8px; background:white; color:var(--ink); height:34px; font:inherit; font-size:14px; font-weight:650; cursor:pointer; padding:0 17px; white-space:nowrap; }
+    .controls { height:49px; padding:11px 29px 0; display:flex; align-items:center; gap:7px; }
+    button { border:1px solid #b9c3c0; border-radius:8px; background:white; color:var(--ink); height:34px; font:inherit; font-size:14px; font-weight:650; cursor:pointer; padding:0 10px; white-space:nowrap; }
     button:hover { border-color:var(--teal); }
     button[aria-pressed=true] { color:var(--teal); border-color:var(--teal); background:#edf6f4; }
     button:focus-visible { outline:3px solid #82bcc1; outline-offset:3px; }
@@ -47,16 +47,17 @@
             <text x="437" y="61" class="axis">Threshold dates</text>
           </g>
         </g>
-        <text id="axis-unit" x="64" y="87" class="axis">Activity / September baseline</text>
         <g id="national-view"></g>
         <g id="states-view" style="display:none"></g>
       </svg>
       <div class="controls">
         <button id="start" aria-pressed="true">1 · Start</button>
-        <button id="national" aria-pressed="false">2 · Early US season</button>
-        <button id="guidance" aria-pressed="false">3 · Week 44</button>
-        <button id="fixed" aria-pressed="false">4 · Week 47</button>
-        <button id="threshold" aria-pressed="false">5 · Threshold</button>
+        <button id="national-guidance" aria-pressed="false">2 · US: week 44</button>
+        <button id="national-fixed" aria-pressed="false">3 · + week 47</button>
+        <button id="national-threshold" aria-pressed="false">4 · + threshold</button>
+        <button id="guidance" aria-pressed="false">5 · States: week 44</button>
+        <button id="fixed" aria-pressed="false">6 · + week 47</button>
+        <button id="threshold" aria-pressed="false">7 · + threshold</button>
         <span id="control-hint">Arrow keys to advance</span>
         <button id="reset" aria-label="Reset demonstration" title="Reset">↺</button>
       </div>
@@ -67,7 +68,7 @@
     const DATA = /*__SLIDE_DATA__*/;
     const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
     const reducedMotion=matchMedia('(prefers-reduced-motion:reduce)').matches;
-    const buttons=['start','national','guidance','fixed','threshold'];
+    const buttons=['start','national-guidance','national-fixed','national-threshold','guidance','fixed','threshold'];
     let stage=1, animation=0;
     function element(tag,attrs,parent,text) {
       const el=document.createElementNS(NS,tag);
@@ -90,48 +91,46 @@
         points.unshift([points[0][0]-.5,points[0][1]]); points.push([points.at(-1)[0]+.5,points.at(-1)[1]]);
         element('path',{d:path(points,X,Y),class:'sample',stroke:'#a4b0b0','stroke-width':compact?.9:1.1,opacity:compact?.3:.38,'data-draw':row.draw},curves);
       });
-      const rules=element('g',{'data-layer':'rules'},group), multiplier=DATA.fit.threshold_multiplier;
-      const thresholdRule=element('g',compact?{'data-reveal':5}:{},rules);
+      const rules=element('g',{'data-layer':'rules'},group), multiplier=DATA.fit.threshold_multiplier, firstStage=compact?5:2;
+      const thresholdRule=element('g',{'data-reveal':firstStage+2},rules);
       element('line',{x1:x,x2:x+width,y1:Y(multiplier),y2:Y(multiplier),stroke:'#0a6670','stroke-width':1.5,'stroke-dasharray':'6 5'},thresholdRule);
       element('text',{x:x+width-10,y:Y(multiplier)-9,'text-anchor':'end','font-size':compact?13:15,style:'fill:var(--teal)'},thresholdRule,`${multiplier.toFixed(1)}×`);
-      if(compact) {
-        const guidanceRule=element('g',{'data-reveal':3},rules), guidanceTime=location.scenarios[0].guidance_time;
+      {
+        const guidanceRule=element('g',{'data-reveal':firstStage},rules), guidanceTime=location.scenarios[0].guidance_time;
         element('line',{x1:X(guidanceTime),x2:X(guidanceTime),y1:y,y2:y+height,stroke:'#8e6836','stroke-width':1.5,'stroke-dasharray':'3 5'},guidanceRule);
         element('text',{x:X(guidanceTime)-7,y:y+15,'text-anchor':'end','font-size':12,style:'fill:#8e6836'},guidanceRule,`Wk ${DATA.fit.guidance_week}`);
       }
-      const fixedRule=element('g',compact?{'data-reveal':4}:{},rules);
+      const fixedRule=element('g',{'data-reveal':firstStage+1},rules);
       const fixedTime=location.scenarios[0].fixed_time;
       element('line',{x1:X(fixedTime),x2:X(fixedTime),y1:y,y2:y+height,stroke:'#647278','stroke-width':1.5,'stroke-dasharray':'3 5'},fixedRule);
-      element('text',{x:X(fixedTime)+(compact?7:-7),y:y+(compact?15:22),'text-anchor':compact?'start':'end','font-size':compact?12:15,style:'fill:var(--muted)'},fixedRule,`${compact?'Wk':'Fixed week'} ${DATA.fit.fixed_week}`);
+      element('text',{x:X(fixedTime)+7,y:y+(compact?15:22),'text-anchor':'start','font-size':compact?12:15,style:'fill:var(--muted)'},fixedRule,`${compact?'Wk':'Fixed week'} ${DATA.fit.fixed_week}`);
       const markers=element('g',{'data-layer':'markers'},group);
-      const thresholdMarkers=compact?element('g',{'data-reveal':5},markers):markers;
+      const optimalMarkers=element('g',{'data-reveal':firstStage},markers);
+      const thresholdMarkers=element('g',{'data-reveal':firstStage+2},markers);
       location.scenarios.forEach(row=>{
-        row.optimal_times.forEach((time,i)=>element('circle',{cx:X(time),cy:Y(row.optimal_heights[i]),r:compact?2.5:3.5,fill:'#933a4b',opacity:.7,stroke:'#fbfaf6','stroke-width':.8,'data-draw':row.draw,'data-kind':'optimal','data-week':row.optimal_weeks[i],'data-time':time},markers));
+        row.optimal_times.forEach((time,i)=>element('circle',{cx:X(time),cy:Y(row.optimal_heights[i]),r:compact?2.5:3.5,fill:'#933a4b',opacity:.7,stroke:'#fbfaf6','stroke-width':.8,'data-draw':row.draw,'data-kind':'optimal','data-week':row.optimal_weeks[i],'data-time':time},optimalMarkers));
         if(row.threshold_time!==null) element('circle',{cx:X(row.threshold_time),cy:Y(row.threshold_height),r:compact?3.1:4.4,fill:'#fbfaf6',stroke:'#0a6670','stroke-width':compact?1.3:1.7,opacity:.8,'data-draw':row.draw,'data-kind':'threshold','data-week':row.threshold_week,'data-time':row.threshold_time},thresholdMarkers);
       });
       return {group,rules,markers};
     }
     function comparison(parent,location,center,top,compact=false) {
-      const group=element('g',{'data-summary':location.name},parent);
-      const font=compact?14:18, valueFont=compact?23:32;
-      if(compact) {
-        element('text',{x:center,y:top+39,'text-anchor':'middle','font-size':font},group,'Median gap to optimum');
-        element('text',{x:center,y:top+105,'text-anchor':'middle','font-size':font},group,'Benefit vs. optimum');
-      } else {
-        element('text',{x:center,y:173,'text-anchor':'middle','font-size':font},group,'Median gap to optimum');
-        element('text',{x:center,y:330,'text-anchor':'middle','font-size':17},group,'Benefit vs. optimum');
-        element('text',{x:center,y:410,'text-anchor':'middle',class:'axis'},group,'Across all 5,000 pairs');
+      const group=element('g',{'data-summary':location.name},parent), firstStage=compact?5:2;
+      const headings=element('g',{'data-reveal':firstStage},group);
+      const font=compact?14:18, valueFont=compact?23:28;
+      element('text',{x:center,y:compact?top+42:173,'text-anchor':'middle','font-size':font},headings,'Median gap to optimum');
+      element('text',{x:center,y:compact?top+106:330,'text-anchor':'middle','font-size':compact?14:17},headings,'Benefit vs. optimum');
+      if(!compact) element('text',{x:center,y:410,'text-anchor':'middle',class:'axis'},headings,'Across all 5,000 pairs');
+      for(const [i,policy] of ['guidance','fixed','threshold'].entries()) {
+        const column=element('g',{'data-reveal':firstStage+i,'data-column':policy},group);
+        const x=center+(i-1)*(compact?75:92), color=policy==='guidance'?'#8e6836':policy==='threshold'?'#0a6670':'#14242b', metrics=location.summary[policy];
+        const label=policy==='guidance'?'Guidance':policy==='fixed'?'Fixed':'Threshold';
+        const detail=policy==='guidance'?`Week ${DATA.fit.guidance_week}`:policy==='fixed'?`Week ${DATA.fit.fixed_week}`:`${DATA.fit.threshold_multiplier.toFixed(1)}×`;
+        element('text',{x,y:compact?top+1:210,'text-anchor':'middle','font-size':compact?14:16,style:`fill:${color}`},column,label);
+        element('text',{x,y:compact?top+18:231,'text-anchor':'middle','font-size':compact?12:14,style:'fill:var(--muted)'},column,detail);
+        element('text',{x,y:compact?top+74:276,'text-anchor':'middle','font-size':valueFont,'font-weight':600,style:`fill:${color}`,'data-policy':policy,'data-metric':'gap'},column,`${metrics.median_absolute_weeks} wk`);
+        element('text',{x,y:compact?top+136:370,'text-anchor':'middle','font-size':compact?20:23,'font-weight':600,style:`fill:${color}`,'data-policy':policy,'data-metric':'benefit'},column,`${((1-metrics.pooled_relative_loss)*100).toFixed(1)}%`);
       }
-      const policies=compact?['guidance','fixed','threshold']:['fixed','threshold'];
-      for(const [i,policy] of policies.entries()) {
-        const column=element('g',compact?{'data-reveal':i+3,'data-column':policy}:{'data-column':policy},group);
-        const x=center+(compact?(i-1)*75:(i?64:-64)), color=policy==='guidance'?'#8e6836':policy==='threshold'?'#0a6670':'#14242b', metrics=location.summary[policy];
-        const label=policy==='guidance'?`Week ${DATA.fit.guidance_week}`:policy==='fixed'?`Week ${DATA.fit.fixed_week}`:'Threshold';
-        element('text',{x,y:compact?top+10:218,'text-anchor':'middle','font-size':compact?14:16,style:`fill:${policy==='fixed'?'#647278':color}`},column,label);
-        element('text',{x,y:compact?top+72:262,'text-anchor':'middle','font-size':valueFont,'font-weight':600,style:`fill:${color}`,'data-policy':policy,'data-metric':'gap'},column,`${metrics.median_absolute_weeks} wk`);
-        element('text',{x,y:compact?top+135:370,'text-anchor':'middle','font-size':compact?20:26,'font-weight':600,style:`fill:${color}`,'data-policy':policy,'data-metric':'benefit'},column,`${((1-metrics.pooled_relative_loss)*100).toFixed(1)}%`);
-      }
-      if(location.summary.threshold.non_crossings) element('text',{x:center,y:compact?top+158:448,'text-anchor':'middle',class:'axis'},group,`${location.summary.threshold.non_crossings} / 5,000 did not cross`);
+      if(location.summary.threshold.non_crossings) element('text',{x:center,y:compact?top+158:448,'text-anchor':'middle',class:'axis','data-reveal':firstStage+2},group,`${location.summary.threshold.non_crossings} / 5,000 did not cross`);
       return group;
     }
     const national=plot($('national-view'),DATA.national,64,100,796,370,DATA.national_y_max);
@@ -143,11 +142,7 @@
       plot($('states-view'),location,left,top+20,320,130,DATA.states_y_max,true);
       comparison($('states-view'),location,left+437,top,true);
     });
-    const stateLayers=[...$('states-view').querySelectorAll('[data-reveal]')];
-    function revealNational(progress) {
-      for(const layer of [national.rules,national.markers,national.summary]) layer.style.opacity=progress;
-      $('national-view').dataset.progress=progress;
-    }
+    const policyLayers=[...document.querySelectorAll('[data-reveal]')];
     function animate(duration,tick,done=()=>{}) {
       const start=performance.now();
       function frame(now) {
@@ -161,42 +156,36 @@
       cancelAnimationFrame(animation); stage=Math.max(1,Math.min(buttons.length,Math.floor(value)));
       document.body.dataset.state=stage; history.replaceState(null,'',`#state=${stage}`);
       buttons.forEach((id,i)=>$(id).setAttribute('aria-pressed',stage===i+1));
-      $('national-view').style.display=stage<3?'':'none'; $('states-view').style.display=stage>=3?'':'none';
+      const showingStates=stage>=5;
+      $('national-view').style.display=showingStates?'none':''; $('states-view').style.display=showingStates?'':'none';
       $('national-view').style.opacity=1; $('states-view').style.opacity=1;
       $('policy-legend').style.display=stage===1?'none':'';
-      $('threshold-legend').style.display=stage===2||stage===5?'':'none';
-      $('axis-unit').style.display=stage>=3?'none':'';
-      $('sample-count').textContent=stage>=3?'2022–23 · 50 of 5,000 draws per state':'US · 2022–23 · 50 of 5,000 paired draws';
-      stateLayers.forEach(layer=>{
+      $('threshold-legend').style.display=stage===4||stage===7?'':'none';
+      $('sample-count').textContent=showingStates?'2022–23 · 50 of 5,000 draws per state':'US · 2022–23 · 50 of 5,000 paired draws';
+      policyLayers.forEach(layer=>{
         const visible=Number(layer.dataset.reveal)<=stage;
         layer.style.opacity=visible?1:0; layer.style.visibility=visible?'visible':'hidden';
       });
-      revealNational(stage===1?0:1);
-      if(stage===2&&play&&previous<stage&&!reducedMotion) {
-        revealNational(0); animate(700,revealNational);
-      } else if(stage>=3&&play&&previous<3&&!reducedMotion) {
-        $('states-view').style.opacity=0;
-        if(previous===2) $('national-view').style.display='';
+      if(showingStates&&play&&previous<5&&!reducedMotion) {
+        $('states-view').style.opacity=0; $('national-view').style.display='';
         animate(900,p=>{
           const incoming=p*p*(3-2*p);
           $('national-view').style.opacity=1-incoming; $('states-view').style.opacity=incoming;
         },()=>{$('national-view').style.display='none';});
-      } else if(stage>=4&&play&&previous<stage&&!reducedMotion) {
-        const incoming=stateLayers.filter(layer=>Number(layer.dataset.reveal)>previous&&Number(layer.dataset.reveal)<=stage);
+      } else if(stage>1&&play&&previous<stage&&!reducedMotion) {
+        const incoming=policyLayers.filter(layer=>Number(layer.dataset.reveal)>previous&&Number(layer.dataset.reveal)<=stage);
         incoming.forEach(layer=>layer.style.opacity=0);
         animate(700,p=>incoming.forEach(layer=>layer.style.opacity=p*p*(3-2*p)));
       }
-      const visiblePolicies=['guidance','fixed','threshold'].slice(0,Math.max(0,stage-2));
-      const statements=DATA.states.map(location=>`${location.name}: ${visiblePolicies.map(policy=>{
-        const metrics=location.summary[policy], label=policy==='guidance'?'week 44':policy==='fixed'?'week 47':'threshold';
+      const visiblePolicies=['guidance','fixed','threshold'].slice(0,showingStates?stage-4:stage-1);
+      const locations=showingStates?DATA.states:[DATA.national];
+      const statements=locations.map(location=>`${location.name}: ${visiblePolicies.map(policy=>{
+        const metrics=location.summary[policy], label=policy==='guidance'?`week ${DATA.fit.guidance_week}`:policy==='fixed'?`week ${DATA.fit.fixed_week}`:'threshold';
         return `${label}, median absolute gap ${metrics.median_absolute_weeks} weeks and retained modeled benefit ${((1-metrics.pooled_relative_loss)*100).toFixed(1)} percent`;
       }).join('; ')}.`).join(' ');
-      const desc=stage>=3?`Texas, California, Minnesota, and New York in 2022/23. Each advance adds a comparator: vaccination in week 44 near the end of the guidance window, the frozen fixed week 47, then the frozen 1.7 times local September baseline threshold. Week 44 models a dose in that specific week, not every date permitted by guidance. Each state uses the same 5,000 paired VE and epidemic draws; each state/draw has its own optimum. The first 50 curves are shown per state. ${statements} These are retrospective full-season latent curves, not an as-of-date evaluation or a geographic holdout.`:[
-        '',
-        'The first 50 of 5,000 US 2022/23 epidemic and VE pairs. This landing view is still. Advance to reveal the two frozen timing rules and their results.',
-        'The unchanged pre-pandemic rules are fixed week 47 and the first week above 1.7 times September baseline. In 5,000 US 2022/23 pairs, median distance from each pair\'s optimum is six weeks for the fixed date and two for the threshold. Pooled retained modeled benefit is 74.7 and 96.8 percent of the sum of per-draw optima. The first 50 curves are shown. Burgundy dots mark optima, teal rings threshold dates. This is a retrospective latent-curve simulation; the six weeks describes the dose-date gap, not an estimated peak shift.'
-      ][stage];
-      $('chart-title').textContent=stage>=3?'Vaccination timing compared in four states in 2022–23':'The early 2022–23 US season';
+      const desc=stage===1?'The first 50 of 5,000 US 2022/23 epidemic and VE pairs. This landing view is still. Advances reveal vaccination in week 44, fixed week 47, then the activity threshold.':
+        `${showingStates?'Texas, California, Minnesota, and New York':'United States'} in 2022/23. Each advance adds a rule: vaccination in week 44 near the end of the guidance window, the retained fixed week 47, then the frozen ${DATA.fit.threshold_multiplier.toFixed(1)} times local August baseline threshold. Week 44 models one specific dose week, not every date permitted by guidance. Each location uses 5,000 paired VE and epidemic draws, each with its own optimum. The first 50 curves are shown. Burgundy dots mark optima; teal rings mark threshold dates. ${statements} The August sensitivity analysis was selected after reviewing the September-baseline results. The multiplier was then calibrated using pre-pandemic draws only and frozen before recalculating evaluation outcomes. These are retrospective full-season latent curves, not an as-of-date evaluation, an untouched holdout, or a geographic holdout.`;
+      $('chart-title').textContent=showingStates?'Vaccination timing compared in four states in 2022–23':'The early 2022–23 US season';
       $('chart-desc').textContent=desc; $('status').textContent=desc;
     }
     buttons.forEach((id,i)=>$(id).addEventListener('click',()=>setStage(i+1)));

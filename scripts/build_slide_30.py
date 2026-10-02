@@ -1,18 +1,8 @@
 #!/usr/bin/env python3
-"""Build linked pre-pandemic draws and a frozen-rule test on later seasons."""
-
-import gzip
-import hashlib
-import json
+"""Build slide 30 from the frozen August sensitivity analysis."""
 import math
 import statistics
 from bisect import bisect_right
-from pathlib import Path
-
-from build_slide_25 import protection, week_index
-from build_slide_30_threshold import build_threshold_example
-
-ROOT = Path(__file__).resolve().parents[1]
 
 
 def curve_at(points, time):
@@ -66,7 +56,7 @@ def align_seasons(scenarios):
             fits[i][j], fits[j][i] = (score, shift), (score, -shift)
     reference = max(range(len(curves)), key=lambda i: sum(row[0] for row in fits[i]))
     shifts = [row[1] for row in fits[reference]]
-    # Shared-area alignment uses unit AUC; the displayed heights use September baseline.
+    # Shared-area alignment uses unit AUC; the displayed heights use August baseline.
     displayed = []
     for row in scenarios:
         points = row['burden_points']
@@ -98,7 +88,7 @@ def align_seasons(scenarios):
     median = statistics.median(after)
     assert mean[0][0] <= median <= mean[-1][0]
     return {'method': 'Maximum pairwise shared area after normalizing each seasonal AUC to one; representative-profile alignment',
-            'display_scale': 'Each draw divided by its September weeks 36-39 mean; unit AUC used only to choose shifts',
+            'display_scale': 'Each draw divided by its August weeks 32-35 mean; unit AUC used only to choose shifts',
             'n_scenarios': len(curves), 'reference_draw': scenarios[reference]['draw'],
             'shift_grid_weeks': .25, 'search_limit_weeks': 20,
             'mean_peak_before_recentering': peak, 'mean_common_window': [left-peak, right-peak],
@@ -111,75 +101,11 @@ def align_seasons(scenarios):
             'y_max': math.ceil(max(v for c in displayed for _, v in c))}
 
 
+
 def build():
-    config = json.loads((ROOT / 'data/slide-30/inputs.json').read_text())
-    source = ROOT / config['source']['path']
-    assert hashlib.sha256(source.read_bytes()).hexdigest() == config['source']['sha256']
-    original = json.loads(source.read_text())
-    training = ROOT / 'data/slide-30/threshold-example/training-draws.json.gz'
-    assert hashlib.sha256(training.read_bytes()).hexdigest() == original['training_draws_sha256']
-    training_rows = json.loads(gzip.decompress(training.read_bytes()))['scenarios'][:50]
-    for row, saved in zip(original['scenarios'], training_rows):
-        assert all(row[key] == saved[key] for key in ['draw', 'season', 'weeks', 'max_week', 'burden', 'parameters'])
-        assert max(abs(r-(math.fsum(saved['burden'])-u)) for r, u in zip(row['remaining'], saved['utility'])) < 1e-12
-    assert original['n_draws'] == 5000
-    assert config['decision_rule_validated'] is False
-    assert config['forecast_evaluation_performed'] is False
-    assert [row['draw'] for row in original['scenarios']] == config['scenario_draws']
-    scenarios, max_error = [], 0
-    for row in original['scenarios']:
-        params = row['parameters']
-        elapsed = [week_index(w, row['max_week']) for w in row['weeks']]
-        candidates = [week_index(w, row['max_week']) for w in original['candidate_weeks']]
-        for vaccination, saved in zip(candidates, row['remaining']):
-            remaining = math.fsum(b * (1-protection(t-vaccination, params))
-                                 for b, t in zip(row['burden'], elapsed))
-            max_error = max(max_error, abs(remaining-saved))
-        best = min(range(len(candidates)), key=row['remaining'].__getitem__)
-        best_week = original['candidate_weeks'][best]
-        dose_time = candidates[best]
-        regret = [value-row['remaining'][best] for value in row['remaining']]
-        assert regret[best] == 0 and all(value >= 0 for value in regret)
-        assert sum(value < 1e-12 for value in regret) == 1
-        assert best_week in row['weeks']
-        protection_points = [[-.5, 0]]
-        for i in range(159):
-            t = i/4
-            if t == dose_time+params['immune_lag_weeks']:
-                protection_points.append([t, 0])
-            protection_points.append([t, protection(t-dose_time, params)])
-        assert protection(0, params) == 0
-        assert all(0 <= point[1] <= .8 for point in protection_points)
-        scenarios.append({
-            'draw': row['draw'], 'season': row['season'], 'max_week': row['max_week'],
-            'baseline': statistics.mean(row['burden'][row['weeks'].index(w)] for w in [36, 37, 38, 39]),
-            'burden_points': list(map(list, zip(elapsed, row['burden']))),
-            'protection_points': protection_points,
-            'decision_points': list(map(list, zip(candidates, regret))),
-            'best_index': best, 'best_week': best_week, 'dose_time': dose_time,
-            'epidemic_at_dose': row['burden'][row['weeks'].index(best_week)],
-            'protection_at_dose': 0, 'immune_lag_weeks': params['immune_lag_weeks'],
-        })
-    assert len(scenarios) == 50 and max_error < 1e-12
-    candidate_totals = len(scenarios)*len(original['candidate_weeks'])
-    threshold = build_threshold_example('expanded')
-    threshold['evaluation_n'] = len(threshold['scenarios'])
-    threshold['scenarios'] = threshold['scenarios'][:50]
-    threshold['display_selection'] = 'First 50 of the seeded 5000 evaluation pairs; summaries use all 5000.'
-    threshold['y_max'] = math.ceil(max(v for row in threshold['scenarios'] for _, v in row['burden_points']))
-    data = {**config, 'n_draws': original['n_draws'], 'scenarios': scenarios,
-            'alignment': align_seasons(scenarios),
-            'threshold_example': threshold,
-            'burden_y_max': math.ceil(max(max(r['burden']) for r in original['scenarios'])*100)/100,
-            'protection_y_max': .8,
-            'regret_y_max': math.ceil(max(max(p[1] for p in s['decision_points']) for s in scenarios)*10)/10,
-            'validation': {'candidate_totals_checked': candidate_totals, 'max_absolute_error': max_error}}
-    (ROOT / 'data/slide-30/slide-30.json').write_text(json.dumps(data, indent=2)+'\n')
-    html = (ROOT / 'src/slide-30.html').read_text()
-    assert html.count('/*__SLIDE_DATA__*/') == 1
-    (ROOT / 'docs/slide-30.html').write_text(html.replace('/*__SLIDE_DATA__*/', json.dumps(data, separators=(',', ':'))))
-    print(f'Built slide 30: {len(scenarios)} matched minima, {candidate_totals} candidate totals checked; maximum error {max_error:.3g}.')
+    from build_august_slides import build as build_august
+    build_august(30)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     build()

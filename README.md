@@ -120,22 +120,21 @@ Standalone **slides 28–31** close the vaccine-timing section:
   from this conceptual missed-vaccination branch.
 - [Slide 30](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-30.html#state=1)
   shows 50 pre-pandemic epidemic / VE pairs and aligns their curves in state 4.
-  A threshold of 1.7× September baseline and fixed week 47 are learned from
-  5,000 pre-pandemic pairs, then frozen. State 5 displays 50 later-season
-  pairs and compares the rules across all 5,000 evaluation draws from 2023–26.
-  The plot frame, vertical scale, and palette stay consistent through the
-  crossfade. A separate 5,000-draw 2022–23 stress test is documented in the
-  [evidence notes](specs/slide-30-evidence.md). These are new retrospective
-  simulations using latent ILI curves, not a real-time policy evaluation.
+  The August-inclusive refit calibrates a **2.3× weeks 32–35 baseline**
+  threshold from 5,000 pre-pandemic pairs, with eligible triggers from week 36.
+  State 5 compares it with the retained fixed week 47 in 5,000 later-season
+  pairs from 2023–26; the first 50 are shown. See the
+  [active evidence notes](specs/august-baseline-evidence.md) for the post hoc
+  sensitivity-analysis scope, source data, and independent checks.
 - [Slide 31](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-31.html#state=1)
-  tests those same frozen rules in the early 2022–23 US season, then in
-  Texas, California, Minnesota, and New York. Each location displays the
-  first 50 pairs and summarizes all 5,000. Five presenter states provide
-  a static Start, the national comparison, and four state panels that add
-  week 44, week 47, and the threshold in sequence. Build with
+  applies the frozen August rule to the early 2022–23 US season, then Texas,
+  California, Minnesota, and New York. Each location displays the first 50
+  pairs and summarizes all 5,000. Seven presenter states provide a static
+  Start followed by week 44, fixed week 47, and threshold columns in the
+  national view, then the same sequence in four state panels. Build with
   `python3 scripts/build_slide_31.py`; edit `src/slide-31.html`.
-  [Evidence notes](specs/slide-31-evidence.md) record the paired extraction,
-  independent checks, and limits of this retrospective comparison.
+  Week 44 models a dose near the end of the guidance window. The earlier
+  September-based results remain unchanged in their original data folders.
 
 Slides 28–29 have four states; slide 30 has five. Each has a static Start,
 arrow navigation, and Reset. Build slide 30 alone with
