@@ -1,0 +1,53 @@
+{
+  "status": "PASS",
+  "method": "Independent R CSV parsing, MMWR calendar conversion, means, count ratios, and thresholds",
+  "latest_week_ending": "2026-09-26",
+  "maximum_absolute_error": 0,
+  "locations": {
+    "United States": {
+      "points": 13,
+      "baseline": 1.2432302500000001,
+      "threshold": 2.8594295750000001,
+      "latest": 1.7423599999999999,
+      "crossed": false
+    },
+    "Texas": {
+      "points": 13,
+      "baseline": 1.7730524999999999,
+      "threshold": 4.0780207499999994,
+      "latest": 1.83165,
+      "crossed": false
+    },
+    "California": {
+      "points": 13,
+      "baseline": 1.9870675,
+      "threshold": 4.5702552499999998,
+      "latest": 2.61951,
+      "crossed": false
+    },
+    "Minnesota": {
+      "points": 13,
+      "baseline": 0.45171600000000001,
+      "threshold": 1.0389467999999999,
+      "latest": 0.95716599999999996,
+      "crossed": false
+    },
+    "New York": {
+      "points": 13,
+      "baseline": 0.65933874999999997,
+      "threshold": 1.5164791249999998,
+      "latest": 1.43119,
+      "crossed": false
+    }
+  },
+  "threshold_fit_sha256": "97b6e6d4c614d693c6aedf601a7ee60118b8220e9c5607caa9685dda000e2dd7",
+  "source_sha256": {
+    "metadata.json": "1746bac32a8f0e485ee93e22af9a85fc374b896c45852b2e601347d9ad6b8f39",
+    "national-request.json": "a6a3aa00bcfb49bb48fbd823800a2fb827c608bd197eee6ce4f5530d339f4b58",
+    "states-request.json": "5f2ea744d18a7ffcab9c918a37bb40690a8f5fd7016da2cf98d9edf04a69ba83",
+    "national.zip": "c0ab447355bd226072a71b64b7f1f060a964491242a85c49531653b4c70a00bc",
+    "states.zip": "96737620c87df8488808a3a88b4fbec501ecf4086fbf071ac5875e43133f4d73",
+    "national.csv": "1eea9eb10797b6343cd3a686d0e8909a4a21aeac9c8067b345fd4cff7ac6b053",
+    "states.csv": "14206db226ed99dea44c3b0f2ebe0cb9475bb0a9a7969b4bd79d601828615e83"
+  }
+}

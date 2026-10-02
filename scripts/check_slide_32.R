@@ -1,77 +1,52 @@
 #!/usr/bin/env Rscript
-# Independent, vectorized checks against the saved paired draws.
+# Independently verify the current ILINet observations, calendar, and threshold.
 library(jsonlite)
-raw <- fromJSON(gzfile('data/august-baseline/training-draws.json.gz'), simplifyVector=FALSE)
-shown <- fromJSON('data/slide-32/diagnostic.json', simplifyVector=FALSE)
-aligned <- fromJSON('data/august-baseline/alignment.json', simplifyVector=FALSE)$alignment
-as_points <- function(x) do.call(rbind, lapply(x, unlist))
-time <- function(w, max_week) ifelse(w >= 32, w-36, max_week-36+w)
-offsets <- matrix(NA_real_, length(raw$scenarios), 2,
-                  dimnames=list(NULL, c('dose', 'onset')))
-seasons <- character(nrow(offsets))
-curve_error <- slope_error <- marker_error <- mean_error <- 0
-mean_grid <- as_points(shown$mean$activity)
-slope_grid <- as_points(shown$mean$slope)
-activity_matrix <- matrix(NA_real_, nrow(mean_grid), 50)
-slope_matrix <- matrix(NA_real_, nrow(slope_grid), 50)
-origin <- min(vapply(aligned$profiles, function(p) p$shift, numeric(1)))
-
-for (i in seq_along(raw$scenarios)) {
-  r <- raw$scenarios[[i]]
-  t <- time(unlist(r$weeks), r$max_week)
-  y <- 100*unlist(r$burden)
-  # Average adjacent first differences, independently of Python's secant code.
-  delta <- diff(y)
-  slope <- (head(delta, -1)+tail(delta, -1))/2
-  st <- t[2:(length(t)-1)]
-  slope <- slope[st >= 0]
-  st <- st[st >= 0]
-  best <- which.max(unlist(r$utility))
-  dose <- time(raw$candidate_weeks[[best]], r$max_week)
-  onset <- dose+r$parameters$immune_lag_weeks
-  fastest <- st[which.max(slope)]
-  offsets[i, ] <- c(dose, onset)-fastest
-  seasons[i] <- r$season
-  if (i <= 50) {
-    s <- shown$scenarios[[i]]
-    stopifnot(s$draw == r$draw, s$season == r$season,
-              s$dose_week == raw$candidate_weeks[[best]], s$fastest == fastest)
-    slope_error <- max(slope_error, abs(as_points(s$slope)-cbind(st, slope)))
-    curve_error <- max(curve_error, abs(as_points(s$activity)-cbind(t[t>=0], y[t>=0])))
-    marker_error <- max(marker_error, abs(c(s$dose, s$onset)-c(dose, onset)))
-    shift <- aligned$profiles[[i]]$shift-origin
-    stopifnot(s$shift == shift)
-    activity_matrix[,i] <- approx(t+shift, y, xout=mean_grid[,1])$y
-    slope_matrix[,i] <- approx(st+shift, slope, xout=slope_grid[,1])$y
-  }
+folder <- 'data/slide-32/current-ilinet'
+d <- fromJSON(file.path(folder, 'slide.json'), simplifyVector=FALSE)
+p <- fromJSON(file.path(folder, 'provenance.json'), simplifyVector=FALSE)
+for (name in names(p$source_sha256)) {
+  stopifnot(digest::digest(file=file.path(folder,name), algo='sha256') == p$source_sha256[[name]])
 }
-mean_error <- max(abs(rowMeans(activity_matrix)-mean_grid[,2]),
-                  abs(rowMeans(slope_matrix)-slope_grid[,2]))
-stopifnot(!anyNA(activity_matrix), !anyNA(slope_matrix))
-summary_error <- 0
-for (s in shown$seasons) {
-  keep <- seasons == s$season
-  stopifnot(sum(keep) == s$n, sum(head(keep, 50)) == s$display_n)
-  for (kind in c('dose','onset')) {
-    actual <- unname(quantile(offsets[keep,kind], c(.25,.5,.75), type=7))
-    expected <- unlist(s[[kind]][c('q1','median','q3')])
-    summary_error <- max(summary_error, abs(actual-expected))
+fit <- fromJSON('data/august-baseline/threshold-fit.json')
+stopifnot(digest::digest(file='data/august-baseline/threshold-fit.json', algo='sha256') == d$threshold_fit_sha256,
+          d$threshold_multiplier == fit$threshold_multiplier,
+          identical(unlist(d$baseline_weeks), as.integer(fit$baseline_weeks)))
+read_source <- function(name) read.csv(file.path(folder,name), skip=1, check.names=FALSE,
+                                      na.strings=c('X','NA',''), stringsAsFactors=FALSE)
+national <- read_source('national.csv')
+states <- read_source('states.csv')
+maximum_error <- 0
+results <- list()
+for (location in c(list(d$national), d$states)) {
+  source <- if (location$name == 'United States') national else states[states$REGION == location$name,]
+  source <- source[source$YEAR == d$year & source$WEEK >= d$first_week & source$WEEK <= d$latest_week,]
+  source <- source[order(source$WEEK),]
+  weeks <- vapply(location$points, function(x) x$week, integer(1))
+  values <- vapply(location$points, function(x) if(is.null(x$value)) NA_real_ else x$value, numeric(1))
+  dates <- vapply(location$points, function(x) x$week_ending, character(1))
+  expected <- source[[location$source_column]]
+  stopifnot(identical(weeks, source$WEEK), identical(is.na(values), is.na(expected)),
+            identical(dates, as.character(MMWRweek::MMWRweek2Date(source$YEAR,source$WEEK)+6)))
+  baseline <- mean(expected[weeks %in% 32:35])
+  threshold <- baseline*fit$threshold_multiplier
+  maximum_error <- max(maximum_error, abs(values-expected),
+                        abs(baseline-location$baseline_percentage),
+                        abs(threshold-location$threshold_percentage), na.rm=TRUE)
+  crosses <- weeks[weeks >= fit$first_trigger_week & !is.na(expected) & expected >= threshold]
+  if(length(crosses)) stopifnot(location$first_crossing_week == crosses[1]) else stopifnot(is.null(location$first_crossing_week))
+  if(location$name != 'United States') {
+    # The published state percentages are rounded. Counts provide a second check.
+    stopifnot(max(abs(100*source$ILITOTAL/source[['TOTAL PATIENTS']]-expected), na.rm=TRUE) < 1e-5)
   }
+  results[[location$name]] <- list(points=length(values), baseline=baseline, threshold=threshold,
+                                   latest=tail(values,1), crossed=length(crosses)>0)
 }
-aligned_dose <- vapply(shown$scenarios, function(s) s$dose+s$shift, numeric(1))
-aligned_onset <- vapply(shown$scenarios, function(s) s$onset+s$shift, numeric(1))
-stopifnot(median(aligned_dose) == shown$mean$dose,
-          median(aligned_onset) == shown$mean$onset,
-          slope_grid[which.max(slope_grid[,2]),1] == shown$mean$fastest)
-errors <- c(curve=curve_error, slope=slope_error, markers=marker_error,
-            aligned_mean=mean_error, season_summaries=summary_error)
-stopifnot(all(errors < 1e-12))
-result <- list(status='PASS', method='Independent R adjacent differences and type-7 quantiles',
-               checked_pairs=nrow(offsets), checked_plotted_pairs=50,
-               maximum_absolute_errors=as.list(errors),
-               pooled_onset_quartiles=unname(quantile(offsets[,'onset'], c(.25,.5,.75))),
-               pooled_onset_within_two_weeks=mean(abs(offsets[,'onset']) <= 2),
-               sources_sha256=shown$sources_sha256)
-write_json(result, 'data/slide-32/independent-validation.json', pretty=TRUE,
-           auto_unbox=TRUE, digits=16)
-print(result)
+nyc <- subset(states, REGION == 'New York City' & YEAR == d$year & WEEK >= d$first_week & WEEK <= d$latest_week)
+stopifnot(all(is.na(nyc[['%UNWEIGHTED ILI']])), all(is.na(nyc$ILITOTAL)),
+          d$states[[4]]$label == 'New York (excl. NYC)', maximum_error < 1e-12)
+result <- list(status='PASS', method='Independent R CSV parsing, MMWR calendar conversion, means, count ratios, and thresholds',
+               latest_week_ending=d$latest_week_ending, maximum_absolute_error=maximum_error,
+               locations=results, threshold_fit_sha256=d$threshold_fit_sha256,
+               source_sha256=p$source_sha256)
+write_json(result, file.path(folder,'validation.json'), pretty=TRUE, auto_unbox=TRUE, digits=16)
+print(result[c('status','latest_week_ending','maximum_absolute_error','locations')])

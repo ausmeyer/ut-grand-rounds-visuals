@@ -1,116 +1,92 @@
 #!/usr/bin/env python3
-"""Describe timing and weekly slopes in the existing pre-pandemic paired draws."""
-import gzip
+"""Build current ILINet curves with the frozen, exploratory August threshold."""
+import csv
+import datetime as dt
 import hashlib
 import json
 import math
 import statistics
 from pathlib import Path
 
-from build_slide_30 import curve_at
-
 ROOT = Path(__file__).resolve().parents[1]
-INPUT = ROOT / 'data/august-baseline'
-PINS = {
-    'training-draws.json.gz': '91a5921c4d8cfec5f27cb395953395c097375d38ec949e74a1e48107f6a25b03',
-    'alignment.json': 'b1c27a8d8860998ac52d4fd0fbfca1034ad7bd2a93867a4a49b2be5797a5427e',
-}
+FOLDER = ROOT/'data/slide-32/current-ilinet'
+FIT = ROOT/'data/august-baseline/threshold-fit.json'
+FIT_SHA256 = '97b6e6d4c614d693c6aedf601a7ee60118b8220e9c5607caa9685dda000e2dd7'
+STATES = ['Texas', 'California', 'Minnesota', 'New York']
 
 
-def week_time(week, max_week):
-    return week-36 if week >= 32 else max_week-36+week
+def sha(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def interval(values):
-    q1, _, q3 = statistics.quantiles(values, n=4, method='inclusive')
-    return {'median': statistics.median(values), 'q1': q1, 'q3': q3}
+def read_csv(name):
+    return list(csv.DictReader((FOLDER/name).read_text(encoding='utf-8-sig').splitlines()[1:]))
 
 
-def describe(row, candidates):
-    times = [week_time(w, row['max_week']) for w in row['weeks']]
-    values = [100*v for v in row['burden']]
-    assert all(b-a == 1 for a, b in zip(times, times[1:]))
-    # Centered two-week secant, at each interior week. No extra smoothing.
-    slope = [[times[i], (values[i+1]-values[i-1])/2]
-             for i in range(1, len(times)-1) if times[i] >= 0]
-    best = max(range(len(candidates)), key=row['utility'].__getitem__)
-    assert sum(u == row['utility'][best] for u in row['utility']) == 1
-    dose = week_time(candidates[best], row['max_week'])
-    onset = dose+row['parameters']['immune_lag_weeks']
-    fastest = max(slope, key=lambda point: point[1])
-    assert fastest[1] > 0 and slope[0][0] <= dose <= onset <= slope[-1][0]
-    # An additive constant cancels, without estimating its value.
-    assert all(abs((values[i+1]+10-values[i-1]-10)/2-(values[i+1]-values[i-1])/2) < 1e-12
-               for i in range(1, len(times)-1))
-    return {'draw': row['draw'], 'season': row['season'], 'max_week': row['max_week'],
-            'activity': [[t, v] for t, v in zip(times, values) if t >= 0],
-            'slope': slope, 'dose_week': candidates[best], 'dose': dose, 'onset': onset,
-            'immune_lag_weeks': row['parameters']['immune_lag_weeks'],
-            'fastest': fastest[0], 'dose_offset': dose-fastest[0], 'onset_offset': onset-fastest[0]}
+def number(value):
+    return None if value in ('X', 'NA', '') else float(value)
 
 
 def build():
-    for name, digest in PINS.items():
-        assert hashlib.sha256((INPUT/name).read_bytes()).hexdigest() == digest, name
-    raw = json.loads(gzip.decompress((INPUT/'training-draws.json.gz').read_bytes()))
-    alignment = json.loads((INPUT/'alignment.json').read_text())['alignment']
-    rows = [describe(row, raw['candidate_weeks']) for row in raw['scenarios']]
-    shown = rows[:50]
-    assert len(rows) == 5000 and len(alignment['profiles']) == len(shown)
-    origin = min(p['shift'] for p in alignment['profiles'])
-    for row, profile in zip(shown, alignment['profiles']):
-        assert row['draw'] == profile['draw']
-        # Reuse horizontal shifts only. No August baseline or scaled heights.
-        row['shift'] = profile['shift']-origin
-        assert abs(row['dose']+profile['shift']-alignment['mean_peak_before_recentering']
-                   -profile['optimal_time_after']) < 1e-10
-    shifted_activity = [[[t+r['shift'], v] for t, v in r['activity']] for r in shown]
-    shifted_slope = [[[t+r['shift'], v] for t, v in r['slope']] for r in shown]
-    left = max(c[0][0] for c in shifted_activity)
-    right = min(c[-1][0] for c in shifted_activity)
-    activity = [[k/4, statistics.mean(curve_at(c, k/4) for c in shifted_activity)]
-                for k in range(math.ceil(left*4), math.floor(right*4)+1)]
-    slope = [[k/4, statistics.mean(curve_at(c, k/4) for c in shifted_slope)]
-             for k in range(math.ceil((left+1)*4), math.floor((right-1)*4)+1)]
-    # Differencing and averaging commute on the common interior support.
-    assert max(abs(v-(curve_at(activity, t+1)-curve_at(activity, t-1))/2)
-               for t, v in slope) < 1e-12
-    mean = {'activity': activity, 'slope': slope,
-            'dose': statistics.median(r['dose']+r['shift'] for r in shown),
-            'onset': statistics.median(r['onset']+r['shift'] for r in shown),
-            'fastest': max(slope, key=lambda p: p[1])[0]}
-    summaries = []
-    for season in sorted({r['season'] for r in rows}):
-        selected = [r for r in rows if r['season'] == season]
-        summaries.append({'season': season, 'n': len(selected),
-                          'display_n': sum(r['season'] == season for r in shown),
-                          'dose': interval([r['dose_offset'] for r in selected]),
-                          'onset': interval([r['onset_offset'] for r in selected])})
-    payload = {
-        'slide': 32, 'sources_sha256': PINS, 'n': len(rows), 'display_n': len(shown),
-        'selection': 'First 50 saved paired draws, in original order; no new draws or fit.',
-        'derivative': '(ILI[t+1] - ILI[t-1]) / 2; percentage points per week; weekly grid',
-        'reference': 'Each draw\u2019s maximum positive centered slope from week 36 through week 21; earliest exact tie.',
-        'alignment': 'Existing AUC-overlap horizontal shifts only; earliest displayed start is aligned week zero.',
-        'scope': 'Retrospective smoothed latent ILI curves. Conditional draws from eight seasons, not 5,000 independent seasons. No prospective trigger is fitted or tested.',
-        'scenarios': shown, 'mean': mean, 'seasons': summaries,
-        'pooled_onset': interval([r['onset_offset'] for r in rows]),
-        'pooled_onset_within_two_weeks': statistics.mean(abs(r['onset_offset']) <= 2 for r in rows),
-        'bounds': {'aligned_x': [0, math.ceil(max(c[-1][0] for c in shifted_activity)/2)*2],
-                   'activity_max': math.ceil(max(v for c in shifted_activity for _, v in c)),
-                   'slope_max': math.ceil(max(abs(v) for c in shifted_slope for _, v in c)*5)/5,
-                   'mean_activity_max': math.ceil(max(v for _, v in activity)),
-                   'mean_slope_max': math.ceil(max(abs(v) for _, v in slope)*10)/10},
-    }
-    folder = ROOT/'data/slide-32'
-    folder.mkdir(exist_ok=True)
-    (folder/'diagnostic.json').write_text(json.dumps(payload, indent=2)+'\n')
+    provenance = json.loads((FOLDER/'provenance.json').read_text())
+    for name, digest in provenance['source_sha256'].items():
+        assert sha(FOLDER/name) == digest, name
+    assert sha(FIT) == FIT_SHA256
+    fit = json.loads(FIT.read_text())
+    assert fit['threshold_multiplier'] == 2.3 and fit['baseline_weeks'] == [32,33,34,35]
+    metadata = json.loads((FOLDER/'metadata.json').read_text())
+    dates = {(r['year'],r['weeknumber']):r for r in metadata['mmwr']}
+    national_raw, states_raw = read_csv('national.csv'), read_csv('states.csv')
+    latest = max((int(r['YEAR']),int(r['WEEK'])) for r in national_raw if number(r['% WEIGHTED ILI']) is not None)
+    year, latest_week = latest
+    first_week = 26
+    assert latest_week >= max(fit['baseline_weeks'])
+    last_end = dates[latest]['weekend']
+    assert dt.date.fromisoformat(last_end) <= dt.date.fromisoformat(provenance['retrieved_utc'][:10])
+    first_end = dates[year, first_week]['weekend']
+
+    def location(name, rows, column, label=None):
+        selected = sorted((r for r in rows if int(r['YEAR']) == year and first_week <= int(r['WEEK']) <= latest_week), key=lambda r:int(r['WEEK']))
+        assert [int(r['WEEK']) for r in selected] == list(range(first_week, latest_week+1))
+        points = [{'week':int(r['WEEK']), 'week_ending':dates[year,int(r['WEEK'])]['weekend'],
+                   'value':number(r[column])} for r in selected]
+        baseline_points = [r for r in points if r['week'] in fit['baseline_weeks']]
+        assert len(baseline_points) == 4 and all(r['value'] is not None for r in baseline_points)
+        baseline = statistics.mean(r['value'] for r in baseline_points)
+        threshold = fit['threshold_multiplier']*baseline
+        crossing = next((r['week'] for r in points if r['week'] >= fit['first_trigger_week'] and r['value'] is not None and r['value'] >= threshold), None)
+        assert baseline > 0 and all(r['value'] is None or 0 <= r['value'] <= 100 for r in points)
+        return {'name':name, 'label':label or name, 'source_column':column, 'points':points,
+                'baseline_percentage':baseline, 'threshold_percentage':threshold,
+                'latest_percentage':points[-1]['value'], 'first_crossing_week':crossing}
+
+    national = location('United States', national_raw, '% WEIGHTED ILI')
+    states = [location(name, [r for r in states_raw if r['REGION'] == name], '%UNWEIGHTED ILI',
+                       'New York (excl. NYC)' if name == 'New York' else name) for name in STATES]
+    # NYC is a separate jurisdiction. Do not combine absent counts as zero.
+    nyc = [r for r in states_raw if r['REGION'] == 'New York City' and int(r['YEAR']) == year and first_week <= int(r['WEEK']) <= latest_week]
+    assert len(nyc) == latest_week-first_week+1 and all(number(r['%UNWEIGHTED ILI']) is None for r in nyc)
+    maxima = lambda rows: max([r['threshold_percentage'] for r in rows]+[p['value'] for r in rows for p in r['points'] if p['value'] is not None])
+    ticks = [{'week':w, 'label':dt.date.fromisoformat(dates[year,w]['weekend']).strftime('%b %-d')}
+             for w in [first_week,30,35,latest_week]]
+    payload = {'slide':32, 'year':year, 'first_week':first_week, 'latest_week':latest_week,
+               'first_week_ending':first_end, 'latest_week_ending':last_end,
+               'latest_label':dt.date.fromisoformat(last_end).strftime('%b %-d, %Y'),
+               'retrieved_utc':provenance['retrieved_utc'], 'source_page':provenance['source_page'],
+               'source_sha256':provenance['source_sha256'], 'threshold_fit_sha256':FIT_SHA256,
+               'threshold_multiplier':fit['threshold_multiplier'], 'baseline_weeks':fit['baseline_weeks'],
+               'first_trigger_week':fit['first_trigger_week'], 'national':national, 'states':states,
+               'national_y_max':math.ceil(maxima([national])*1.12*2)/2,
+               'ticks':ticks,
+               'method':'Arithmetic mean of reported ILINet percentages in weeks 32–35, multiplied by the existing 2.3. National uses CDC weighted ILI; states use published unweighted ILI. No fitting, smoothing, projection, or resampling.',
+               'scope':'Current surveillance illustration of an exploratory rule, not a validated vaccination recommendation. The rule was calibrated on latent curves; this overlay applies it to reported values. NYC is unavailable and excluded from the New York panel.'}
+    (FOLDER/'slide.json').write_text(json.dumps(payload, indent=2)+'\n')
     source = (ROOT/'src/slide-32.html').read_text()
     assert source.count('/*__SLIDE_DATA__*/') == 1
     (ROOT/'docs/slide-32.html').write_text(source.replace('/*__SLIDE_DATA__*/', json.dumps(payload, separators=(',', ':'))))
-    print(f'Built slide 32: {len(shown)} existing pairs displayed; {len(rows)} pairs across {len(summaries)} seasons summarized.')
-    print(json.dumps({'aligned_mean': {k: mean[k] for k in ['dose', 'onset', 'fastest']},
-                      'pooled_onset': payload['pooled_onset'], 'seasons': summaries}, indent=2))
+    print(f'Built slide 32: current ILINet through {last_end}, with the frozen {fit["threshold_multiplier"]}× rule.')
+    for row in [national]+states:
+        print(f'{row["label"]}: latest {row["latest_percentage"]:.6f}%; baseline {row["baseline_percentage"]:.6f}%; threshold {row["threshold_percentage"]:.6f}%; first crossing {row["first_crossing_week"]}')
 
 
 if __name__ == '__main__':

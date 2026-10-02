@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>Slide 32 · Can the shape of the rise guide timing?</title>
+  <title>Slide 32 · Where are we now?</title>
   <style>
-    :root { --paper:#fbfaf6; --ink:#14242b; --muted:#647278; --teal:#0a6670; --red:#933a4b; }
+    :root { --paper:#fbfaf6; --ink:#14242b; --muted:#647278; --teal:#0a6670; }
     * { box-sizing:border-box; }
     html,body { width:100%; height:100%; margin:0; overflow:hidden; }
     body { background:var(--paper); color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
@@ -19,51 +19,40 @@
     .curve { fill:none; stroke-linejoin:round; stroke-linecap:round; }
     .grid { stroke:#dfe4df; stroke-width:1; }
     .controls { height:49px; padding:11px 29px 0; display:flex; align-items:center; gap:8px; }
-    button,select { border:1px solid #b9c3c0; border-radius:8px; background:white; color:var(--ink); height:34px; font:inherit; font-size:14px; font-weight:650; cursor:pointer; padding:0 12px; white-space:nowrap; }
-    button:hover,select:hover { border-color:var(--teal); }
+    button { border:1px solid #b9c3c0; border-radius:8px; background:white; color:var(--ink); height:34px; font:inherit; font-size:14px; font-weight:650; cursor:pointer; padding:0 12px; white-space:nowrap; }
+    button:hover { border-color:var(--teal); }
     button[aria-pressed=true] { color:var(--teal); border-color:var(--teal); background:#edf6f4; }
-    button:focus-visible,select:focus-visible { outline:3px solid #82bcc1; outline-offset:3px; }
-    button:disabled { opacity:.35; cursor:default; }
+    button:focus-visible { outline:3px solid #82bcc1; outline-offset:3px; }
     #reset { padding:0 10px; font-size:19px; margin-left:auto; }
     #control-hint { color:var(--muted); font-size:13px; margin-left:8px; }
-    #draw-picker { position:absolute; right:70px; top:38px; display:flex; align-items:center; gap:7px; }
-    #draw-picker[hidden] { display:none; }
-    #draw-picker button { width:34px; padding:0; font-size:20px; }
-    #draw-select { width:195px; }
     .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
   </style>
 </head>
 <body>
-  <main class="slide" aria-label="Slide 32. Can the shape of the rise guide timing?">
-    <h1>Can the shape of the rise guide timing?</h1>
-    <section class="visual" aria-label="An exploratory comparison of optimal timing and epidemic slopes">
+  <main class="slide" aria-label="Slide 32. Where are we now?">
+    <h1>Where are we now?</h1>
+    <section class="visual" aria-label="Current ILINet observations and the candidate vaccination threshold">
       <svg viewBox="0 0 1208 535" role="img" aria-labelledby="chart-title chart-desc">
-        <title id="chart-title">Activity and its first derivative</title>
+        <title id="chart-title">Current ILINet in the United States</title>
         <desc id="chart-desc"></desc>
-        <text x="64" y="23" font-size="15" font-weight="650" style="fill:var(--teal)">NEXT STUDY</text>
-        <text id="sample-count" x="1154" y="23" text-anchor="end" class="axis"></text>
-        <g id="timing-legend">
-          <circle cx="69" cy="56" r="5" fill="#933a4b"/>
-          <text id="dose-legend" x="82" y="61" class="axis">Optimal vaccination</text>
-          <g id="reference-legend">
-            <line x1="288" x2="310" y1="56" y2="56" stroke="#647278" stroke-width="1.5" stroke-dasharray="4 4"/>
-            <text x="318" y="61" class="axis">Fastest rise</text>
-          </g>
+        <text x="64" y="23" font-size="15" font-weight="650" style="fill:var(--teal)">CURRENT ILINET</text>
+        <text id="as-of" x="1154" y="23" text-anchor="end" class="axis"></text>
+        <text x="64" y="61" class="axis">Visits for ILI (%)</text>
+        <g id="threshold-legend">
+          <line x1="854" x2="880" y1="56" y2="56" stroke="#0a6670" stroke-width="2" stroke-dasharray="6 4"/>
+          <text id="threshold-label" x="1154" y="61" text-anchor="end" class="axis"></text>
         </g>
-        <g id="chart"></g>
+        <g id="national-view"></g>
+        <g id="states-view"></g>
+        <a href="https://gis.cdc.gov/grasp/fluview/fluportaldashboard.html" target="_blank" rel="noopener noreferrer">
+          <text x="64" y="533" font-size="12" style="fill:var(--muted)">CDC ILINet · preliminary</text>
+        </a>
       </svg>
-      <div id="draw-picker" hidden>
-        <button id="previous-draw" aria-label="Previous draw">‹</button>
-        <label for="draw-select" class="sr-only">Inspect one of the 50 paired draws</label>
-        <select id="draw-select"></select>
-        <button id="next-draw" aria-label="Next draw">›</button>
-      </div>
       <div class="controls">
         <button id="start" aria-pressed="true">1 · Start</button>
-        <button id="mean-timing" aria-pressed="false">2 · Mean timing</button>
-        <button id="draws" aria-pressed="false">3 · 50 draws</button>
-        <button id="individual" aria-pressed="false">4 · Each draw</button>
-        <button id="seasons" aria-pressed="false">5 · By season</button>
+        <button id="us-threshold" aria-pressed="false">2 · US threshold</button>
+        <button id="states" aria-pressed="false">3 · States</button>
+        <button id="state-thresholds" aria-pressed="false">4 · State thresholds</button>
         <span id="control-hint">Arrow keys to advance</span>
         <button id="reset" aria-label="Reset demonstration" title="Reset">↺</button>
       </div>
@@ -74,141 +63,95 @@
     const DATA = /*__SLIDE_DATA__*/;
     const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
     const reducedMotion=matchMedia('(prefers-reduced-motion:reduce)').matches;
-    const buttons=['start','mean-timing','draws','individual','seasons'];
-    let stage=1, selected=0, animation=0;
+    const buttons=['start','us-threshold','states','state-thresholds'];
+    let stage=1, animation=0;
     function element(tag,attrs,parent,text) {
       const el=document.createElementNS(NS,tag);
       for(const [key,value] of Object.entries(attrs)) el.setAttribute(key,value);
       if(text!==undefined) el.textContent=text;
       parent.appendChild(el); return el;
     }
-    function at(points,time) {
-      const i=Math.min(points.length-2,Math.max(0,points.findIndex(p=>p[0]>=time)-1));
-      const a=points[i], b=points[i+1]; return a[1]+(b[1]-a[1])*(time-a[0])/(b[0]-a[0]);
-    }
-    function path(points,X,Y,shift=0) { return points.map(([t,v],i)=>`${i?'L':'M'}${X(t+shift).toFixed(3)},${Y(v).toFixed(3)}`).join(' '); }
-    function curveView() {
-      const mean=stage<=2, single=stage===4, row=DATA.scenarios[selected];
-      const xMax=single?row.activity.at(-1)[0]:DATA.bounds.aligned_x[1];
-      const yMax=mean?DATA.bounds.mean_activity_max:single?Math.ceil(Math.max(...row.activity.map(p=>p[1]))):DATA.bounds.activity_max;
-      const dMax=mean?DATA.bounds.mean_slope_max:single?Math.ceil(Math.max(...row.slope.map(p=>Math.abs(p[1])))*10)/10:DATA.bounds.slope_max;
-      const X=t=>64+t/xMax*1090, Y=v=>279-v/yMax*177, D=v=>414-v/dMax*73;
+    function plot(parent,row,x,y,width,height,yMax,compact=false) {
+      const group=element('g',{'data-location':row.name},parent);
+      const X=week=>x+(week-DATA.first_week)/(DATA.latest_week-DATA.first_week)*width;
+      const Y=value=>y+height-value/yMax*height;
+      element('text',{x,y:y-22,'font-size':compact?22:24,'font-weight':600},group,row.label);
       for(const value of [0,yMax/2,yMax]) {
-        element('line',{x1:64,x2:1154,y1:Y(value),y2:Y(value),class:'grid'},$('chart'));
-        element('text',{x:51,y:Y(value)+5,'text-anchor':'end',class:'axis'},$('chart'),value);
+        element('line',{x1:x,x2:x+width,y1:Y(value),y2:Y(value),class:'grid'},group);
+        element('text',{x:x-12,y:Y(value)+5,'text-anchor':'end',class:'axis'},group,Number(value.toFixed(2)));
       }
-      for(const value of [-dMax,0,dMax]) {
-        element('line',{x1:64,x2:1154,y1:D(value),y2:D(value),class:'grid','stroke-dasharray':value===0?'':'3 5'},$('chart'));
-        element('text',{x:51,y:D(value)+5,'text-anchor':'end',class:'axis'},$('chart'),value.toFixed(1));
-      }
-      element('text',{x:64,y:91,'font-size':16,'font-weight':600},$('chart'),'ILI (%)');
-      element('text',{x:64,y:326,'font-size':16,'font-weight':600},$('chart'),'Weekly change (percentage points)');
-      const ticks=single?[[0,'Sep'],[9,'Nov'],[row.max_week-35,'Jan'],[row.max_week-27,'Mar'],[row.max_week-18,'May']]:[0,8,16,24,32,40].map(t=>[t,t]);
-      ticks.forEach(([t,label])=>element('text',{x:X(t),y:511,'text-anchor':'middle',class:'axis'},$('chart'),label));
-      element('text',{x:609,y:534,'text-anchor':'middle',class:'axis'},$('chart'),single?'Calendar date':'Aligned time (weeks)');
-      const marks=[];
-      function draw(data,shift,color,width,opacity) {
-        const g=element('g',{'data-draw':data.draw??'mean',opacity},$('chart'));
-        for(const [panel,scale] of [['activity',Y],['slope',D]]) element('path',{d:path(data[panel],X,scale,shift),class:'curve',stroke:color,'stroke-width':width,'data-panel':panel},g);
-        const timing=element('g',{'data-layer':'timing'},g);
-        const t=data.dose, x=X(t+shift);
-        if(mean||single) element('line',{x1:x,x2:x,y1:102,y2:487,stroke:'#933a4b','stroke-width':1,opacity:.28},timing);
-        for(const [panel,scale] of [['activity',Y],['slope',D]]) {
-          const v=at(data[panel],t);
-          const dot=element('circle',{cx:x,cy:scale(v),r:mean||single?6:3.1,fill:'#933a4b',stroke:'#fbfaf6','stroke-width':1,'data-kind':'dose','data-panel':panel,'data-time':t,'data-aligned-time':t+shift,'data-value':v},timing);
-          element('title',{},dot,`Optimal vaccination${data.draw?`, draw ${data.draw}`:', median aligned date'}`);
-        }
-        if(stage===1) timing.style.opacity=0;
-        marks.push(timing); return g;
-      }
-      const groups=[];
-      if(mean) groups.push(draw(DATA.mean,0,'#425f66',2.7,1));
-      else if(single) {
-        element('line',{x1:X(row.fastest),x2:X(row.fastest),y1:102,y2:487,stroke:'#647278','stroke-width':1.5,'stroke-dasharray':'4 4','data-fastest':row.fastest},$('chart'));
-        groups.push(draw(row,0,'#425f66',2.7,1));
-      } else DATA.scenarios.forEach(row=>groups.push(draw(row,row.shift,'#a4b0b0',1.1,.62)));
-      return {groups,marks};
-    }
-    function seasonView() {
-      const X=t=>260+(t+12)/16*840;
-      element('text',{x:64,y:99,'font-size':21,'font-weight':600},$('chart'),'Timing relative to each draw’s fastest rise');
-      element('text',{x:1154,y:99,'text-anchor':'end',class:'axis'},$('chart'),'Median · middle 50%');
-      for(const t of [-12,-8,-4,0,4]) {
-        element('line',{x1:X(t),x2:X(t),y1:118,y2:466,stroke:t===0?'#647278':'#dfe4df','stroke-width':t===0?1.5:1,'stroke-dasharray':t===0?'4 4':''},$('chart'));
-        element('text',{x:X(t),y:494,'text-anchor':'middle',class:'axis'},$('chart'),t>0?`+${t}`:t);
-      }
-      DATA.seasons.forEach((row,i)=>{
-        const y=132+i*46, g=element('g',{'data-season':row.season},$('chart'));
-        element('text',{x:64,y:y+5,'font-size':18},g,row.season.replace('/','–'));
-        const q=row.dose, attrs={'data-kind':'dose','data-q1':q.q1,'data-q3':q.q3,'data-median':q.median};
-        element('line',{x1:X(q.q1),x2:X(q.q3),y1:y,y2:y,stroke:'#933a4b','stroke-width':3,'stroke-linecap':'round',opacity:.65,...attrs},g);
-        element('circle',{cx:X(q.median),cy:y,r:5,fill:'#933a4b',stroke:'#933a4b','stroke-width':2,...attrs},g);
+      DATA.ticks.forEach((tick,i)=>element('text',{x:X(tick.week),y:y+height+25,'text-anchor':i===0?'start':i===DATA.ticks.length-1?'end':'middle',class:'axis'},group,tick.label));
+      let d='',connected=false;
+      row.points.forEach(point=>{
+        if(point.value===null) {connected=false;return;}
+        d+=`${connected?'L':'M'}${X(point.week).toFixed(3)},${Y(point.value).toFixed(3)} `; connected=true;
       });
-      element('text',{x:680,y:528,'text-anchor':'middle',class:'axis'},$('chart'),'Weeks before / after the fastest rise');
+      element('path',{d,class:'curve',stroke:'#425f66','stroke-width':compact?2.7:3.2,'data-layer':'observed'},group);
+      row.points.forEach(point=>{
+        if(point.value===null) return;
+        const dot=element('circle',{cx:X(point.week),cy:Y(point.value),r:point.week===DATA.latest_week?(compact?4:5):2.2,fill:'#425f66','data-week':point.week,'data-value':point.value,'data-date':point.week_ending},group);
+        element('title',{},dot,`${row.label}, week ending ${point.week_ending}: ${point.value.toFixed(2)}% of visits for ILI`);
+      });
+      const rule=element('g',{'data-layer':'threshold','data-threshold':row.threshold_percentage},group);
+      const line=element('line',{x1:x,x2:x+width,y1:Y(row.threshold_percentage),y2:Y(row.threshold_percentage),stroke:'#0a6670','stroke-width':2,'stroke-dasharray':'8 6'},rule);
+      const label=element('text',{x:x+width-2,y:Y(row.threshold_percentage)-10,'text-anchor':'end','font-size':compact?15:18,'font-weight':600,style:'fill:var(--teal);paint-order:stroke;stroke:var(--paper);stroke-width:4px;stroke-linejoin:round'},rule,`${row.threshold_percentage.toFixed(2)}%`);
+      return {rule,line,label,x,width};
     }
-    function updateDescription() {
-      const row=DATA.scenarios[selected];
-      const scope='Existing national pre-pandemic ILI and VE pairs from eight historical seasons. Raw ILI percent, with no division by or subtraction of an estimated background. Weekly change is the centered difference, (ILI one week later minus ILI one week earlier) divided by two. No additional smoothing is applied. Vaccination dates maximize each pair’s saved utility, which already incorporates the immune-response delay and waning. These are retrospective smoothed latent curves, not an evaluated real-time rule.';
-      const detail=stage<=2?`The aligned mean of the first 50 pairs. Horizontal shifts are reused from slide 30’s AUC-overlap alignment. Marks in state 2 show the median aligned optimal vaccination date, placed on the mean. It is a summary, not a single representative pair. Median vaccination is at aligned week ${DATA.mean.dose}. Start does not animate.`:
-        stage===3?'All first 50 paired draws, in saved order, with each pair’s own optimal vaccination date in both panels. Curves and markers appear together over eight seconds.':
-        stage===4?`Individual draw ${row.draw}, ${row.season}. Optimal vaccination week ${row.dose_week}. Vaccination is ${Math.abs(row.dose_offset)} weeks ${row.dose_offset<=0?'before':'after'} this curve’s fastest rise. The select menu and previous/next draw buttons inspect all 50 pairs. Vertical axes rescale to each draw, retaining percent and percentage-point units.`:
-        'All 5,000 saved pairs, grouped by their eight historical seasons. Dots show medians and lines show the middle 50 percent of optimal vaccination-date offsets from each individual curve’s own maximum positive weekly rise. These intervals describe conditional draws, not uncertainty across 5,000 independent seasons. Nearness in the mean is not consistently reproduced within every season.';
-      const reference='Fastest rise means the largest positive centered weekly change from week 36 through week 21, taking the earliest exact tie. It can be a later upswing in a multi-wave season; it is not necessarily the first transition from accelerating to approximately linear growth. Future weeks are used to describe slope and find this reference; no prospective detection threshold or clinical recommendation is being established.';
-      $('chart-title').textContent=stage===5?'Timing by historical season':stage===4?`Draw ${row.draw}: ${row.season}`:'Activity and its first derivative';
-      $('chart-desc').textContent=`${detail} ${scope} ${reference}`; $('status').textContent=detail;
-    }
-    function render() {
-      $('chart').replaceChildren();
-      $('timing-legend').style.visibility=stage===1?'hidden':'visible';
-      $('reference-legend').style.display=stage===4?'':'none';
-      $('dose-legend').textContent=stage<=2?'Median vaccination':'Optimal vaccination';
-      $('draw-picker').hidden=stage!==4;
-      $('previous-draw').disabled=selected===0; $('next-draw').disabled=selected===DATA.scenarios.length-1;
-      $('draw-select').value=selected;
-      $('sample-count').textContent=stage<=2?'Aligned mean · 50 paired draws':stage===3?'50 paired draws · 8 pre-pandemic seasons':stage===4?'Individual scenarios · calendar time':'5,000 paired draws · 8 historical seasons';
-      const layers=stage===5?(seasonView(),null):curveView();
-      updateDescription(); return layers;
-    }
-    function animate(duration,tick) {
+    const national=plot($('national-view'),DATA.national,64,126,1090,346,DATA.national_y_max);
+    const states=DATA.states.map((row,i)=>{
+      const maximum=Math.max(row.threshold_percentage,...row.points.filter(p=>p.value!==null).map(p=>p.value));
+      const yMax=Math.ceil(maximum*1.12*2)/2;
+      return plot($('states-view'),row,i%2?666:64,i<2?115:350,488,143,yMax,true);
+    });
+    $('as-of').textContent=`Through ${DATA.latest_label}`;
+    $('threshold-label').textContent=`Candidate threshold · ${DATA.threshold_multiplier.toFixed(1)}× August`;
+    function animate(duration,tick,done=()=>{}) {
       const start=performance.now();
       function frame(now) {
         const p=Math.max(0,Math.min(1,(now-start)/duration)); tick(p);
-        if(p<1) animation=requestAnimationFrame(frame);
+        if(p<1) animation=requestAnimationFrame(frame); else done();
       }
       animation=requestAnimationFrame(frame);
     }
     function setStage(value,play=true) {
       const previous=stage;
       cancelAnimationFrame(animation); stage=Math.max(1,Math.min(buttons.length,Math.floor(value)));
-      $('chart').style.opacity=1;
       document.body.dataset.state=stage; history.replaceState(null,'',`#state=${stage}`);
       buttons.forEach((id,i)=>$(id).setAttribute('aria-pressed',stage===i+1));
-      const layers=render();
+      const stateView=stage>=3, showRule=stage===2||stage===4;
+      $('national-view').style.display=stateView?'none':''; $('states-view').style.display=stateView?'':'none';
+      $('national-view').style.opacity=1; $('states-view').style.opacity=1;
+      $('threshold-legend').style.visibility=showRule?'visible':'hidden';
+      [national,...states].forEach(plot=>{
+        plot.rule.style.visibility=showRule?'visible':'hidden';
+        plot.line.setAttribute('x2',plot.x+plot.width); plot.label.style.opacity=1;
+      });
       if(play&&previous<stage&&!reducedMotion) {
-        if(stage===2) {
-          layers.marks.forEach(g=>g.style.opacity=0);
-          animate(850,p=>layers.marks.forEach(g=>g.style.opacity=p*p*(3-2*p)));
-        } else if(stage===3) {
-          layers.groups.forEach(g=>g.style.opacity=0);
-          animate(8000,p=>layers.groups.forEach((g,i)=>g.style.opacity=.62*Math.max(0,Math.min(1,p*50-i))));
-        } else {
-          $('chart').style.opacity=0;
-          animate(550,p=>$('chart').style.opacity=p*p*(3-2*p));
+        if(stage===3) {
+          $('national-view').style.display=''; $('states-view').style.opacity=0;
+          animate(800,p=>{
+            const fade=p*p*(3-2*p);
+            $('national-view').style.opacity=1-fade; $('states-view').style.opacity=fade;
+          },()=>{$('national-view').style.display='none';});
+        } else if(showRule) {
+          const plots=stateView?states:[national];
+          plots.forEach(plot=>{plot.line.setAttribute('x2',plot.x);plot.label.style.opacity=0;});
+          animate(850,p=>plots.forEach(plot=>{
+            plot.line.setAttribute('x2',plot.x+plot.width*p);
+            plot.label.style.opacity=Math.max(0,(p-.5)*2);
+          }));
         }
-      } else $('chart').style.opacity=1;
+      }
+      const locations=stateView?DATA.states:[DATA.national];
+      const detail=locations.map(row=>`${row.label}: latest reported ILI ${row.latest_percentage.toFixed(2)} percent${showRule?`, candidate threshold ${row.threshold_percentage.toFixed(2)} percent, 2.3 times the arithmetic mean of reported percentages in weeks 32–35`:''}.`).join(' ');
+      const desc=`${detail} CDC ILINet data through the week ending ${DATA.latest_week_ending}, downloaded ${DATA.retrieved_utc.slice(0,10)}. These are reported observations with no fitted epidemic curve or forecast. The national series is CDC population-weighted ILI; state series are published unweighted percentages. New York excludes New York City because its separate series is unavailable. Vertical scales differ across the state panels. The 2.3 multiplier is reused without recalibration from slides 30–31. Applying a rule calibrated on latent curves to observed values is an exploratory illustration, not a validated clinical timing rule or an official CDC threshold. It uses each location’s own baseline. Data are preliminary and can be revised. The page is a dated snapshot, not an automatically refreshing feed.`;
+      $('chart-title').textContent=stateView?'Current ILINet in Texas, California, Minnesota, and New York excluding NYC':'Current ILINet in the United States';
+      $('chart-desc').textContent=desc; $('status').textContent=detail;
     }
-    DATA.scenarios.forEach((row,i)=>{
-      const option=document.createElement('option'); option.value=i;
-      option.textContent=`${String(i+1).padStart(2,'0')} · ${row.season.replace('/','–')}`; $('draw-select').appendChild(option);
-    });
-    function selectDraw(index) { cancelAnimationFrame(animation); selected=index; $('chart').style.opacity=1; render(); }
-    $('draw-select').addEventListener('change',event=>selectDraw(Number(event.target.value)));
-    $('previous-draw').addEventListener('click',()=>selectDraw(Math.max(0,selected-1)));
-    $('next-draw').addEventListener('click',()=>selectDraw(Math.min(DATA.scenarios.length-1,selected+1)));
     buttons.forEach((id,i)=>$(id).addEventListener('click',()=>setStage(i+1)));
-    $('reset').addEventListener('click',()=>{selected=0;setStage(1,false);});
+    $('reset').addEventListener('click',()=>setStage(1,false));
     document.addEventListener('keydown',event=>{
-      if(event.repeat||event.target.tagName==='SELECT'||(event.target.tagName==='BUTTON'&&event.key===' ')) return;
+      if(event.repeat||(event.target.tagName==='BUTTON'&&event.key===' ')) return;
       if(['ArrowRight','PageDown',' ','ArrowLeft','PageUp','Home'].includes(event.key)) {
         event.preventDefault();
         const next=event.key==='Home'?1:['ArrowLeft','PageUp'].includes(event.key)?Math.max(1,stage-1):Math.min(buttons.length,stage+1);

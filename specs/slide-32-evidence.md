@@ -1,123 +1,116 @@
-# Slide 32: Can the shape of the rise guide timing?
+# Slide 32: Where are we now?
 
-This exploratory diagnostic examines the proposed relationship between
-vaccination timing and the transition from accelerating to approximately
-linear epidemic growth. It reuses existing pre-pandemic national ILI / VE
-pairs. No model, decision threshold, or vaccination rule is fitted here.
-Slides 30–31 and the manuscript inputs are unchanged.
+Slide 32 now shows current reported ILINet curves and introduces the existing
+candidate vaccination threshold. It replaces the derivative exploration at the
+user’s request. The earlier version is recoverable at Git commit `575e77b`;
+its saved `data/slide-32/diagnostic.json` and independent validation are retained
+as historical data and are not used by the current build. Slides 30–31 and their
+model outputs are unchanged.
 
-## Source and definitions
+## Current source and reporting date
 
-- `data/august-baseline/training-draws.json.gz`: all 5,000 existing paired
-  draws from eight historical seasons. SHA-256:
-  `91a5921c4d8cfec5f27cb395953395c097375d38ec949e74a1e48107f6a25b03`.
-- `data/august-baseline/alignment.json`: existing slide 30 AUC-overlap
-  horizontal shifts. SHA-256:
-  `b1c27a8d8860998ac52d4fd0fbfca1034ad7bd2a93867a4a49b2be5797a5427e`.
-- The first 50 pairs appear in their saved order, without selection on
-  agreement with the hypothesis. The season summary uses all 5,000.
+CDC FluView was downloaded on **October 2, 2026, at 18:39:58 UTC**. Its latest
+national and selected-state observations end **September 26, 2026 (MMWR week
+38)**. This presentation focuses on the current fall’s run-up: 13 weekly
+observations from July 4 through September 26, 2026 (weeks 26–38).
 
-Activity is the saved latent ILI probability multiplied by 100. We neither
-subtract nor divide by an August or September baseline. The optima remain
-those of the original saved utility, including its original outcome and
-seasonal window; removing background from the plot does not redefine that
-utility. Optimal vaccination is the unique utility maximum among weeks
-36–52 and 1–12. That optimum already incorporates the pair's saved
-1–3-week immune-response delay and waning. All plotted timing markers
-refer to the optimal vaccination date. The saved diagnostic data are
-retained unchanged; protection-onset annotations and comparisons have
-been removed from every presenter state.
+- [CDC FluView Interactive](https://gis.cdc.gov/grasp/fluview/fluportaldashboard.html)
+- [CDC surveillance methods](https://www.cdc.gov/fluview/overview/index.html)
+- Metadata: `https://gis.cdc.gov/flu2/GetPhase02InitApp?appVersion=Public`
+- Download: `https://gis.cdc.gov/flu2/PostPhase02DataDownload`
 
-The first derivative is estimated on the weekly grid by the centered
-two-week secant `(ILI[t+1] - ILI[t-1]) / 2`, in percentage points per week.
-No further smoothing or derivative-model fitting is performed. Lines
-interpolate these values. A constant additive background cancels from
-this operation; a time-varying background would not necessarily cancel.
+`data/slide-32/current-ilinet/` retains the metadata, request JSON, original ZIP
+responses, extracted CSVs, provenance with SHA-256 fingerprints, plotted data,
+and independent numerical validation. Requests cover CDC download seasons
+2024–25 and 2025–26; only the current 2026 window is displayed. The metadata
+and returned CSVs agree on the latest week.
 
-For the mean and ensemble views, only the saved horizontal shifts are
-reused. Cached baseline-scaled heights are not used. Aligned week zero is
-the earliest shifted start of the 50 displayed September–May curves.
-The mean uses common support with equal weight per pair; its derivative
-uses common interior support. The median aligned optimal vaccination date
-is placed on the mean. This is a summary, not a representative pair.
+The national curve uses CDC’s **population-weighted percent ILI**. State curves
+use the published **unweighted percent ILI** for each named jurisdiction. These
+are reported observations, with no GAM fit, extra smoothing, posterior sampling,
+forecast, or extension beyond the last report. Missing values are not converted
+to zero or connected across a gap. Current displayed series are complete.
 
-The individual and season-summary views use each draw's **fastest rise**:
-the maximum positive centered weekly derivative from week 36 through
-week 21, with the earliest time chosen for an exact tie. This is a simple
-retrospective descriptive reference, defined without using an optimum to
-select a nearby local maximum. It may represent a later upswing in a
-multi-wave season. It is **not necessarily the first exponential-to-linear
-transition**, and does not exhaust possible definitions of that transition.
+New York City is a separate ILINet reporting jurisdiction. Its current export
+contains `X` for ILI percentages and counts, and the metadata flags its current
+ILI series as unavailable. Thus the fourth panel is explicitly **New York
+(excl. NYC)**. No city values are imputed or added as zero. The separate NY/NYC
+jurisdictions and the count-based combination needed for a statewide total are
+also documented in [Delphi’s ILINet ingestion specification](https://cmu-delphi.github.io/delphi-epidata/api/v5-signals/fluview_ilinet.html).
+This geographic scope differs from the combined New York model in slide 31.
 
-## What the diagnostic shows
+## Frozen threshold, applied to current reported observations
 
-For the 50 aligned curves, median vaccination is at aligned week 15.25,
-two weeks before the largest derivative of the mean at 17.25. The gap to
-the fastest rise varies across individual historical seasons.
+The multiplier is the existing **2.3** from
+`data/august-baseline/threshold-fit.json`, pinned to SHA-256
+`97b6e6d4c614d693c6aedf601a7ee60118b8220e9c5607caa9685dda000e2dd7`.
+It is not refitted to the current curves.
 
-Each row below is relative to each pair's **own** fastest rise, before any
-pooling. Negative values indicate an earlier date. Intervals describe the
-middle 50% of conditional draws within that historical season, not
-confidence intervals across independent seasons.
+For each displayed location, the baseline is the arithmetic mean of its four
+reported ILI percentages in **MMWR weeks 32–35 of 2026**. Those observations
+end August 15, August 22, August 29, and September 5. “August” retains the
+week-window convention used in slides 30–31; it is not an exact calendar-month
+average. The horizontal line is **2.3 × that local baseline**, in percent ILI.
+Potential crossings are evaluated only from week 36, as in the frozen rule.
 
-| Season | Pairs | Median dose (weeks) | Dose middle 50% |
-| --- | ---: | ---: | --- |
-| 2011/12 | 599 | −9 | −10 to −7 |
-| 2012/13 | 632 | −3 | −4 to −2 |
-| 2013/14 | 610 | −3 | −4 to −2 |
-| 2014/15 | 682 | −3 | −4 to −2 |
-| 2015/16 | 628 | −8 | −10 to −4 |
-| 2016/17 | 604 | −8 | −9 to −6 |
-| 2017/18 | 609 | −3 | −4 to −2 |
-| 2018/19 | 636 | −8 | −9 to −7 |
+| Location | Latest reported ILI (%) | Local baseline (%) | Candidate threshold (%) |
+| --- | ---: | ---: | ---: |
+| United States | 1.742360 | 1.24323025 | 2.859429575 |
+| Texas | 1.831650 | 1.77305250 | 4.078020750 |
+| California | 2.619510 | 1.98706750 | 4.570255250 |
+| Minnesota | 0.957166 | 0.45171600 | 1.038946800 |
+| New York (excl. NYC) | 1.431190 | 0.65933875 | 1.516479125 |
 
-The saved mixture of 5,000 pairs represents eight seasons with conditional Monte
-Carlo variability, not 5,000 independent epidemic seasons. No claim is made
-that the proposed shape relationship has been established or disproved
-by this particular maximum-slope reference.
+No displayed location has crossed its candidate line in the eligible reported
+weeks 36–38. This does not establish when it will cross or identify an optimal
+vaccination date. The original rule was calibrated and explored using latent
+epidemic curves. Applying the multiplier to reported weekly values is an
+**exploratory illustration of a possible operational rule**, not a replication
+of that latent-curve evaluation or a validated vaccination recommendation.
+The candidate line is not CDC’s official seasonal ILI baseline or an influenza
+laboratory-positivity threshold. ILINet measures visits for influenza-like
+illness and can reflect other respiratory pathogens.
 
-The existing curves are retrospective full-season latent estimates. Both
-the centered derivative and identification of the seasonal maximum use
-future information. Neither constitutes a tested nowcasting trigger.
-The slide supports inspecting the hypothesis before proposing a real-time
-rule; it does not establish a clinical recommendation.
+All observations are preliminary and subject to revision. The page is a
+**dated snapshot**, not an automatically updating feed. It shows the latest
+reported week available at retrieval, not a nowcast of October 2.
 
-## Presenter states and handoff
+## Presenter states
 
-1. **Start:** static aligned mean, activity above weekly change.
-2. **Mean timing:** reveal the median optimal vaccination date in both panels.
-3. **50 draws:** all 50 paired curves and their own markers appear together
-   over eight seconds. No resampling occurs in the browser.
-4. **Each draw:** select any of the same 50 pairs or use previous/next draw
-   buttons. Calendar time is restored. A dashed line marks its fastest rise.
-   Vertical axes rescale per draw, retaining the original units.
-5. **By season:** medians and middle-50% intervals for optimal vaccination
-   offsets, using all 5,000 pairs grouped by season.
+1. **Start:** static US ILINet curve; no threshold visible.
+2. **US threshold:** draw the dashed candidate line and reveal its value.
+3. **States:** crossfade to Texas, California, Minnesota, and New York
+   excluding NYC, initially without threshold lines.
+4. **State thresholds:** draw all four local candidate lines together.
 
-ArrowRight, PageDown, and Space advance; ArrowLeft and PageUp go back;
-Home and Reset return to the static landing view. Loading `#state=N`
-shows that completed state without animation. Reduced-motion preference
-also suppresses animation. Native select arrow keys are reserved for the
-draw selector. The accessible description contains the calculation and
-scope, keeping projected copy short.
+The reporting date stays visible. Each state has a separately labeled vertical
+scale to make its distance from its own line legible; calendar axes are shared.
+Thresholds are included when determining those scales, so revealing a line does
+not rescale or move the observed curves. Every curve ends at the latest report.
 
-Rebuild with `python3 scripts/build_slide_32.py`; independently check with
-`Rscript scripts/check_slide_32.R`. The source is `src/slide-32.html`, data
-are `data/slide-32/diagnostic.json`, and the standalone output is
-`docs/slide-32.html`. Slides.com integration remains separate.
+ArrowRight, PageDown, and Space advance; ArrowLeft and PageUp go back; Home and
+Reset return to the static opening. Loading `#state=N` shows that completed
+state without autoplay. Reduced-motion preference suppresses animation.
 
-The independent R calculation uses adjacent first differences and type-7
-quantiles. It checks all 5,000 optima/offsets, all 50 displayed curves and
-markers, reused shifts, mean curves, and every displayed seasonal interval.
-Maximum disagreement is 1.78e−15; all timing and interval checks agree
-exactly. The build also checks additive-background cancellation and the
-equivalence of differencing the mean and averaging the differences.
-Results are saved in `data/slide-32/independent-validation.json`.
+## Build and validation
 
-Local browser checks at 1280 × 720 verified all five states, initial
-stillness, first-advance marker animation, the completed 50-pair animation,
-direct state loading, draw selection and endpoint controls, clicker keys,
-and Reset during a transition. All 50 pairs had matching optimal-dose date
-coordinates in the two panels. No browser errors or
-viewport overflow were observed. Slides 24–31 remained byte-identical to
-their preceding committed versions.
+- Refresh source snapshot deliberately: `python3 scripts/fetch_slide_32_ilinet.py`.
+  Inspect the resulting reporting dates and geographic availability before
+  republishing. The current build is scoped to the 2026 summer-to-fall window.
+- Rebuild offline: `python3 scripts/build_slide_32.py`.
+- Independent numerical check: `Rscript scripts/check_slide_32.R`.
+- Editable source: `src/slide-32.html`; standalone output: `docs/slide-32.html`.
+- Active plotted data: `data/slide-32/current-ilinet/slide.json`.
+- Validation: `data/slide-32/current-ilinet/validation.json`.
+
+The R check independently reads the original CDC CSVs, verifies all 65 plotted
+values, checks week-ending dates with `MMWRweek`, recomputes the five baselines
+and thresholds, confirms the frozen multiplier and source hashes, and checks
+state percentages against the raw ILI/total-visit counts within published
+rounding precision. It confirms NYC is missing and excluded. Maximum numerical
+disagreement with the builder is zero.
+
+Browser checks at 1280 × 720 confirmed all four builds, all 65 plotted points,
+correct threshold endpoints and labels, forward/back navigation, Reset, rapid
+advances during animation, and direct loading of a completed state. Screenshots
+were inspected for clipping and overlap; no console errors or warnings occurred.

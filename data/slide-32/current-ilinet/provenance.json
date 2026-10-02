@@ -1,0 +1,27 @@
+{
+  "retrieved_utc": "2026-10-02T18:39:58.181649+00:00",
+  "metadata_url": "https://gis.cdc.gov/flu2/GetPhase02InitApp?appVersion=Public",
+  "download_url": "https://gis.cdc.gov/flu2/PostPhase02DataDownload",
+  "source_page": "https://gis.cdc.gov/grasp/fluview/fluportaldashboard.html",
+  "seasons": [
+    "2024-25",
+    "2025-26"
+  ],
+  "requested_states": [
+    "Texas",
+    "California",
+    "Minnesota",
+    "New York",
+    "New York City"
+  ],
+  "source_sha256": {
+    "metadata.json": "1746bac32a8f0e485ee93e22af9a85fc374b896c45852b2e601347d9ad6b8f39",
+    "national-request.json": "a6a3aa00bcfb49bb48fbd823800a2fb827c608bd197eee6ce4f5530d339f4b58",
+    "states-request.json": "5f2ea744d18a7ffcab9c918a37bb40690a8f5fd7016da2cf98d9edf04a69ba83",
+    "national.zip": "c0ab447355bd226072a71b64b7f1f060a964491242a85c49531653b4c70a00bc",
+    "states.zip": "96737620c87df8488808a3a88b4fbec501ecf4086fbf071ac5875e43133f4d73",
+    "national.csv": "1eea9eb10797b6343cd3a686d0e8909a4a21aeac9c8067b345fd4cff7ac6b053",
+    "states.csv": "14206db226ed99dea44c3b0f2ebe0cb9475bb0a9a7969b4bd79d601828615e83"
+  },
+  "status": "CDC preliminary surveillance snapshot; later releases can revise these values."
+}

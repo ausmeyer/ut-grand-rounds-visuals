@@ -143,18 +143,19 @@ arrow navigation, and Reset. Build slide 30 alone with
 `build_closing_slides.py` embeds the frozen inputs without accessing the
 manuscript project or the network. Slides.com integration is separate.
 
-Standalone **slide 32** examines optimal timing against epidemic shape,
-using the existing paired draws without an explicit background baseline.
+Standalone **slide 32**, “Where are we now?”, shows the current ILINet curves
+from summer 2026 through the week ending September 26, 2026.
 [Open the slide](https://www.meyerlab.io/ut-grand-rounds-visuals/slide-32.html#state=1).
-Five states move from the aligned mean to timing markers, 50 paired curves,
-individual draw inspection, and a summary across the eight historical seasons.
-The activity and first-derivative panels mark optimal vaccination dates,
-which already account for the immune-response delay. The final state uses
-all 5,000 saved pairs and shows why the mean alone
-cannot establish a consistent within-season pattern. Build with
+Four states show the US curve, reveal its candidate threshold, show Texas,
+California, Minnesota, and New York excluding NYC, then reveal their local
+thresholds. Each threshold is the frozen 2.3 multiplier times that location’s
+reported mean ILI percentage in weeks 32–35. New York City’s separate current
+data are unavailable. This is a dated snapshot downloaded October 2, 2026;
+the page does not refresh automatically. Build offline with
 `python3 scripts/build_slide_32.py`; independently verify with
 `Rscript scripts/check_slide_32.R`. The [source and handoff notes](specs/slide-32-evidence.md)
-define the descriptive fastest-rise reference and its retrospective scope.
+record the CDC source, threshold definition, and scope of this exploratory overlay.
+The earlier derivative version is preserved in Git history and its saved data.
 
 `build_surveillance_section.py` reads the already-downloaded CSV files from
 `../data/processed/` and embeds compact chart data directly into the published

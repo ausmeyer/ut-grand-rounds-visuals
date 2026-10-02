@@ -1,0 +1,432 @@
+{
+  "slide": 32,
+  "year": 2026,
+  "first_week": 26,
+  "latest_week": 38,
+  "first_week_ending": "2026-07-04",
+  "latest_week_ending": "2026-09-26",
+  "latest_label": "Sep 26, 2026",
+  "retrieved_utc": "2026-10-02T18:39:58.181649+00:00",
+  "source_page": "https://gis.cdc.gov/grasp/fluview/fluportaldashboard.html",
+  "source_sha256": {
+    "metadata.json": "1746bac32a8f0e485ee93e22af9a85fc374b896c45852b2e601347d9ad6b8f39",
+    "national-request.json": "a6a3aa00bcfb49bb48fbd823800a2fb827c608bd197eee6ce4f5530d339f4b58",
+    "states-request.json": "5f2ea744d18a7ffcab9c918a37bb40690a8f5fd7016da2cf98d9edf04a69ba83",
+    "national.zip": "c0ab447355bd226072a71b64b7f1f060a964491242a85c49531653b4c70a00bc",
+    "states.zip": "96737620c87df8488808a3a88b4fbec501ecf4086fbf071ac5875e43133f4d73",
+    "national.csv": "1eea9eb10797b6343cd3a686d0e8909a4a21aeac9c8067b345fd4cff7ac6b053",
+    "states.csv": "14206db226ed99dea44c3b0f2ebe0cb9475bb0a9a7969b4bd79d601828615e83"
+  },
+  "threshold_fit_sha256": "97b6e6d4c614d693c6aedf601a7ee60118b8220e9c5607caa9685dda000e2dd7",
+  "threshold_multiplier": 2.3,
+  "baseline_weeks": [
+    32,
+    33,
+    34,
+    35
+  ],
+  "first_trigger_week": 36,
+  "national": {
+    "name": "United States",
+    "label": "United States",
+    "source_column": "% WEIGHTED ILI",
+    "points": [
+      {
+        "week": 26,
+        "week_ending": "2026-07-04",
+        "value": 0.997989
+      },
+      {
+        "week": 27,
+        "week_ending": "2026-07-11",
+        "value": 0.941175
+      },
+      {
+        "week": 28,
+        "week_ending": "2026-07-18",
+        "value": 0.902908
+      },
+      {
+        "week": 29,
+        "week_ending": "2026-07-25",
+        "value": 0.871407
+      },
+      {
+        "week": 30,
+        "week_ending": "2026-08-01",
+        "value": 0.866641
+      },
+      {
+        "week": 31,
+        "week_ending": "2026-08-08",
+        "value": 0.873289
+      },
+      {
+        "week": 32,
+        "week_ending": "2026-08-15",
+        "value": 0.954391
+      },
+      {
+        "week": 33,
+        "week_ending": "2026-08-22",
+        "value": 1.13209
+      },
+      {
+        "week": 34,
+        "week_ending": "2026-08-29",
+        "value": 1.3561
+      },
+      {
+        "week": 35,
+        "week_ending": "2026-09-05",
+        "value": 1.53034
+      },
+      {
+        "week": 36,
+        "week_ending": "2026-09-12",
+        "value": 1.58855
+      },
+      {
+        "week": 37,
+        "week_ending": "2026-09-19",
+        "value": 1.64559
+      },
+      {
+        "week": 38,
+        "week_ending": "2026-09-26",
+        "value": 1.74236
+      }
+    ],
+    "baseline_percentage": 1.24323025,
+    "threshold_percentage": 2.859429575,
+    "latest_percentage": 1.74236,
+    "first_crossing_week": null
+  },
+  "states": [
+    {
+      "name": "Texas",
+      "label": "Texas",
+      "source_column": "%UNWEIGHTED ILI",
+      "points": [
+        {
+          "week": 26,
+          "week_ending": "2026-07-04",
+          "value": 1.06598
+        },
+        {
+          "week": 27,
+          "week_ending": "2026-07-11",
+          "value": 0.937459
+        },
+        {
+          "week": 28,
+          "week_ending": "2026-07-18",
+          "value": 0.98668
+        },
+        {
+          "week": 29,
+          "week_ending": "2026-07-25",
+          "value": 0.955238
+        },
+        {
+          "week": 30,
+          "week_ending": "2026-08-01",
+          "value": 0.960826
+        },
+        {
+          "week": 31,
+          "week_ending": "2026-08-08",
+          "value": 0.887507
+        },
+        {
+          "week": 32,
+          "week_ending": "2026-08-15",
+          "value": 1.20148
+        },
+        {
+          "week": 33,
+          "week_ending": "2026-08-22",
+          "value": 1.54526
+        },
+        {
+          "week": 34,
+          "week_ending": "2026-08-29",
+          "value": 2.10261
+        },
+        {
+          "week": 35,
+          "week_ending": "2026-09-05",
+          "value": 2.24286
+        },
+        {
+          "week": 36,
+          "week_ending": "2026-09-12",
+          "value": 2.09511
+        },
+        {
+          "week": 37,
+          "week_ending": "2026-09-19",
+          "value": 1.90602
+        },
+        {
+          "week": 38,
+          "week_ending": "2026-09-26",
+          "value": 1.83165
+        }
+      ],
+      "baseline_percentage": 1.7730525,
+      "threshold_percentage": 4.078020749999999,
+      "latest_percentage": 1.83165,
+      "first_crossing_week": null
+    },
+    {
+      "name": "California",
+      "label": "California",
+      "source_column": "%UNWEIGHTED ILI",
+      "points": [
+        {
+          "week": 26,
+          "week_ending": "2026-07-04",
+          "value": 2.00385
+        },
+        {
+          "week": 27,
+          "week_ending": "2026-07-11",
+          "value": 1.84647
+        },
+        {
+          "week": 28,
+          "week_ending": "2026-07-18",
+          "value": 1.65654
+        },
+        {
+          "week": 29,
+          "week_ending": "2026-07-25",
+          "value": 1.59761
+        },
+        {
+          "week": 30,
+          "week_ending": "2026-08-01",
+          "value": 1.63119
+        },
+        {
+          "week": 31,
+          "week_ending": "2026-08-08",
+          "value": 1.61067
+        },
+        {
+          "week": 32,
+          "week_ending": "2026-08-15",
+          "value": 1.60297
+        },
+        {
+          "week": 33,
+          "week_ending": "2026-08-22",
+          "value": 1.86176
+        },
+        {
+          "week": 34,
+          "week_ending": "2026-08-29",
+          "value": 2.08002
+        },
+        {
+          "week": 35,
+          "week_ending": "2026-09-05",
+          "value": 2.40352
+        },
+        {
+          "week": 36,
+          "week_ending": "2026-09-12",
+          "value": 2.5744
+        },
+        {
+          "week": 37,
+          "week_ending": "2026-09-19",
+          "value": 2.57249
+        },
+        {
+          "week": 38,
+          "week_ending": "2026-09-26",
+          "value": 2.61951
+        }
+      ],
+      "baseline_percentage": 1.9870675,
+      "threshold_percentage": 4.57025525,
+      "latest_percentage": 2.61951,
+      "first_crossing_week": null
+    },
+    {
+      "name": "Minnesota",
+      "label": "Minnesota",
+      "source_column": "%UNWEIGHTED ILI",
+      "points": [
+        {
+          "week": 26,
+          "week_ending": "2026-07-04",
+          "value": 0.410076
+        },
+        {
+          "week": 27,
+          "week_ending": "2026-07-11",
+          "value": 0.322608
+        },
+        {
+          "week": 28,
+          "week_ending": "2026-07-18",
+          "value": 0.424042
+        },
+        {
+          "week": 29,
+          "week_ending": "2026-07-25",
+          "value": 0.369828
+        },
+        {
+          "week": 30,
+          "week_ending": "2026-08-01",
+          "value": 0.369039
+        },
+        {
+          "week": 31,
+          "week_ending": "2026-08-08",
+          "value": 0.412729
+        },
+        {
+          "week": 32,
+          "week_ending": "2026-08-15",
+          "value": 0.433432
+        },
+        {
+          "week": 33,
+          "week_ending": "2026-08-22",
+          "value": 0.40855
+        },
+        {
+          "week": 34,
+          "week_ending": "2026-08-29",
+          "value": 0.433195
+        },
+        {
+          "week": 35,
+          "week_ending": "2026-09-05",
+          "value": 0.531687
+        },
+        {
+          "week": 36,
+          "week_ending": "2026-09-12",
+          "value": 0.74935
+        },
+        {
+          "week": 37,
+          "week_ending": "2026-09-19",
+          "value": 0.713098
+        },
+        {
+          "week": 38,
+          "week_ending": "2026-09-26",
+          "value": 0.957166
+        }
+      ],
+      "baseline_percentage": 0.451716,
+      "threshold_percentage": 1.0389468,
+      "latest_percentage": 0.957166,
+      "first_crossing_week": null
+    },
+    {
+      "name": "New York",
+      "label": "New York (excl. NYC)",
+      "source_column": "%UNWEIGHTED ILI",
+      "points": [
+        {
+          "week": 26,
+          "week_ending": "2026-07-04",
+          "value": 0.781031
+        },
+        {
+          "week": 27,
+          "week_ending": "2026-07-11",
+          "value": 0.709063
+        },
+        {
+          "week": 28,
+          "week_ending": "2026-07-18",
+          "value": 0.702629
+        },
+        {
+          "week": 29,
+          "week_ending": "2026-07-25",
+          "value": 0.688387
+        },
+        {
+          "week": 30,
+          "week_ending": "2026-08-01",
+          "value": 0.659033
+        },
+        {
+          "week": 31,
+          "week_ending": "2026-08-08",
+          "value": 0.569622
+        },
+        {
+          "week": 32,
+          "week_ending": "2026-08-15",
+          "value": 0.612325
+        },
+        {
+          "week": 33,
+          "week_ending": "2026-08-22",
+          "value": 0.601081
+        },
+        {
+          "week": 34,
+          "week_ending": "2026-08-29",
+          "value": 0.699025
+        },
+        {
+          "week": 35,
+          "week_ending": "2026-09-05",
+          "value": 0.724924
+        },
+        {
+          "week": 36,
+          "week_ending": "2026-09-12",
+          "value": 0.780208
+        },
+        {
+          "week": 37,
+          "week_ending": "2026-09-19",
+          "value": 1.11499
+        },
+        {
+          "week": 38,
+          "week_ending": "2026-09-26",
+          "value": 1.43119
+        }
+      ],
+      "baseline_percentage": 0.65933875,
+      "threshold_percentage": 1.5164791249999998,
+      "latest_percentage": 1.43119,
+      "first_crossing_week": null
+    }
+  ],
+  "national_y_max": 3.5,
+  "ticks": [
+    {
+      "week": 26,
+      "label": "Jul 4"
+    },
+    {
+      "week": 30,
+      "label": "Aug 1"
+    },
+    {
+      "week": 35,
+      "label": "Sep 5"
+    },
+    {
+      "week": 38,
+      "label": "Sep 26"
+    }
+  ],
+  "method": "Arithmetic mean of reported ILINet percentages in weeks 32\u201335, multiplied by the existing 2.3. National uses CDC weighted ILI; states use published unweighted ILI. No fitting, smoothing, projection, or resampling.",
+  "scope": "Current surveillance illustration of an exploratory rule, not a validated vaccination recommendation. The rule was calibrated on latent curves; this overlay applies it to reported values. NYC is unavailable and excluded from the New York panel."
+}

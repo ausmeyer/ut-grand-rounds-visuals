@@ -1,0 +1,26 @@
+{
+  "AppVersion": "Public",
+  "DatasourceDT": [
+    {
+      "ID": 1,
+      "Name": "ILINet"
+    }
+  ],
+  "RegionTypeId": 3,
+  "SubRegionsDT": [
+    {
+      "ID": 0,
+      "Name": ""
+    }
+  ],
+  "SeasonsDT": [
+    {
+      "ID": 64,
+      "Name": "64"
+    },
+    {
+      "ID": 65,
+      "Name": "65"
+    }
+  ]
+}
